@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.1.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-4.1.xsd						
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+	http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task-4.1.xsd
+	">
+
+	<!-- 开启Shiro注解的Spring配置方式的beans。在lifecycleBeanPostProcessor之后运行 -->
+	<bean
+		class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+		depends-on="lifecycleBeanPostProcessor" />
+	<bean
+		class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+	<!-- shiro为集成spring -->
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<prop key="org.apache.shiro.authz.UnauthorizedException">/system/error</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- 項目自定义的Realm -->
+	<bean id="shiroDbRealm" class="com.cheuks.bin.bomb.backstage.shiro.CutomRealm"></bean>
+
+	<!-- <bean id="shiroEhcacheManager" class="Controller.shiro.cache.ShiroRedisClusterManager"> 
+		</bean> -->
+
+	<bean id="redisSessionDao" class="com.cheuks.bin.bomb.backstage.shiro.RedisSessionDao">
+		<!-- <property name="tempCacheTimeOutSecond" value="10" />15秒过期 -->
+		<property name="redisCacheFactory" ref="redisCacheFactory"></property>
+	</bean>
+
+	<bean id="DefaultWebSessionManager"
+		class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+		<property name="sessionDAO" ref="redisSessionDao" />
+	</bean>
+
+	<bean name="redisShiroCacheManager"
+		class="com.cheuks.bin.bomb.backstage.shiro.RedisShiroCacheManager">
+		<property name="redisCacheFactory" ref="redisCacheFactory" />
+	</bean>
+
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="shiroDbRealm" />
+		<!-- <property name="cacheManager" ref="shiroEhcacheManager" /> -->
+		<property name="cacheManager" ref="redisShiroCacheManager" />
+		<property name="sessionManager" ref="DefaultWebSessionManager" />
+	</bean>
+
+	<!-- Shiro Filter -->
+	<bean id="shiroFilter"
+		class="com.cheuks.bin.bomb.backstage.shiro.CutomShiroFilterFactoryBean">
+		<!-- <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean"> -->
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="/login" />
+		<property name="successUrl" value="/main" />
+		<property name="unauthorizedUrl" value="/error" />
+		<property name="filterChainDefinitions">
+			<value>
+				/login = anon<!-- anon=不过滤 -->
+				/index = anon<!-- anon=不过滤 -->
+				<!-- /** = authc --><!-- Authc:验证 -->
+			</value>
+		</property>
+	</bean>
+</beans>

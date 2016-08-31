@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.1.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-4.1.xsd						
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+	http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task-4.1.xsd
+	">
+
+
+	<!--短信 -->
+	<!-- <bean id="smsFactory" class="project.master.fw.sh.common.ChuangLanSmsFactory"> -->
+	<bean id="smsFactory" class="project.master.fw.sh.common.DefaultSmsFactory">
+		<property name="randomCodeMaxSize" value="30" />
+		<property name="randomCodeLength" value="6" />
+		<property name="timeOutSceond" value="30" />
+		<property name="randomCodeOftenSize" value="5" />
+<!-- 		<property name="account" value="gz_xhkj" />
+		<property name="passwrod" value="Xhkj168888" />
+		<property name="url" value="http://222.73.117.156" /> -->
+	</bean>
+	<!--文件保存 -->
+	<bean id="upLoadFileFactory" class="project.master.fw.sh.common.UpLoadFileFactory" />
+	<!--登录Session -->
+	<bean id="settingSession" class="project.freehelp.common.SettingSession" />
+	<!--init -->
+	<bean id="init" class="project.freehelp.common.Init" />
+</beans>
