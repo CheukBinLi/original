@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT QueryList (Alias*,Join*,Query*)>
+<!--<!ELEMENT Context (CachePool,Bean*,Intercept*,ScanToPack*,CloneModel)>-->
+<!ELEMENT Alias EMPTY><!--别名-->
+<!ELEMENT Join (#PCDATA)><!--引用-->
+<!ELEMENT Query (#PCDATA)><!--sql/hql-->
+
+<!--QueryList-->
+<!ATTLIST QueryList package CDATA #REQUIRED>
+<!--Alias-->
+<!ATTLIST Alias name CDATA #REQUIRED><!--实体类全名-->
+<!ATTLIST Alias Alias CDATA #REQUIRED><!--SQL/HQL 语句中的实体类别名-->
+<!--where-->
+<!ATTLIST Join name CDATA #REQUIRED><!--名字-->
+<!--Query-->
+<!ATTLIST Query name CDATA #REQUIRED><!--实体类全名-->
+<!ATTLIST Query type (HQL|SQL) #REQUIRED><!--语句类型：HQL/SQL-->
+<!ATTLIST Query freemarkFormat (false|true) #REQUIRED><!--是否使用FREEMARK标签格式化-->
+<!ATTLIST Query resultType CDATA #IMPLIED><!--实体类全名-->
+<!ATTLIST Query Alias (true|false) #REQUIRED><!--是否使用了类别名-->
+<!ATTLIST Query joinRef CDATA #IMPLIED><!--join引用-->
+<!ATTLIST Query joinTag CDATA #IMPLIED><!--替换标记-->
+
