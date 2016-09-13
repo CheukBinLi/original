@@ -20,6 +20,7 @@ import javax.persistence.Table;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.UnknownEntityTypeException;
 import org.hibernate.cache.CacheException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,8 +146,13 @@ public abstract class AbstractHibernateDBAdapter implements DBAdapter {
 	}
 
 	public <T> T get(Class<T> clazz, Serializable id) throws Throwable {
-		Object o = getSession().get(clazz, id);
-		return (T) (null == o ? null : o);
+		try {
+			Object o = getSession().get(clazz, id);
+			return (T) (null == o ? null : o);
+		} catch (UnknownEntityTypeException e) {
+			// e.printStackTrace();
+		}
+		return null;
 	}
 
 	public <T> T load(Class<T> clazz, Serializable id) throws Throwable {

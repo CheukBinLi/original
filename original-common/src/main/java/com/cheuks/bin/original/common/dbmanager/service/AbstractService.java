@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.cheuks.bin.original.common.dbmanager.dao.BaseDao;
+import com.cheuks.bin.original.common.util.ObjectFill;
 
-public abstract class AbstractService<entity, ID extends Serializable> implements BaseService<entity, ID> {
+public abstract class AbstractService<entity, ID extends Serializable> extends ObjectFill implements BaseService<entity, ID> {
 
 	public abstract BaseDao<entity, ID> getService();
 
@@ -36,6 +37,12 @@ public abstract class AbstractService<entity, ID extends Serializable> implement
 
 	public void update(entity obj) throws Throwable {
 		getService().update(obj);
+	}
+
+	public void update(ID id, Map<String, Object> params) throws Throwable {
+		entity e = getService().get(id);
+		e = fillObject(e, params);
+		getService().update(e);
 	}
 
 	public void delete(entity obj) throws Throwable {

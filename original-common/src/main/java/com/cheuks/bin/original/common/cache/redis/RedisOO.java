@@ -18,7 +18,7 @@ public interface RedisOO {
 
 	public boolean mapKeyExists(Object key, Object mapKey) throws RedisExcecption;
 
-	public Map<byte[], byte[]> getMap(Object key) throws RedisExcecption;
+	public Map<byte[], byte[]> getMapObject(Object key) throws RedisExcecption;
 
 	public boolean addListFirst(Object key, Object value) throws RedisExcecption;
 

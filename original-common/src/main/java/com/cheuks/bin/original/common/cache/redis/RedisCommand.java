@@ -7,7 +7,25 @@ public interface RedisCommand {
 
 	public void delete(String key) throws RedisExcecption;
 
+	public Object evalSha(String sha, int keys, String... params) throws RedisExcecption;
+
+	public Object evalSha(String sha, List<String> keys, List<String> argv) throws RedisExcecption;
+
+	public Object evalSha(String sha, String key) throws RedisExcecption;
+
+	public boolean scriptExists(String sha, String key) throws RedisExcecption;
+
+	public void scriptFlush() throws RedisExcecption;
+
+	public void scriptKill() throws RedisExcecption;
+
+	public String scriptLoad(String key, String script) throws RedisExcecption;
+
 	public boolean exists(String key) throws RedisExcecption;
+
+	public boolean expireAt(String key, long unixTime) throws RedisExcecption;
+
+	public boolean expire(String key, int seconds) throws RedisExcecption;
 
 	public boolean set(String key, String value) throws RedisExcecption;
 
@@ -52,6 +70,10 @@ public interface RedisCommand {
 	public boolean setMap(String key, String mapKey, String value) throws RedisExcecption;
 
 	public boolean setMap(String key, Map<String, String> map) throws RedisExcecption;
+
+	public Map<String, String> getMap(String key) throws RedisExcecption;
+
+	public List<String> getMapList(String key, String... subKyes) throws RedisExcecption;
 
 	public boolean mapKeyExists(String key, String mapKey) throws RedisExcecption;
 

@@ -18,6 +18,8 @@ public interface BaseService<entity, ID extends Serializable> {
 
 	void update(entity obj) throws Throwable;
 
+	void update(ID id, Map<String, Object> params) throws Throwable;
+
 	void delete(entity obj) throws Throwable;
 
 	int executeUpdate(String queryName, Map<String, Object> params, boolean isHql, boolean isFromat) throws Throwable;

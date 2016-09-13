@@ -7,7 +7,13 @@ public interface RedisBinary {
 
 	public void delete(byte[] key) throws RedisExcecption;
 
+	public byte[] scriptLoad(byte[] key, byte[] script) throws RedisExcecption;
+
 	public boolean exists(byte[] key) throws RedisExcecption;
+
+	public boolean expireAt(byte[] key, long unixTime) throws RedisExcecption;
+
+	public boolean expire(byte[] key, int seconds) throws RedisExcecption;
 
 	public boolean set(byte[] key, byte[] value) throws RedisExcecption;
 
@@ -52,6 +58,10 @@ public interface RedisBinary {
 	public boolean setMap(byte[] key, byte[] mapKey, byte[] value) throws RedisExcecption;
 
 	public boolean setMap(byte[] key, Map<byte[], byte[]> map) throws RedisExcecption;
+
+	public Map<byte[], byte[]> getMap(byte[] key) throws RedisExcecption;
+
+	public List<byte[]> getMapList(byte[] key, byte[]... subKyes) throws RedisExcecption;
 
 	public boolean mapKeyExists(byte[] key, byte[] mapKey) throws RedisExcecption;
 

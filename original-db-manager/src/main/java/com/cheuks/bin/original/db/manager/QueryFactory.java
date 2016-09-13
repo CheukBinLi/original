@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.cheuks.bin.original.common.util.ScanFile;
+import com.cheuks.bin.original.common.util.Scan;
 
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
@@ -43,8 +43,8 @@ public class QueryFactory implements QueryType {
 	private final Configuration freemarkerConfiguration = new Configuration(Configuration.VERSION_2_3_0);
 	private StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
 
-	private String files;
-	private ScanFile scanFile;
+	private String index;
+	private Scan scan;
 
 	public QueryFactory() {
 		super();
@@ -52,6 +52,8 @@ public class QueryFactory implements QueryType {
 	}
 
 	public synchronized void put(String name, String XQL, boolean isFormat) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException {
+		if (LOG.isDebugEnabled())
+			LOG.debug("name: " + name + " isFormat: " + isFormat + " XQL: " + XQL);
 		if (null == name || null == XQL)
 			return;
 		if (isFormat) {
@@ -64,28 +66,32 @@ public class QueryFactory implements QueryType {
 	}
 
 	public String getXQL(String name, boolean isFormat, Map<String, Object> params) throws TemplateException, IOException {
-		// if (!isScan)
-		// scan();
-		if (!isFormat)
-			return UNFORMAT_XQL.get(name);
-		Template tp = FORMAT_XQL.get(name);
-		if (null == tp)
-			return null;
-		StringWriter sw = new StringWriter();
-		tp.process(params, sw);
+		String result = null;
+		if (!isFormat) {
+			result = UNFORMAT_XQL.get(name);
+		} else {
+			Template tp = FORMAT_XQL.get(name);
+			if (null == tp)
+				return null;
+			StringWriter sw = new StringWriter();
+			tp.process(params, sw);
+			result = sw.toString();
+		}
 		if (LOG.isDebugEnabled())
-			LOG.debug("name:%s: isFormat:%b XQL:%s", name, isFormat, sw.toString());
-		return sw.toString();
+			LOG.debug("name:%s: isFormat:%b XQL:%s", name, isFormat, result);
+		return result;
 	}
 
 	@PostConstruct
 	private void scan() {
 		try {
 			Set<String> o = null;
-			o = scanFile.doScan(files).get(files);
+			o = scan.getResource(index);
+			if (null == o)
+				return;
 			xmlExplain(o);
-		} catch (Exception e) {
-			LOG.error("扫描", e);
+		} catch (Throwable e) {
+			LOG.error("扫描文件失败", e);
 		}
 	}
 
@@ -93,7 +99,6 @@ public class QueryFactory implements QueryType {
 		Iterator<String> it = urls.iterator();
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		SAXParser parser = factory.newSAXParser();
-		xmlHandler handler = new xmlHandler();
 		XMLReader xmlReader = parser.getXMLReader();
 		xmlReader.setEntityResolver(new EntityResolver() {
 			public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
@@ -104,7 +109,7 @@ public class QueryFactory implements QueryType {
 			String str = it.next();
 			InputSource is = new InputSource(Thread.currentThread().getContextClassLoader().getResourceAsStream(str));
 			is.setEncoding("utf-8");
-			xmlReader.setContentHandler(handler);
+			xmlReader.setContentHandler(new xmlHandler());
 			xmlReader.parse(is);
 		}
 	}
@@ -177,31 +182,33 @@ public class QueryFactory implements QueryType {
 
 		private String alias(String str) {
 			if (alias)
-				for (Entry<String, String> en : aliases.entrySet())
+				for (Entry<String, String> en : aliases.entrySet()) {
 					str = str.replaceAll(en.getKey(), en.getValue());
+				}
 			return str;
 		}
 
 		private String join(String str, String joinRef, String joinTag) {
-			str = str.replaceAll(joinTag, joins.get(joinRef));
+			str = str.replace(joinTag, joins.get(joinRef));
 			return str;
 		}
 	}
 
-	public String getFiles() {
-		return files;
+	public String getIndex() {
+		return index;
 	}
 
-	public void setFiles(String files) {
-		this.files = files;
+	public QueryFactory setIndex(String index) {
+		this.index = index;
+		return this;
 	}
 
-	public ScanFile getScanFile() {
-		return scanFile;
+	public Scan getScan() {
+		return scan;
 	}
 
-	public QueryFactory setScanFile(ScanFile scanFile) {
-		this.scanFile = scanFile;
+	public QueryFactory setScan(Scan scan) {
+		this.scan = scan;
 		return this;
 	}
 
