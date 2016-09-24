@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE QueryList SYSTEM "Query.dtd">
+<QueryList package="${entityFullName}">
+	<Alias name="${entityFullName}" Alias="${entitySimpleName}" />
+	<Join name="defaultWhereList">
+		<![CDATA[ 
+			<#list params as item> 
+				<${tag}if ${item}??>
+					<${tag}if like??>
+						and A.${item} like '%'||:${item}||'%' 
+					<${tag}else>
+						and A.${item}=:${item} 
+					</${tag}if>
+				</${tag}if>
+			</#list>
+			<${tag}if orderby??>
+					order by A.${dollar}{orderby} 
+					<${tag}if sort??>
+					  ASC
+					  <${tag}else>
+					  	${dollar}{sort}
+					</${tag}if>
+				</${tag}if>
+		]]>
+	</Join>
+	<Query name="list" type="HQL" freemarkFormat="true" Alias="true" joinRef="defaultWhereList" joinTag="@WHERE@">
+		<![CDATA[ 
+			FROM ${entitySimpleName} A 
+			WHERE 
+			1=1 
+			@WHERE@ 
+		]]>
+	</Query>
+	<Query name="count" type="HQL" freemarkFormat="true" Alias="true" joinRef="defaultWhereList" joinTag="@WHERE@">
+		<![CDATA[ 
+			SELECT COUNT(1) FROM ${entitySimpleName} A 
+			WHERE 
+			1=1 
+			@WHERE@ 
+		]]>
+	</Query>
+</QueryList>

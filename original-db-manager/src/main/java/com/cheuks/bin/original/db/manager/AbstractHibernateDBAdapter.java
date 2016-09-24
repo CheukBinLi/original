@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.cheuks.bin.original.common.cache.CacheFactory;
 import com.cheuks.bin.original.common.dbmanager.DBAdapter;
+import com.cheuks.bin.original.common.dbmanager.QueryFactory;
 import com.cheuks.bin.original.common.util.SoftConcurrentHashMap;
 
 import freemarker.template.TemplateException;
@@ -114,7 +115,7 @@ public abstract class AbstractHibernateDBAdapter implements DBAdapter {
 	}
 
 	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, int page, int size, Object... params) throws Throwable {
-		String xql = queryFactory.getXQL(queryName, false, null);
+		String xql = queryFactory.get(queryName, null, false);
 		Query query = fillParams(isHQL ? getSession().createQuery(xql) : getSession().createSQLQuery(xql), params);
 		List list = page > 0 ? page(query, page, size).list() : query.list();
 		return null == list ? null : list;
@@ -126,8 +127,8 @@ public abstract class AbstractHibernateDBAdapter implements DBAdapter {
 		return null == o ? null : o;
 	}
 
-	public Object uniqueResult(String queryName, boolean isHQL, boolean isFormat, Map<String, Object> params) throws TemplateException, IOException {
-		String xql = queryFactory.getXQL(queryName, isFormat, params);
+	public Object uniqueResult(String queryName, boolean isHQL, boolean isFormat, Map<String, Object> params) throws Throwable {
+		String xql = queryFactory.get(queryName, params, isFormat);
 		Query query = fillParams(isHQL ? getSession().createQuery(xql) : getSession().createSQLQuery(xql), params);
 		Object o = query.uniqueResult();
 		return null == o ? null : o;
@@ -138,7 +139,7 @@ public abstract class AbstractHibernateDBAdapter implements DBAdapter {
 	}
 
 	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, boolean isFormat, Map<String, Object> params, int page, int size) throws Throwable {
-		String xql = queryFactory.getXQL(queryName, isFormat, params);
+		String xql = queryFactory.get(queryName, params, isFormat);
 		// System.err.println("XQL:" + xql);
 		Query query = fillParams(isHQL ? getSession().createQuery(xql) : getSession().createSQLQuery(xql), params);
 		List list = page > 0 ? page(query, page, size).list() : query.list();
@@ -235,7 +236,7 @@ public abstract class AbstractHibernateDBAdapter implements DBAdapter {
 	}
 
 	public int executeUpdate(String queryName, Map<String, Object> params, boolean isHql, boolean isFromat) throws Throwable {
-		String xql = queryFactory.getXQL(queryName, isFromat, params);
+		String xql = queryFactory.get(queryName, params, isFromat);
 		Query query = fillParams(isHql ? getSession().createQuery(xql) : getSession().createSQLQuery(xql), params);
 		return query.executeUpdate();
 

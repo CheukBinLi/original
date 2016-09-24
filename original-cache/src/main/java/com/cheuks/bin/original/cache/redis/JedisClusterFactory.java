@@ -84,7 +84,6 @@ public class JedisClusterFactory extends AbstractJedisCluster<JedisCluster> {
 
 	@Override
 	public void destory(JedisCluster jedis) {
-
 	}
 
 	@Override

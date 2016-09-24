@@ -17,7 +17,7 @@ import com.cheuks.bin.original.common.util.SoftConcurrentHashMap;
 
 public class HibernateSqlParseHelpper {
 
-	private static final Logger LOG = LoggerFactory.getLogger(QueryFactory.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HibernateSqlParseHelpper.class);
 
 	private static final HibernateSqlParseHelpper newInstance = new HibernateSqlParseHelpper();
 

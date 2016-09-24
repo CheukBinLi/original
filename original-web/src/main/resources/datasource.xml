@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.1.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-4.1.xsd						
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+	http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task-4.1.xsd
+	">
+
+	<bean id="writingDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+
+		<property name="driverClass" value="${writingDataSource.driverClassName}" />
+		<property name="jdbcUrl" value="${writingDataSource.url}" />
+		<property name="user" value="${writingDataSource.username}" />
+		<property name="password" value="${writingDataSource.password}" />
+
+		<property name="acquireIncrement" value="10" />
+		<!-- 定义在从数据库获取新连接失败后重复尝试获取的次数，默认为30 -->
+		<property name="acquireRetryAttempts" value="100" />
+		<!-- 两次连接中间隔时间，单位毫秒，默认为1000 -->
+		<property name="acquireRetryDelay" value="1000" />
+		<!-- 连接关闭时默认将所有未提交的操作回滚。默认为false -->
+		<property name="autoCommitOnClose" value="false" />
+		<!-- 获取连接失败将会引起所有等待获取连接的线程抛出异常。但是数据源仍有效保留，并在下次调 用getConnection()的时候继续尝试获取连接。如果设为true，那么在尝试获取连接失败后该数据源将申明已断开并永久关闭。默认为 false； -->
+		<property name="breakAfterAcquireFailure" value="false" />
+		<!-- 当连接池用完时客户端调用getConnection()后等待获取新连接的时间，超时后将抛出SQLException，如设为0则无限期等待。单位毫秒，默认为0； -->
+		<property name="checkoutTimeout" value="0" />
+		<!-- 始化时创建的连接数，应在minPoolSize与maxPoolSize之间取值。默认为3； -->
+		<property name="initialPoolSize" value="10" />
+		<!-- 最大空闲时间，超过空闲时间的连接将被丢弃。为0或负数则永不丢弃。默认为0； -->
+		<property name="maxIdleTime" value="10000" />
+		<!-- 接池中保留的最大连接数。默认为15 -->
+		<property name="maxPoolSize" value="40" />
+		<!-- JDBC的标准参数，用以控制数据源内加载的PreparedStatement数量。但由于预缓存的Statement属 于单个Connection而不是整个连接池。所以设置这个参数需要考虑到多方面的因素，如果maxStatements与 maxStatementsPerConnection均为0，则缓存被关闭。默认为0； -->
+		<property name="maxStatements" value="50" />
+		<!-- 连接池内单个连接所拥有的最大缓存Statement数。默认为0； -->
+		<property name="maxStatementsPerConnection" value="0" />
+		<!--C3P0是异步操作的，缓慢的JDBC操作通过帮助进程完成。扩展这些操作可以有效的提升性能，通过多线程实现多个操作同时被执行。默认为3； -->
+		<property name="numHelperThreads" value="3" />
+		<!-- 用户修改系统配置参数执行前最多等待的秒数。默认为300； -->
+		<property name="propertyCycle" value="600" />
+	</bean>
+
+	<bean id="readingDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+
+		<property name="driverClass" value="${readingDataSource.driverClassName}" />
+		<property name="jdbcUrl" value="${readingDataSource.url}" />
+		<property name="user" value="${readingDataSource.username}" />
+		<property name="password" value="${readingDataSource.password}" />
+
+		<property name="acquireIncrement" value="10" />
+		<!-- 定义在从数据库获取新连接失败后重复尝试获取的次数，默认为30 -->
+		<property name="acquireRetryAttempts" value="100" />
+		<!-- 两次连接中间隔时间，单位毫秒，默认为1000 -->
+		<property name="acquireRetryDelay" value="1000" />
+		<!-- 连接关闭时默认将所有未提交的操作回滚。默认为false -->
+		<property name="autoCommitOnClose" value="false" />
+		<!-- 获取连接失败将会引起所有等待获取连接的线程抛出异常。但是数据源仍有效保留，并在下次调 用getConnection()的时候继续尝试获取连接。如果设为true，那么在尝试获取连接失败后该数据源将申明已断开并永久关闭。默认为 false； -->
+		<property name="breakAfterAcquireFailure" value="false" />
+		<!-- 当连接池用完时客户端调用getConnection()后等待获取新连接的时间，超时后将抛出SQLException，如设为0则无限期等待。单位毫秒，默认为0； -->
+		<property name="checkoutTimeout" value="0" />
+		<!-- 始化时创建的连接数，应在minPoolSize与maxPoolSize之间取值。默认为3； -->
+		<property name="initialPoolSize" value="10" />
+		<!-- 最大空闲时间，超过空闲时间的连接将被丢弃。为0或负数则永不丢弃。默认为0； -->
+		<property name="maxIdleTime" value="10000" />
+		<!-- 接池中保留的最大连接数。默认为15 -->
+		<property name="maxPoolSize" value="40" />
+		<!-- JDBC的标准参数，用以控制数据源内加载的PreparedStatement数量。但由于预缓存的Statement属 于单个Connection而不是整个连接池。所以设置这个参数需要考虑到多方面的因素，如果maxStatements与 maxStatementsPerConnection均为0，则缓存被关闭。默认为0； -->
+		<property name="maxStatements" value="50" />
+		<!-- 连接池内单个连接所拥有的最大缓存Statement数。默认为0； -->
+		<property name="maxStatementsPerConnection" value="0" />
+		<!--C3P0是异步操作的，缓慢的JDBC操作通过帮助进程完成。扩展这些操作可以有效的提升性能，通过多线程实现多个操作同时被执行。默认为3； -->
+		<property name="numHelperThreads" value="3" />
+		<!-- 用户修改系统配置参数执行前最多等待的秒数。默认为300； -->
+		<property name="propertyCycle" value="600" />
+	</bean>
+</beans>

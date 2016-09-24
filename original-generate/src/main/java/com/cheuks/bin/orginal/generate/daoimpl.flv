@@ -1,0 +1,24 @@
+package ${entityPackage}.dao.impl;
+
+import ${entityFullName};
+import ${entityPackage}.dao.impl.${entitySimpleName}DaoImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ${entitySimpleName}DaoImpl extends AbstractDao<${entitySimpleName}, ${idType}> implements ${entitySimpleName}Dao {
+
+	@Autowired
+	private DBAdapter dBAdapter;
+
+	@Override
+	public Class<${entitySimpleName}> getEntityClass() {
+		return ${entitySimpleName}.class;
+	}
+
+	@Override
+	public DBAdapter getDBAdapter() {
+		return dBAdapter;
+	}
+
+}

@@ -1,0 +1,157 @@
+package com.welfare.fundraising.controller;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
+
+import com.cheuks.bin.original.common.cache.redis.RedisFactory;
+import com.common.api.weixin.auth.AuthUtil;
+import com.common.api.weixin.js.JsSdkTicket;
+import com.common.api.weixin.token.AccessTokenUtil;
+import com.common.api.weixin.user.UserUtil;
+import com.welfare.core.base.entity.WeiXinInfo;
+import com.welfare.core.base.service.WeiXinInfoService;
+import com.welfare.core.contant.WebContant;
+
+@Controller
+@Scope("prototype")
+@RequestMapping({ "/*", "/*/**", "/", "" })
+public class CommonController extends AbstractController {
+
+	private final static Logger LOG = LoggerFactory.getLogger(CommonController.class);
+
+	@Autowired
+	private RedisFactory redisFactory;
+
+	@Autowired
+	private WeiXinInfoService weiXinInfoService;
+
+	@Autowired
+	private FreeMarkerViewResolver freeMarkerViewResolver;
+
+	@RequestMapping({ "{path}" })
+	public ModelAndView basePath(@PathVariable("path") String path, HttpServletRequest request, HttpServletResponse resopnse) {
+		return new ModelAndView(path);
+	}
+
+	@RequestMapping({ "tokenTest" })
+	public void tokenTest(HttpServletRequest request, HttpServletResponse resopnse) throws IOException {
+		resopnse.getWriter().write(request.getParameter("echostr"));
+	}
+
+	@RequestMapping({ "weiXinAuth" })
+	public ModelAndView weiXinAuth(HttpServletRequest request, HttpServletResponse resopnse) throws IOException {
+		String state = request.getParameter("state");
+		if (null != request.getSession().getAttribute(WebContant.OPEN_ID)) {
+			return new ModelAndView("forward:/fundraising/get/" + state + "/to/fundraisingMain");
+		}
+		if (LOG.isDebugEnabled())
+			LOG.debug("登录授权");
+		String addId = (String) freeMarkerViewResolver.getAttributesMap().get("appId");
+		return new ModelAndView("redirect:https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + addId + "&redirect_uri=http%3A%2F%2Fben.tunnel.zhangym.cn%2Fwelfare-fundraising%2Fauthorization&response_type=code&scope=snsapi_userinfo" + (null == state ? "" : "&state=" + state) + "#wechat_redirect");
+	}
+
+	@RequestMapping({ "authorization" })
+	public ModelAndView authorization(HttpServletRequest request, HttpServletResponse resopnse) throws Throwable {
+		request.setCharacterEncoding("utf-8");
+		resopnse.setCharacterEncoding("utf-8");
+		// 用户同意授权后，能获取到code
+		String code = request.getParameter("code");
+
+		Map<String, Object> weixim = freeMarkerViewResolver.getAttributesMap();
+		String appId = (String) weixim.get("appId");
+		String appSecret = (String) weixim.get("appSecret");
+		String mchId = (String) weixim.get("mchId");
+		String openId;
+		String accessToken;
+
+		Map<String, String> sign;
+		String state = request.getParameter("state");
+		if (null == code || "".equals(code)) {
+			return new ModelAndView("forward:weiXinAuth");
+		}
+		// 用户token，和openid
+		Map<String, String> authToken = AuthUtil.getWebLoginAuth(appId, appSecret, code);
+		if (LOG.isDebugEnabled())
+			LOG.debug("authToken:" + authToken);
+		openId = authToken.get("openId");
+		accessToken = authToken.get("accessToken");
+		if (null == openId || "".equals(openId)) {
+			return new ModelAndView("forward:weiXinAuth");
+		}
+		// 完成登录
+		// 读取信息
+		WeiXinInfo weiXinInfo = weiXinInfoService.getByPk(openId);
+		if (null == weiXinInfo) {
+			// 用户信息
+			Map<String, String> userInfo = UserUtil.getUserInfo(accessToken, openId);
+			weiXinInfo = new WeiXinInfo(openId, userInfo.get("nickname"), userInfo.get("headImgUrl"), null, new Date());
+			weiXinInfoService.save(weiXinInfo);
+		}
+		// ticket
+		// if (!redisFactory.exists("ticket")) {
+		// String apitoken = AccessTokenUtil.getAccessToken(appId, appSecret);
+		// ticket = JsSdkTicket.getJsSdkTicket(apitoken);
+		// redisFactory.set("ticket", ticket, 7000);
+		// }
+
+		// // job = redisFactory.getMap(WebContant.SIGN);
+		// // if (null == job || job.size() < 1) {
+		// // // apitoken
+		// String apitoken = AccessTokenUtil.getAccessToken(appId, appSecret);
+		// // 打开票据
+		// ticket = JsSdkTicket.getJsSdkTicket(apitoken);
+		// if (null == ticket)
+		// return new ModelAndView("forward:weiXinAuth");
+		// String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getRequestURI();
+		// // 生成签名
+		// job = JsSdkSignUtil.sign(ticket, url);
+		// job = CollectionUtil.newInstance().removeNullValue(job);
+		// job.put("ticket", ticket);
+		// request.getSession().setAttribute(WebContant.SIGN, redisFactory.getMap(WebContant.SIGN));
+		// // redisFactory.setMap(WebContant.SIGN, job);
+		// // redisFactory.expire(WebContant.SIGN, 7200);
+		// // }
+		// 写入SESSION
+		// request.getSession().setAttribute(WebContant.OPEN_ID, openId);
+		// request.getSession().setAttribute(WebContant.SIGN, job);
+
+		// 跳转
+		// // 生成签名
+		// Map<String, String> job = JsSdkSignUtil.sign(ticket, "http://163f.com");
+		//
+		// // 统一订单
+		// OrderPayByJs s = new OrderPayByJs();
+		// DateTime now = new DateTime();
+		// Map<String, Object> order = s.getOrderPaySign(appId, mchId, apitoken, "<![CDATA[腾讯充值中心-QQ会员充值]]", "深圳分店", Long.toString(GeneratedIDService.newInstance().nextID()), 1111.0, "123.12.12.123", now.toString("yyyyMMddHHmmss"), now.plusSeconds(10).toString("yyyyMMddHHmmss"), "http%3A%2F%2Fwww.163.com", "no_credit", openId);
+		// // 检查openId
+		// // get/{id}/to/{next}
+		request.getSession().setAttribute(WebContant.OPEN_ID, openId);
+		request.getSession().setAttribute(WebContant.SIGN, redisFactory.getMap(WebContant.SIGN));
+		// return new ModelAndView("forward:/fundraising/get/" + state + "/to/fundraisingMain");
+		return new ModelAndView("redirect:/fundraising/get/" + state + "/to/fundraisingMain");
+		// return new ModelAndView("forward:login?openId=" + openId + request.getQueryString());
+
+	}
+
+	public static void main(String[] args) {
+		String a = "asdf/resource/asdf/asdf";
+		System.err.println(a.matches("^.*/resource/.*$"));
+		System.err.println(a.matches("^.*/resource/.*$"));
+		System.err.println("**/resource/**".replace("*", ".*").replace(".*.*", ".*"));
+	}
+
+}

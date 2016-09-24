@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE QueryList SYSTEM "Query.dtd">
+<QueryList package="${entityFullName}">
+	<Alias name="${entityFullName}" Alias="${entitySimpleName}" />
+	<Join name="defaultWhereList">
+		<![CDATA[ 
+			<%for(item in params) {%>
+				<${tag}if(has(${item})){${tag}>
+					AND ${item}=:${item} 
+				<${tag}}${tag}>
+			<%}%>
+			<${tag}if (has(orderby)) {${tag}>
+					ORDER BY A.${dollar}{orderby} 
+					<${tag}if (has(sort)){${tag}>
+					  	${dollar}{sort}
+					<${tag}}else{${tag}>
+						 ASC
+					<${tag}}${tag}>
+			<${tag}}${tag}>
+		]]>
+	</Join>
+	<Query name="list" type="HQL" freemarkFormat="true" Alias="true" joinRef="defaultWhereList" joinTag="@WHERE@">
+		<![CDATA[ 
+			FROM ${entitySimpleName} A 
+			WHERE 
+			1=1 
+			@WHERE@ 
+		]]>
+	</Query>
+	<Query name="count" type="HQL" freemarkFormat="true" Alias="true" joinRef="defaultWhereList" joinTag="@WHERE@">
+		<![CDATA[ 
+			SELECT COUNT(1) FROM ${entitySimpleName} A 
+			WHERE 
+			1=1 
+			@WHERE@ 
+		]]>
+	</Query>
+</QueryList>

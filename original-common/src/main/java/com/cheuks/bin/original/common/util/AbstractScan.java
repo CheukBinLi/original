@@ -24,7 +24,6 @@ public abstract class AbstractScan implements Scan {
 
 	private ReentrantLock lock = new ReentrantLock();
 
-	@Override
 	public Set<String> getResource(String path) throws Throwable {
 		if (LOG.isDebugEnabled()) {
 			if (null == getScanPath())

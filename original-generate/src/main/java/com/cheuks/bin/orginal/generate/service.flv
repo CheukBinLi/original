@@ -1,0 +1,6 @@
+package ${entityPackage}.service;
+
+import ${entityFullName};
+public interface ${entitySimpleName}Service extends BaseService<${entitySimpleName}, ${idType}> {
+
+}
