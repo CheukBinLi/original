@@ -1102,6 +1102,17 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 	}
 
+	public <R> R getMapObjectValue(Object key, Object mapKey) throws RedisExcecption {
+		try {
+			byte[] result = this.getMapValue(getCacheSerialize().encode(key), getCacheSerialize().encode(mapKey));
+			if (null != result)
+				return getCacheSerialize().decodeT(result);
+		} catch (Throwable e) {
+			throw new RedisExcecption(e);
+		}
+		return null;
+	}
+
 	public boolean mapKeyExists(Object key, Object mapKey) throws RedisExcecption {
 		try {
 			return this.mapKeyExists(getCacheSerialize().encode(key), getCacheSerialize().encode(mapKey));

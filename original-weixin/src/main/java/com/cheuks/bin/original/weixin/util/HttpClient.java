@@ -117,4 +117,24 @@ public class HttpClient {
 		}
 		return result.toString();
 	}
+
+	public static void main(String[] args) throws IOException {
+		HttpClient hc = new HttpClient();
+		System.out.println(hc.Post("http://api.map.baidu.com/geodata/v3/column/list", "ak=3giFYwPqNvbNaQ3xDIEvflAb9dpHgRth&geotable_id=158084", 10000, false, false));
+
+		System.out.println(hc.Get("http://api.map.baidu.com/geodata/v3/column/list?ak=3giFYwPqNvbNaQ3xDIEvflAb9dpHgRth&geotable_id=158084&key=desc", 10000, false, false));
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("name=test1").append("&geotype=3").append("&is_published=1").append("&ak=3giFYwPqNvbNaQ3xDIEvflAb9dpHgRth");
+
+		System.out.println(hc.Post("http://api.map.baidu.com/geodata/v3/geotable/create", sb.toString(), 10000, false, false));
+		System.out.println(hc.Get("http://api.map.baidu.com/geodata/v3/geotable/list?" + sb.toString(), 10000, false, false));
+
+		StringBuilder column = new StringBuilder();
+		column.append("name=垃圾值").append("&key=desc").append("&type=3").append("&max_length=2048").append("&is_sortfilter_field=0").append("&is_search_field=0");
+		column.append("&is_index_field=0").append("&is_unique_field=0").append("&ak=3giFYwPqNvbNaQ3xDIEvflAb9dpHgRth").append("&geotable_id=158084");
+		System.out.println(hc.Post("http://api.map.baidu.com/geodata/v3/column/create", column.toString(), 10000, false, false));
+
+	}
+
 }

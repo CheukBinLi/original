@@ -739,6 +739,17 @@ public abstract class AbstractJedisCluster<T extends JedisCluster> implements Re
 		}
 	}
 
+	public <R> R getMapObjectValue(Object key, Object mapKey) throws RedisExcecption {
+		try {
+			byte[] result = this.getMapValue(getCacheSerialize().encode(key), getCacheSerialize().encode(mapKey));
+			if (null != result)
+				return getCacheSerialize().decodeT(result);
+		} catch (Throwable e) {
+			throw new RedisExcecption(e);
+		}
+		return null;
+	}
+
 	public List<String> getMapList(String key, String... subKyes) throws RedisExcecption {
 		T jedis = getResource();
 		List<String> result;

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<script type="text/javascript">
+	var ws;
+	function hello() {
+		/* 		ws = new WebSocket("ws://localhost:8080/original-web/tcChat");
+		 if (!ws) */
+		/* ws = new WebSocket("ws://localhost:8080/cs/tcChat?hhhhhhhhhhhh=123123123123123123"); */
+		ws = new WebSocket(
+				"ws://localhost:8889/original-web/test?psid=110&partyId=web_cs_111&senderType=CUSTOMER_SERVICE");
+		//ws = new WebSocket("ws://localhost:8080/ext/websocket");
+		ws.onopen = function(evn) {
+			console.log(evn);
+		};
+		ws.onmessage = function(evn) {
+			console.log(evn.data);
+			var dv = document.getElementById("dv");
+			dv.innerHTML += evn.data;
+		};
+		ws.onclose = function() {
+			console.log("关闭");
+		};
+
+	};
+	function subsend() {
+		var msg = document.getElementById("msg").value;
+		ws.send(msg);
+		document.getElementById("msg").value = "";
+	}
+</script>
+<body>
+	<h2>Hello World!</h2>
+	<div id="dv" />
+	<input type="button" value="连接" onclick="hello()" />
+	<input type="text" id="msg" />
+	<input type="button" onclick="subsend()" value="发送" />
+</body>
+</html>

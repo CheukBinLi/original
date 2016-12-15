@@ -1,5 +1,6 @@
 package com.cheuks.bin.original.cache.redis;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cheuks.bin.original.cache.DefaultCacheSerialize;
+import com.cheuks.bin.original.cache.KryoCacheSerialize;
 import com.cheuks.bin.original.common.cache.redis.RedisExcecption;
 import com.cheuks.bin.original.common.cache.redis.RedisFactory;
 
@@ -29,7 +31,7 @@ public class JedisClusterFactory extends AbstractJedisCluster<JedisCluster> {
 	private int connectionTimeout = 30000;
 	private int maxRedirections = 8;// 最大重定向
 	// private String serverList;
-	private String serverList = "192.1681.1.200:2000,192.168.1.201:2001,192.168.1.202:2002,192.168.1.203:2003,192.168.1.204:2004,192.168.1.205:2005";
+	private String serverList = "192.168.1.200:2000,192.168.1.201:2001,192.168.1.202:2002,192.168.1.203:2003,192.168.1.204:2004,192.168.1.205:2005";
 	private boolean testOnBorrow;// ping
 	private JedisPoolConfig config;
 	protected static JedisCluster jedisCluster;
@@ -64,7 +66,8 @@ public class JedisClusterFactory extends AbstractJedisCluster<JedisCluster> {
 
 		jedisCluster = new JedisCluster(hosts, getConnectionTimeout(), soTimeOut, maxRedirections, config);
 		if (null == getCacheSerialize())
-			setCacheSerialize(new DefaultCacheSerialize());
+			// setCacheSerialize(new DefaultCacheSerialize());
+			setCacheSerialize(new KryoCacheSerialize());
 		if (LOG.isInfoEnabled())
 			LOG.info("ClusterJedisManager:complete");
 	}
@@ -190,5 +193,7 @@ public class JedisClusterFactory extends AbstractJedisCluster<JedisCluster> {
 		}
 		sha = rm.scriptLoad("aa", "local a=KEYS[1]; return a;");
 		System.out.println(rm.evalSha(sha, 1, "哈哈1"));
+
+		rm.set(123, Arrays.asList("1", "2", "3").toArray());
 	}
 }

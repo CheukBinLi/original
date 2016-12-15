@@ -19,6 +19,8 @@
 		<jedis.version>2.8.1</jedis.version>
 		<beetl.version>2.5.2</beetl.version>
 		<elasticsearch.version>2.4.0</elasticsearch.version>
+		<kryo.version>3.0.3</kryo.version>
+		<fst.version>2.48</fst.version>
 	</properties>
 	<distributionManagement>
 		<repository>
@@ -137,6 +139,9 @@
 		<module>original-weixin</module>
 		<module>original-test</module>
 		<module>original-web</module>
-    <module>original-search</module>
+		<module>original-search</module>
+		<module>original-annotation</module>
+    <module>original-config</module>
+    <module>original-reflect</module>
   </modules>
 </project>

@@ -1,5 +1,6 @@
 package com.cheuks.bin.original.common.util;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,5 +34,22 @@ public class CollectionUtil {
 		}
 		return map;
 	}
+
+	public <K> Map<K, Object> toMap(boolean isWeak, Object... params) {
+		if (null == params || 0 != (params.length % 2))
+			return null;
+		Map<K, Object> result = isWeak ? new WeakHashMap<K, Object>() : new HashMap<K, Object>();
+		for (int i = 0, len = params.length; i < len; i++) {
+			result.put((K) params[i++], params[i]);
+		}
+		return result;
+	}
+
+	// public final <T> T convery(Object o) {
+	// if (null == o) {
+	// return null;
+	// }
+	// return (T) o;
+	// }
 
 }

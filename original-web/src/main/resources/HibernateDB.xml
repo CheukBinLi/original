@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.1.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-4.1.xsd						
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+	http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task-4.1.xsd
+	"
+>
+	<bean id="scan" class="com.cheuks.bin.original.common.util.ScanSimple">
+		<property name="scanPath" value="mapper.*query$xml,lua.*$lua" />
+	</bean>
+	<bean id="queryFactory" class="com.cheuks.bin.original.db.manager.BeetlQueryFactory">
+		<property name="index" value="mapper.*query$xml" />
+		<property name="scan" ref="scan" />
+	</bean>
+	<bean id="dBAdapter" class="com.cheuks.bin.original.db.manager.HibernateDBAdapter">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="queryFactory" ref="queryFactory" />
+	</bean>
+</beans>

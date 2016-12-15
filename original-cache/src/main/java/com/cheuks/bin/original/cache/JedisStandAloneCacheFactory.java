@@ -7,7 +7,6 @@ import com.cheuks.bin.original.cache.redis.JedisStandAloneFactory;
 import com.cheuks.bin.original.common.cache.CacheException;
 import com.cheuks.bin.original.common.cache.RedisCacheFactory;
 
-
 public class JedisStandAloneCacheFactory extends JedisStandAloneFactory implements RedisCacheFactory<Object, Object> {
 
 	public Object take(Object key) throws CacheException {

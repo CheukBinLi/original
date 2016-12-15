@@ -1,6 +1,5 @@
 package com.cheuks.bin.original.db.manager;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -29,8 +28,6 @@ import com.cheuks.bin.original.common.cache.CacheFactory;
 import com.cheuks.bin.original.common.dbmanager.DBAdapter;
 import com.cheuks.bin.original.common.dbmanager.QueryFactory;
 import com.cheuks.bin.original.common.util.SoftConcurrentHashMap;
-
-import freemarker.template.TemplateException;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public abstract class AbstractHibernateDBAdapter implements DBAdapter {

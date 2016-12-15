@@ -30,7 +30,7 @@ public class RedisLuaSimple implements RedisLua {
 		int length;
 		String fileName;
 		byte[] sha;
-		String script;
+//		String script;
 		for (String str : filePaths) {
 			out.reset();
 			try {

@@ -69,7 +69,7 @@ public class ScanSimple extends AbstractScan {
 		return result;
 	}
 
-	protected final Set<String> classMatchFilter(String path, Set<URL> paths) throws InterruptedException, ExecutionException {
+	protected final Set<String> classMatchFilter(final String path, Set<URL> paths) throws InterruptedException, ExecutionException {
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
 		final String pathPattern = "^(/.*/|.*/)?" + path.replace("*", "(.*)?").replace("(.*)?(.*)?", "(.*)?").replace("(.*)?/(.*)?", "(/.*|.*/)?").replace("/.*/.*", "/.*") + "(/.*)?$";
 		// packageName
@@ -89,15 +89,15 @@ public class ScanSimple extends AbstractScan {
 				fileClassPaths.add(u);
 		}
 		// 过滤
-		futures.add(executorService.submit(new ScanSimple.FileFilter(jarClassPaths, pathPattern, 0, countDownLatch) {
+		futures.add(executorService.submit(new ScanSimple.FileFilter(jarClassPaths, pathPattern, null, countDownLatch) {
 			@Override
-			public Set<String> doFilter(Set<URL> url, String pathPattern, int startIndex) throws IOException {
+			public Set<String> doFilter(Set<URL> url, String pathPattern, String startIndex) throws IOException {
 				return jarTypeFilter(pathPattern, url);
 			}
 		}));
-		futures.add(executorService.submit(new ScanSimple.FileFilter(fileClassPaths, pathPattern, startIndex, countDownLatch) {
+		futures.add(executorService.submit(new ScanSimple.FileFilter(fileClassPaths, pathPattern, path.substring(0, path.contains("*") ? path.indexOf("*") : path.length()), countDownLatch) {
 			@Override
-			public Set<String> doFilter(Set<URL> url, String pathPattern, int startIndex) {
+			public Set<String> doFilter(Set<URL> url, String pathPattern, String startIndex) {
 				Iterator<URL> it = url.iterator();
 				Set<String> result = new HashSet<String>();
 				while (it.hasNext())
@@ -137,13 +137,15 @@ public class ScanSimple extends AbstractScan {
 		return result;
 	}
 
-	protected final Set<String> fileTypeFilter(File file, String pathPattern, int startIndex) {
+	protected final Set<String> fileTypeFilter(File file, String pathPattern, String startIndex) {
 		// Map<String, String> result = new WeakHashMap<String, String>();
 		Set<String> result = new HashSet<String>();
+		String filePath;
 		if (file.isFile()) {
 			if (file.getPath().replace(File.separator, "/").matches(pathPattern)) {
+				filePath = file.getPath();
 				// 文件添加返回
-				result.add(file.getPath());
+				result.add(filePath.substring(filePath.indexOf(startIndex)));
 			}
 			return result;
 		} else if (file.isDirectory()) {
@@ -160,7 +162,7 @@ public class ScanSimple extends AbstractScan {
 
 		private String pathPattern;
 		private Set<URL> urls;
-		private int startIndex;
+		private String startIndex;
 		private final CountDownLatch countDownLatch;
 
 		public FileFilter(Set<URL> urls, String pathPattern, final CountDownLatch countDownLatch) {
@@ -170,7 +172,7 @@ public class ScanSimple extends AbstractScan {
 			this.countDownLatch = countDownLatch;
 		}
 
-		public FileFilter(Set<URL> urls, String pathPattern, int startIndex, final CountDownLatch countDownLatch) {
+		public FileFilter(Set<URL> urls, String pathPattern, String startIndex, final CountDownLatch countDownLatch) {
 			super();
 			this.pathPattern = pathPattern;
 			this.startIndex = startIndex;
@@ -178,7 +180,7 @@ public class ScanSimple extends AbstractScan {
 			this.countDownLatch = countDownLatch;
 		}
 
-		public abstract Set<String> doFilter(Set<URL> url, String pathPattern, int startIndex) throws Exception;
+		public abstract Set<String> doFilter(Set<URL> url, String pathPattern, String startIndex) throws Exception;
 
 		public Set<String> call() throws Exception {
 			Set<String> result = doFilter(urls, pathPattern, startIndex);
@@ -193,14 +195,17 @@ public class ScanSimple extends AbstractScan {
 
 		// Map<String, Set<String>> result = new ScanSimple().doScan("META-INF.maven.*xml,com.cheuks.*");
 		AbstractScan scan = new ScanSimple();
-		scan.setScanPath("META-INF.maven.*xml,com.cheuks.*,mapper.*query$xml*,org/apache/*/spi/**Root*$class");
+		scan.setScanPath("META-INF.maven.*xml,com.cheuks.*,mapper.*query$xml*,org/apache/*/spi/**Root*$class,com.cheuks.*,org.springframework.orm.*");
 		Set<String> result = scan.getResource("org/apache/*/spi/*/*Root*$class");
+		Set<String> result2 = scan.getResource("com.cheuks.*");
+		Set<String> result3 = scan.getResource("org.springframework.orm.*");
 		// Set<String> result = scan.getResource("org.apache.*.spi.*Root*$class");
 		// Set<String> result = scan.getResource("mapper.*query$xml*");
 		// Set<String> result2 = scan.getResource("META-INF.maven.*xml");
 		// Map<String, Set<String>> result1 = scan.resource;
 		System.out.println(result);
-		// System.out.println(result2);
+		System.out.println(result2);
+		System.out.println(result3);
 		// System.out.println(result1.toString());
 	}
 

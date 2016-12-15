@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.1.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-4.1.xsd						
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+	http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task-4.1.xsd
+	">
+
+	<!-- 缓存管理器 -->
+	<!-- <bean id="cacheManager" class="org.yyy.auth.client.shiro.cache.RedisCacheManager"></bean> -->
+	<!-- redis序列化数据格式处理，这里自定义实现了org.springframework.data.redis.serializer.RedisSerializer<T>接口 -->
+	<!-- <bean id="jedisSerializer" class="org.yyy.auth.client.shiro.cache.FastJsonSerializer"></bean> -->
+	<!-- redis数据连接池 -->
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<!-- 最大分配的对象数 -->
+		<property name="maxTotal" value="50" />
+		<!-- 最小能够保持IDLE状态的对象数 -->
+		<property name="minIdle" value="5" />
+		<!-- 最大能够保持IDLE状态的对象数 -->
+		<property name="maxIdle" value="2000" />
+		<!-- 当池内没有返回对象时，最大等待时间 -->
+		<property name="maxWaitMillis" value="5000" />
+		<!-- 当调用borrow Object方法时，是否进行有效性检查 -->
+		<property name="testOnBorrow" value="true" />
+		<!-- 当调用return Object方法时，是否进行有效性检查 -->
+		<property name="testOnReturn" value="true" />
+	</bean>
+	<!-- redis集群配置 -->
+	<bean id="redisClusterConfiguration" class="org.springframework.data.redis.connection.RedisClusterConfiguration">
+		<property name="clusterNodes">
+			<set>
+				<!-- 192.1681.1.200:2000,192.168.1.201:2001,192.168.1.202:2002,192.168.1.203:2003,192.168.1.204:2004,192.168.1.205:2005 -->
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="192.1681.1.200" />
+					<constructor-arg name="port" value="2000" />
+				</bean>
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="192.1681.1.201" />
+					<constructor-arg name="port" value="2001" />
+				</bean>
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="192.1681.1.202" />
+					<constructor-arg name="port" value="2002" />
+				</bean>
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="192.1681.1.203" />
+					<constructor-arg name="port" value="2003" />
+				</bean>
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="192.1681.1.204" />
+					<constructor-arg name="port" value="2004" />
+				</bean>
+				<bean class="org.springframework.data.redis.connection.RedisNode">
+					<constructor-arg name="host" value="192.1681.1.205" />
+					<constructor-arg name="port" value="2005" />
+				</bean>
+			</set>
+		</property>
+	</bean>
+	<!-- redis工厂 -->
+	<bean id="jedisClusterRedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<constructor-arg name="clusterConfig" ref="redisClusterConfiguration" />
+		<constructor-arg name="poolConfig" ref="jedisPoolConfig" />
+	</bean>
+	<!-- redis模板 -->
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+		<!-- <property name="keySerializer" ref="jedisSerializer" /> -->
+		<property name="connectionFactory" ref="jedisClusterRedisConnectionFactory" />
+	</bean>
+	<!-- 将session放入redis -->
+	<bean id="redisHttpSessionConfiguration" class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration">
+		<property name="maxInactiveIntervalInSeconds" value="1800" />
+	</bean>
+</beans>
