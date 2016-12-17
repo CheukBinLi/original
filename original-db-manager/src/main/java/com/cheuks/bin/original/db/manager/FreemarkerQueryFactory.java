@@ -1,39 +1,19 @@
 package com.cheuks.bin.original.db.manager;
 
-import java.io.IOException;
 import java.io.StringWriter;
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.Attributes;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
-
-import com.cheuks.bin.original.common.util.Scan;
 
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
-import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateNotFoundException;
 
+@SuppressWarnings("restriction")
 public class FreemarkerQueryFactory extends AbstractQueryFactory {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FreemarkerQueryFactory.class);

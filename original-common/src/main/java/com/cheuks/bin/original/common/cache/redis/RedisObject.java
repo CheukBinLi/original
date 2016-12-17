@@ -31,4 +31,16 @@ public interface RedisObject {
 	public <R> R popListFirstObject(String key) throws RedisExcecption;
 
 	public <R> R popListLastObject(String key) throws RedisExcecption;
+
+	/***
+	 * 删除列表中的值
+	 * 
+	 * @param key
+	 * @param value
+	 * @param count
+	 *            删除个数 正数：从头部至尾部进行移除，负数：从尾部至头部进行移除
+	 * @return
+	 * @throws RedisExcecption
+	 */
+	public long removeListObject(String key, Object value, int count) throws RedisExcecption;
 }

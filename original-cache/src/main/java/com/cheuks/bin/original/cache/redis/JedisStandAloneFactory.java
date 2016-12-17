@@ -921,6 +921,52 @@ public class JedisStandAloneFactory implements RedisFactory {
 		return popList(key, false);
 	}
 
+	public long removeListValue(byte[] key, byte[] value, int count) throws RedisExcecption {
+		Jedis jedis = getResource();
+		long result = -1l;
+		try {
+			result = jedis.lrem(key, count, value);
+			if (LOG.isDebugEnabled())
+				LOG.debug("removeListValue:" + result);
+			return result;
+		} catch (Throwable e) {
+			throw new RedisExcecption(e);
+		} finally {
+			destory(jedis);
+		}
+	}
+
+	public long removeListValue(String key, String value, int count) throws RedisExcecption {
+		Jedis jedis = getResource();
+		long result = -1l;
+		try {
+			result = jedis.lrem(key, count, value);
+			if (LOG.isDebugEnabled())
+				LOG.debug("removeListString:" + result);
+			return result;
+		} catch (Throwable e) {
+			throw new RedisExcecption(e);
+		} finally {
+			destory(jedis);
+		}
+	}
+
+	public long removeListObject(String key, Object value, int count) throws RedisExcecption {
+		try {
+			return this.removeListValue(key.getBytes(), getCacheSerialize().encode(value), count);
+		} catch (Throwable e) {
+			throw new RedisExcecption(e);
+		}
+	}
+
+	public long removeListOO(Object key, Object value, int count) throws RedisExcecption {
+		try {
+			return this.removeListValue(getCacheSerialize().encode(key), getCacheSerialize().encode(value), count);
+		} catch (Throwable e) {
+			throw new RedisExcecption(e);
+		}
+	}
+
 	/*********************/
 
 	public boolean setObject(String key, Object value) throws RedisExcecption {
@@ -1062,7 +1108,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 	}
 
-	public boolean set(Object key, Object value) throws RedisExcecption {
+	public boolean setOO(Object key, Object value) throws RedisExcecption {
 		try {
 			return this.set(getCacheSerialize().encode(key), getCacheSerialize().encode(value));
 		} catch (Throwable e) {
@@ -1070,7 +1116,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 	}
 
-	public boolean set(Object key, Object value, int expireSeconds) throws RedisExcecption {
+	public boolean setOO(Object key, Object value, int expireSeconds) throws RedisExcecption {
 		try {
 			return this.set(getCacheSerialize().encode(key), getCacheSerialize().encode(value), expireSeconds);
 		} catch (Throwable e) {
@@ -1078,7 +1124,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 	}
 
-	public <R> R getAndSet(Object key, Object value) throws RedisExcecption {
+	public <R> R getAndSetOO(Object key, Object value) throws RedisExcecption {
 		try {
 			return (R) this.getAndSet(getCacheSerialize().encode(key), getCacheSerialize().encode(value));
 		} catch (Throwable e) {
@@ -1086,7 +1132,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 	}
 
-	public <R> R get(Object key) throws RedisExcecption {
+	public <R> R getOO(Object key) throws RedisExcecption {
 		try {
 			return (R) this.get(getCacheSerialize().encode(key));
 		} catch (Throwable e) {
@@ -1094,7 +1140,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 	}
 
-	public boolean setMap(Object key, Object mapKey, Object value) throws RedisExcecption {
+	public boolean setMapOO(Object key, Object mapKey, Object value) throws RedisExcecption {
 		try {
 			return this.setMap(getCacheSerialize().encode(key), getCacheSerialize().encode(mapKey), getCacheSerialize().encode(value));
 		} catch (Throwable e) {
@@ -1113,7 +1159,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		return null;
 	}
 
-	public boolean mapKeyExists(Object key, Object mapKey) throws RedisExcecption {
+	public boolean mapKeyExistsOO(Object key, Object mapKey) throws RedisExcecption {
 		try {
 			return this.mapKeyExists(getCacheSerialize().encode(key), getCacheSerialize().encode(mapKey));
 		} catch (Throwable e) {
@@ -1121,7 +1167,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 	}
 
-	public Map<byte[], byte[]> getMapObject(Object key) throws RedisExcecption {
+	public Map<byte[], byte[]> getMapOO(Object key) throws RedisExcecption {
 		try {
 			return this.getMap(getCacheSerialize().encode(key));
 		} catch (Throwable e) {
@@ -1129,23 +1175,25 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 	}
 
-	public boolean addListFirst(Object key, Object value) throws RedisExcecption {
+	public boolean addListFirstOO(Object key, Object value) throws RedisExcecption {
 		try {
-			return this.addListFirst(getCacheSerialize().encode(key), getCacheSerialize().encode(value));
+			// return this.addListFirst(getCacheSerialize().encode(key), getCacheSerialize().encode(value));
+			return this.addList(getCacheSerialize().encode(key), true, getCacheSerialize().encode(value));
 		} catch (Throwable e) {
 			throw new RedisExcecption(e);
 		}
 	}
 
-	public boolean addListLast(Object key, Object value) throws RedisExcecption {
+	public boolean addListLastOO(Object key, Object value) throws RedisExcecption {
 		try {
-			return this.addListLast(getCacheSerialize().encode(key), getCacheSerialize().encode(value));
+			return this.addList(getCacheSerialize().encode(key), false, getCacheSerialize().encode(value));
+			// return this.addListLast(getCacheSerialize().encode(key), getCacheSerialize().encode(value));
 		} catch (Throwable e) {
 			throw new RedisExcecption(e);
 		}
 	}
 
-	public <R> R getListIndex(Object key, int index) throws RedisExcecption {
+	public <R> R getListIndexOO(Object key, int index) throws RedisExcecption {
 		try {
 			return (R) this.getListIndex(getCacheSerialize().encode(key), index);
 		} catch (Throwable e) {
@@ -1153,7 +1201,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 	}
 
-	public boolean setListIndex(Object key, int index, Object value) throws RedisExcecption {
+	public boolean setListIndexOO(Object key, int index, Object value) throws RedisExcecption {
 		try {
 			return this.setListIndex(getCacheSerialize().encode(key), index, getCacheSerialize().encode(value));
 		} catch (Throwable e) {
@@ -1161,7 +1209,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 	}
 
-	public long listLen(Object key) throws RedisExcecption {
+	public long listLenOO(Object key) throws RedisExcecption {
 		try {
 			return this.listLen(getCacheSerialize().encode(key));
 		} catch (Throwable e) {
@@ -1169,7 +1217,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 	}
 
-	public <R> R popListFirst(Object key) throws RedisExcecption {
+	public <R> R popListFirstOO(Object key) throws RedisExcecption {
 		try {
 			return (R) this.popListFirst(getCacheSerialize().encode(key));
 		} catch (Throwable e) {
@@ -1177,7 +1225,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 	}
 
-	public <R> R popListLast(Object key) throws RedisExcecption {
+	public <R> R popListLastOO(Object key) throws RedisExcecption {
 		try {
 			return (R) this.popListLast(getCacheSerialize().encode(key));
 		} catch (Throwable e) {

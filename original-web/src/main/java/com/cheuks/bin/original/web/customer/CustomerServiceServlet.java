@@ -1,5 +1,6 @@
 package com.cheuks.bin.original.web.customer;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.websocket.StreamInbound;
@@ -21,11 +22,15 @@ public class CustomerServiceServlet extends WebSocketServlet {
 		instance = this;
 	}
 
+	@Override
+	public void init() throws ServletException {
+		super.init();
+	}
+
 	private MessageHandle<DefaultMessageInbound, MessagePackage> messageHandle = null;
 
 	@Override
 	protected StreamInbound createWebSocketInbound(String arg0, HttpServletRequest request) {
-		System.out.println(request.getServletPath());
 		String psid = request.getParameter("psid");
 		String partyId = request.getParameter("partyId");
 		String tempSender = request.getParameter("senderType");

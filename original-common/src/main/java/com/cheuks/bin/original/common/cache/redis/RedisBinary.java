@@ -78,6 +78,18 @@ public interface RedisBinary {
 	public boolean addListLast(byte[] key, byte[]... value) throws RedisExcecption;
 
 	/***
+	 * 删除列表中的值
+	 * 
+	 * @param key
+	 * @param value
+	 * @param count
+	 *            删除个数 正数：从头部至尾部进行移除，负数：从尾部至头部进行移除
+	 * @return
+	 * @throws RedisExcecption
+	 */
+	public long removeListValue(byte[] key, byte[] value, int count) throws RedisExcecption;
+
+	/***
 	 * 删除列表，指定行除外
 	 * 
 	 * @param key

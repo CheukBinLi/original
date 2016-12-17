@@ -12,6 +12,7 @@ import org.beetl.core.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("restriction")
 public class BeetlQueryFactory extends AbstractQueryFactory {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BeetlQueryFactory.class);

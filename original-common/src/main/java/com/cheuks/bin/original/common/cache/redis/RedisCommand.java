@@ -121,6 +121,8 @@ public interface RedisCommand {
 
 	public String popListFirst(String key) throws RedisExcecption;
 
+	public long removeListValue(String key, String value, int count) throws RedisExcecption;
+
 	public Object eval(String script, int keysCount, String... params) throws RedisExcecption;
 
 	public Object eval(String script, List<String> keys, List<String> params) throws RedisExcecption;

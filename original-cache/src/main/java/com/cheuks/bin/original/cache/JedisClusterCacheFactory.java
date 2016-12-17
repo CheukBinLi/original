@@ -10,17 +10,17 @@ import com.cheuks.bin.original.common.cache.RedisCacheFactory;
 public class JedisClusterCacheFactory extends JedisClusterFactory implements RedisCacheFactory<Object, Object> {
 
 	public Object take(Object key) throws CacheException {
-		return get(key);
+		return getOO(key);
 	}
 
 	
 	
 	public Object put(Object key, Object value) throws CacheException {
-		return getAndSet(key, value);
+		return getAndSetOO(key, value);
 	}
 
 	public Object remove(Object key) throws CacheException {
-		Object o = get(key);
+		Object o = getOO(key);
 		deleteOO(key);
 		return o;
 	}

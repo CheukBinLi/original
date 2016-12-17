@@ -14,6 +14,8 @@ public class MessagePackage implements MessageOption, Serializable {
 	private SenderType senderType;// 发送人类型
 	private String sender;// 发送都ID
 	private String receiver;// 接收者ID
+	private String questioner;// 发问者名字
+	private String responder;// 回复者名字
 	private String msgType;// 文字/图片
 	private String msg;// 消息内容
 
@@ -59,6 +61,24 @@ public class MessagePackage implements MessageOption, Serializable {
 
 	public MessagePackage setReceiver(String receiver) {
 		this.receiver = receiver;
+		return this;
+	}
+
+	public String getQuestioner() {
+		return questioner;
+	}
+
+	public MessagePackage setQuestioner(String questioner) {
+		this.questioner = questioner;
+		return this;
+	}
+
+	public String getResponder() {
+		return responder;
+	}
+
+	public MessagePackage setResponder(String responder) {
+		this.responder = responder;
 		return this;
 	}
 

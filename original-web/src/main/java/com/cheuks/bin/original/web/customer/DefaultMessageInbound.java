@@ -5,13 +5,6 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 
-import javax.websocket.ClientEndpoint;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-
 import org.apache.catalina.websocket.MessageInbound;
 
 @SuppressWarnings("deprecation")
@@ -86,4 +79,5 @@ public class DefaultMessageInbound extends MessageInbound implements Serializabl
 		this.partyId = partyId;
 		this.sender = sender;
 	}
+
 }

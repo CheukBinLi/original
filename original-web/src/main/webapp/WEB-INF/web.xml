@@ -36,7 +36,7 @@
 		<servlet-class>
 			com.cheuks.bin.original.web.customer.CustomerServiceServlet
 		</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>test</servlet-name>

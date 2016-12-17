@@ -1,5 +1,8 @@
 package com.cheuks.bin.original.web.customer;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
 import javax.websocket.ClientEndpoint;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -21,7 +24,7 @@ public class ClusterRefreshClient {
 	private Session session;
 
 	@OnOpen
-	public void onOpen(Session session) {
+	public void onOpen(Session session) throws IllegalArgumentException, IOException {
 		System.out.println("Connected to endpoint: " + session.getBasicRemote());
 		this.session = session;
 	}

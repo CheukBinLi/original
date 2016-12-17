@@ -194,6 +194,6 @@ public class JedisClusterFactory extends AbstractJedisCluster<JedisCluster> {
 		sha = rm.scriptLoad("aa", "local a=KEYS[1]; return a;");
 		System.out.println(rm.evalSha(sha, 1, "哈哈1"));
 
-		rm.set(123, Arrays.asList("1", "2", "3").toArray());
+		rm.setOO(123, Arrays.asList("1", "2", "3").toArray());
 	}
 }
