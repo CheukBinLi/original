@@ -38,11 +38,14 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	final Map<String, DefaultMessageInbound> CLUSTER_SERVER = new ConcurrentHashMap<String, DefaultMessageInbound>();
 	final BlockingDeque<DefaultMessageInbound> SYSTEM = new LinkedBlockingDeque<DefaultMessageInbound>();
 	final ObjectMapper mapper = new ObjectMapper();// json
+	private int inConversationTimeOut = 600000;// 10分钟结束
 	{
 		mapper.setSerializationInclusion(Inclusion.NON_NULL);
 	}
-	final String customerServiceName = "CUSTOMER_SERVICE_NAME";// 客服名
-	final String customerServiceServerName = "CUSTOMER_SERVICE_SERVER_NAME";// 客服所在服务器名
+	final String customerServiceQueueName = "CUSTOMER_SERVICE_QUEUE_NAME";// 客服名
+	final String customerServiceCloneQueueName = "CUSTOMER_SERVICE_CLONE_QUEUE_NAME";// 作用：分配客服
+	final String customerServiceServerQueueName = "CUSTOMER_SERVICE_SERVER_QUEUE_NAME";// 客服所在服务器名
+	final String inConversationQueueName = "IN_CONVERSATION_QUEUE_NAME";// 会话中队列名
 	final BlockingDeque<Runnable> TASK;
 	volatile boolean interrupt = false;
 	final Thread delayedTaskThread;
@@ -96,14 +99,29 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 		}
 	}
 
+	private String getInConversationQueueKey(String psid, String client) {
+		return comprise(inConversationQueueName, psid, client);
+	}
+
+	private String getCustomerServiceQueueKey(String psid) {
+		return comprise(customerServiceQueueName, psid);
+	}
+
+	private String getCustomerServiceCloneQueueKey(String psid) {
+		return comprise(customerServiceCloneQueueName, psid);
+	}
+
 	// 客户过期检查
 	@Override
 	public MessageHandleFactory addConnection(DefaultMessageInbound c) throws RedisExcecption, JsonGenerationException, JsonMappingException, IOException {
 		// 直接覆盖，后期修改，只覆盖连接，保留连接了的客户
-		CONNECTION.put(c.getPartyId(), c);
+		if (null != c.getPartyId()) {
+			CONNECTION.put(c.getPartyId(), c);
+		}
 		if (SenderType.CUSTOMER_SERVICE == c.getSender()) {
-			redis.setMap(customerServiceServerName, comprise(c.getPsid(), c.getPartyId()), serverName);
-			redis.addListLast(comprise(customerServiceName, c.getPsid()), c.getPartyId());
+			redis.setMap(customerServiceServerQueueName, comprise(c.getPsid(), c.getPartyId()), serverName);
+			redis.addListLast(getCustomerServiceQueueKey(c.getPsid()), c.getPartyId());
+			redis.addListLast(getCustomerServiceCloneQueueKey(c.getPsid()), c.getPartyId());
 		} else if (SenderType.SYSTEM == c.getSender()) {
 			SYSTEM.addLast(c);
 		} else if (SenderType.CLUSTER == c.getSender()) {// 新主机加入集群
@@ -120,9 +138,10 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	public void destory(DefaultMessageInbound c) throws RedisExcecption {
 		CONNECTION.remove(c.getPartyId());
 		if (SenderType.CUSTOMER_SERVICE == c.getSender()) {
-			redis.mapRemove(customerServiceServerName, comprise(c.getPsid(), c.getPartyId()));
+			redis.mapRemove(customerServiceServerQueueName, comprise(c.getPsid(), c.getPartyId()));
 			// 移除客服
-			redis.removeListValue(comprise(customerServiceName, c.getPsid()), c.getPartyId(), 10);
+			redis.removeListValue(getCustomerServiceQueueKey(c.getPsid()), c.getPartyId(), 10);
+			redis.removeListValue(getCustomerServiceCloneQueueKey(c.getPsid()), c.getPartyId(), 10);
 		}
 		System.out.println("断开连接:" + c.getPartyId());
 	}
@@ -142,12 +161,27 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	@Override
 	public void sendToConsumerService(MessagePackage message) throws Throwable {
 		if (message.getType() == MessagePackageType.WAITING_FOR_ACCESS) {
-			List<String> customerServiceList = redis.getMapList(customerServiceName, comprise(message.getPsid(), message.getReceiver()));
+			List<String> customerServiceList = redis.getMapList(customerServiceQueueName, comprise(message.getPsid(), message.getReceiver()));
 			if (null != customerServiceList) {
 				for (String cs : customerServiceList) {
 					doSendToConsumerService(message.setReceiver(cs));
 				}
 			}
+		} else if (message.getType() == MessagePackageType.SERVICE_DISTRIBUTION) {// 分配客服
+			// 检查是否已在对话队列
+			String inConversationQueueKey = getInConversationQueueKey(message.getPsid(), message.getSender());
+			String consumerService = redis.get(inConversationQueueKey);
+			if (null == consumerService) {// 分配客服
+				String consumerServiceKey = getCustomerServiceCloneQueueKey(message.getPsid());
+				consumerService = redis.popListFirst(consumerServiceKey);
+				// 检查是否空/队列有没有
+				System.out.println(consumerService);
+				redis.addListLast(consumerServiceKey, consumerService);
+				// 添加会话列表
+				redis.set(getInConversationQueueKey(message.getPsid(), message.getSender()), consumerService, inConversationTimeOut);
+			}
+			message.setType(null).setReceiver(consumerService);
+			doSendToConsumerService(message);
 		} else {
 			doSendToConsumerService(message);
 		}
@@ -157,7 +191,7 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 		String value = mapper.writeValueAsString(message);
 		DefaultMessageInbound service;
 		// 从Redis取客服所在服务器
-		String tempServerName = redis.getMapValue(customerServiceServerName, comprise(message.getPsid(), message.getReceiver()));
+		String tempServerName = redis.getMapValue(customerServiceServerQueueName, comprise(message.getPsid(), message.getReceiver()));
 		if (null != tempServerName && !this.serverName.equals(tempServerName)) {
 			if (isLedder) {// 当前主机是集群的中心机
 				service = CLUSTER_SERVER.get(tempServerName);
@@ -199,19 +233,27 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 		}
 	}
 
-	@Override
-	public void dispatcher(String message) throws Throwable {
-		System.out.println(message);
-		MessagePackage messagePackage = mapper.readValue(message, MessagePackage.class);
+	public void dispatcher(MessagePackage messagePackage) throws Throwable {
 		if (MessagePackageType.HEART_BEAT == messagePackage.getType()) {
 			return;
+		} else if (MessagePackageType.CLOSE == messagePackage.getType()) {
+
 		} else if (MessagePackageType.CLUSTER_REFRESH == messagePackage.getType()) {// 刷新集群列表
 			clusterRefresh(messagePackage);
 		} else if (SenderType.SYSTEM == messagePackage.getSenderType()) {
 			sendToConsumerService(messagePackage);
 		} else if (SenderType.CUSTOMER_SERVICE == messagePackage.getSenderType()) {
 			sendToSystem(messagePackage);
+			// 更新会话列表
+			redis.set(getInConversationQueueKey(messagePackage.getPsid(), messagePackage.getReceiver()), messagePackage.getSender(), inConversationTimeOut);
 		}
+	}
+
+	@Override
+	public void dispatcher(String message) throws Throwable {
+		System.out.println(message);
+		MessagePackage messagePackage = mapper.readValue(message, MessagePackage.class);
+		dispatcher(messagePackage);
 	}
 
 	@Override

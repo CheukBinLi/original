@@ -28,7 +28,7 @@ public class WebSocketUtil {
 	 */
 	public static Session connection(final Class<?> annotatedEndpointHandleClass, String serverPath, String... params) throws DeploymentException, IOException, URISyntaxException {
 		WebSocketContainer container = ContainerProvider.getWebSocketContainer(); // 获取WebSocket连接器，其中具体实现可以参照websocket-api.jar的源码,Class.forName("org.apache.tomcat.websocket.WsWebSocketContainer");
-		// String uri = "localhost:8888/original-web/test?partyId=f41234567890f4&psid=110&senderType=system";
+		// String uri = "localhost:8888/original-web/test?partyId=f41234567890f4&psid=110&senderType=SYSTEM";
 		StringBuilder sb = new StringBuilder("ws://" + serverPath + "?");
 		if (null != params) {
 			for (String str : params) {

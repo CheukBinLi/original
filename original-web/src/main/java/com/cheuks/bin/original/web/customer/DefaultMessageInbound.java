@@ -29,6 +29,9 @@ public class DefaultMessageInbound extends MessageInbound implements Serializabl
 	protected void onTextMessage(CharBuffer arg0) throws IOException {
 		try {
 			messageHandle.dispatcher(arg0.toString());
+			
+			
+			
 		} catch (Throwable e) {
 			e.printStackTrace();
 			this.getWsOutbound().writeTextMessage(CharBuffer.wrap("错误信息"));

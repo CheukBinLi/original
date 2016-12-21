@@ -2,6 +2,7 @@ package com.cheuks.bin.original.web.customer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.websocket.Session;
 
 import org.apache.catalina.websocket.StreamInbound;
 import org.apache.catalina.websocket.WebSocketServlet;
@@ -12,6 +13,8 @@ import com.cheuks.bin.original.web.customer.MessageOption.SenderType;
 public class CustomerServiceServlet extends WebSocketServlet {
 
 	private static CustomerServiceServlet instance;
+
+	private String ipAddress = "localhost:8888";
 
 	public static final CustomerServiceServlet instance() {
 		return instance;
@@ -38,7 +41,8 @@ public class CustomerServiceServlet extends WebSocketServlet {
 		if (null == messageHandle) {
 			synchronized (this) {
 				if (null == messageHandle) {
-					messageHandle = new MessageHandleFactory(request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + request.getServletPath(), "localhost:8888" + request.getContextPath() + request.getServletPath());
+					messageHandle = new MessageHandleFactory(request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + request.getServletPath(), ipAddress + request.getContextPath() + request.getServletPath());
+					WebSocketFactoryForWeixin.instance();
 				}
 			}
 		}

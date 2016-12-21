@@ -15,9 +15,11 @@ public class MessagePackage implements MessageOption, Serializable {
 	private String sender;// 发送都ID
 	private String receiver;// 接收者ID
 	private String questioner;// 发问者名字
+	private String questionerHeadImage;// 发问者头像
 	private String responder;// 回复者名字
 	private String msgType;// 文字/图片
 	private String msg;// 消息内容
+	private String additional;// 附加值
 
 	public MessagePackageType getType() {
 		return type;
@@ -73,6 +75,15 @@ public class MessagePackage implements MessageOption, Serializable {
 		return this;
 	}
 
+	public String getQuestionerHeadImage() {
+		return questionerHeadImage;
+	}
+
+	public MessagePackage setQuestionerHeadImage(String questionerHeadImage) {
+		this.questionerHeadImage = questionerHeadImage;
+		return this;
+	}
+
 	public String getResponder() {
 		return responder;
 	}
@@ -97,6 +108,15 @@ public class MessagePackage implements MessageOption, Serializable {
 
 	public MessagePackage setMsg(String msg) {
 		this.msg = msg;
+		return this;
+	}
+
+	public String getAdditional() {
+		return additional;
+	}
+
+	public MessagePackage setAdditional(String additional) {
+		this.additional = additional;
 		return this;
 	}
 
