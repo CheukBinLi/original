@@ -160,9 +160,9 @@ public class NettyServer {
 		RmiBeanFactory rmiBeanFactory = DefaultRmiBeanFactory.newInstance();
 		rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", "com.cheuks.bin.original.reflect"));
 		NettyServer ns = new NettyServer();
-		NettyHandleServiceFactory handleServiceFactory = NettyHandleServiceFactory.newInstance(5);
+		NettyHandleServiceFactory handleServiceFactory = NettyHandleServiceFactory.newInstance(8);
 
-		ns.setPoolSize(15).setMessageHandle(handleServiceFactory).setPort(10087).setRmiBeanFactory(rmiBeanFactory).setCacheSerialize(new FstCacheSerialize());
+		ns.setPoolSize(5).setMessageHandle(handleServiceFactory).setPort(10087).setRmiBeanFactory(rmiBeanFactory).setCacheSerialize(new FstCacheSerialize());
 		ns.run();
 	}
 }

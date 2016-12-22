@@ -17,7 +17,7 @@ public class MessagePackage implements MessageOption, Serializable {
 	private String questioner;// 发问者名字
 	private String questionerHeadImage;// 发问者头像
 	private String responder;// 回复者名字
-	private String msgType;// 文字/图片
+	private MessageType msgType;// 文字/图片
 	private String msg;// 消息内容
 	private String additional;// 附加值
 
@@ -93,11 +93,11 @@ public class MessagePackage implements MessageOption, Serializable {
 		return this;
 	}
 
-	public String getMsgType() {
+	public MessageType getMsgType() {
 		return msgType;
 	}
 
-	public MessagePackage setMsgType(String msgType) {
+	public MessagePackage setMsgType(MessageType msgType) {
 		this.msgType = msgType;
 		return this;
 	}

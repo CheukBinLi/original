@@ -18,4 +18,8 @@ public interface MessageOption {
 	public static enum ContainerType {
 		CLUSTER
 	}
+
+	public static enum MessageType {
+		TEXT, IMAGE, VOICE
+	}
 }
