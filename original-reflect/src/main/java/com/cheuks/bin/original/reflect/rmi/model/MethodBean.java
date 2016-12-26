@@ -3,10 +3,8 @@ package com.cheuks.bin.original.reflect.rmi.model;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
-import com.cheuks.bin.original.common.util.Encryption;
 import com.cheuks.bin.original.reflect.Reflection;
 
-import javassist.CtMethod;
 import javassist.NotFoundException;
 
 public class MethodBean implements Serializable {

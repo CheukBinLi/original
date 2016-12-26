@@ -49,6 +49,7 @@ public class NettyClientAdapter extends NettyClient {
 		args1.put("scan", "com.cheuks.bin.original.reflect");
 		rmiBeanFactory.init(args1);
 		final test2I t = rmiBeanFactory.getBean(test2I.class);
+
 		long now = System.currentTimeMillis();
 		ExecutorService executorService = Executors.newCachedThreadPool();
 		final CountDownLatch countDownLatch = new CountDownLatch(1000000);

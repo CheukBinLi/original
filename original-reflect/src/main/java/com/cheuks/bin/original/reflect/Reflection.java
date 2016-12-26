@@ -9,8 +9,10 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.cheuks.bin.original.common.util.Encryption;
@@ -20,6 +22,7 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 
+@SuppressWarnings("unchecked")
 public class Reflection {
 
 	protected Reflection() {
@@ -33,6 +36,17 @@ public class Reflection {
 		return newInstance;
 	}
 
+	/***
+	 * 末不完成，废弃
+	 * 
+	 * @param collection
+	 * @return
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 */
 	public <T> Class<T> getGenericName(Collection<T> collection) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Method collectionToArray = Collection.class.getDeclaredMethod("toArray");
 		Object current = collectionToArray.invoke(collection, null);
@@ -91,12 +105,12 @@ public class Reflection {
 			}
 			fieldList = new ArrayList<FieldList>();
 			for (Type t : type.getActualTypeArguments())
-				fieldList.addAll(getSettingField((Class<?>) t, isAccessible));
+				fieldList.addAll(getSettingFieldListList((Class<?>) t, isAccessible));
 		}
 		return fieldList;
 	}
 
-	public List<FieldList> getSettingField(Class<?> clazz, boolean isAccessible) throws NoSuchFieldException, SecurityException {
+	public List<FieldList> getSettingFieldListList(Class<?> clazz, boolean isAccessible) throws NoSuchFieldException, SecurityException {
 		Field[] fields = clazz.getDeclaredFields();
 		Method[] methods = clazz.getDeclaredMethods();
 		Set<String> settingMethodName = new HashSet<String>();
@@ -285,5 +299,4 @@ public class Reflection {
 			this.c = c;
 		}
 	}
-
 }

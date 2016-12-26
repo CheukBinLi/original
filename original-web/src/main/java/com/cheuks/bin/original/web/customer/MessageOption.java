@@ -9,6 +9,8 @@ public interface MessageOption {
 		CLUSTER_REFRESH, // 集群列表刷新
 		WAITING_FOR_ACCESS, // 接入等待
 		SERVICE_DISTRIBUTION, // 服务分配
+		NO_CUSTOMER_SERVICE, // 没有客服
+		SEND_TO_SYSTEM, // 直接发送到系统通道
 		HEART_BEAT, // 心跳
 		REQUEST, // 请求
 		RESPONSE, // 回复

@@ -20,6 +20,8 @@ public class MessagePackage implements MessageOption, Serializable {
 	private MessageType msgType;// 文字/图片
 	private String msg;// 消息内容
 	private String additional;// 附加值
+	private volatile int attempts;// 尝试次数
+	private int isChange;
 
 	public MessagePackageType getType() {
 		return type;
@@ -117,6 +119,30 @@ public class MessagePackage implements MessageOption, Serializable {
 
 	public MessagePackage setAdditional(String additional) {
 		this.additional = additional;
+		return this;
+	}
+
+	public int getAttempts() {
+		return attempts;
+	}
+
+	public int getAndAddAttempts(int i) {
+		int result = attempts;
+		attempts += i;
+		return result;
+	}
+
+	public MessagePackage setAttempts(int attempts) {
+		this.attempts = attempts;
+		return this;
+	}
+
+	public int isChange() {
+		return isChange;
+	}
+
+	public MessagePackage setIsChange(int isChange) {
+		this.isChange = isChange;
 		return this;
 	}
 

@@ -9,9 +9,13 @@ import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
 import javax.websocket.DeploymentException;
+import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 
 import org.apache.catalina.websocket.WsOutbound;
@@ -19,6 +23,8 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.cheuks.bin.original.cache.FstCacheSerialize;
 import com.cheuks.bin.original.cache.JedisStandAloneCacheFactory;
@@ -27,6 +33,7 @@ import com.cheuks.bin.original.common.cache.redis.RedisExcecption;
 @SuppressWarnings("deprecation")
 public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound, MessagePackage> {
 
+	private final static Logger LOG = LoggerFactory.getLogger(MessageHandleFactory.class);
 	// 服务器唯一标式
 	final String serverName;
 	// 服务自治主机目录
@@ -37,6 +44,7 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	final Map<String, Session> CLUSTER = new ConcurrentHashMap<String, Session>();
 	final Map<String, DefaultMessageInbound> CLUSTER_SERVER = new ConcurrentHashMap<String, DefaultMessageInbound>();
 	final BlockingDeque<DefaultMessageInbound> SYSTEM = new LinkedBlockingDeque<DefaultMessageInbound>();
+	final BlockingDeque<MessagePackage> NOT_FOUND_CUSTOMER_SERVICE_QUEUE = new LinkedBlockingDeque<MessagePackage>();
 	final ObjectMapper mapper = new ObjectMapper();// json
 	private int inConversationTimeOut = 600000;// 10分钟结束
 	{
@@ -45,10 +53,12 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	final String customerServiceQueueName = "CUSTOMER_SERVICE_QUEUE_NAME";// 客服名
 	final String customerServiceCloneQueueName = "CUSTOMER_SERVICE_CLONE_QUEUE_NAME";// 作用：分配客服
 	final String customerServiceServerQueueName = "CUSTOMER_SERVICE_SERVER_QUEUE_NAME";// 客服所在服务器名
-	final String inConversationQueueName = "IN_CONVERSATION_QUEUE_NAME";// 会话中队列名
+	final String inConversationQueueName = "CUSTOMER_IN_CONVERSATION_QUEUE_NAME";// 会话中队列名
 	final BlockingDeque<Runnable> TASK;
 	volatile boolean interrupt = false;
-	final Thread delayedTaskThread;
+	final int maxAttempts = 10;// 尝试次数
+	final int attemptInterval = 500;
+	private ExecutorService executorService = Executors.newFixedThreadPool(10);
 
 	public MessageHandleFactory(String serverName, String ledderServerName) {
 		super();
@@ -58,7 +68,6 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 		// 密码、地址、端口
 		redis.setCacheSerialize(new FstCacheSerialize());
 		if (!isLedder) {
-			delayedTaskThread = null;
 			TASK = null;
 			int tryCount = 10;
 			Session session = null;
@@ -73,30 +82,17 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 				}
 			}
 		} else {
-			delayedTaskThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					Runnable job;
-					try {
-						while (!interrupt) {
-							if (null != (job = TASK.takeFirst())) {
-								Thread.sleep(500);
-								job.run();
-							}
-						}
-					} catch (InterruptedException e) {
-					}
-				}
-			});
 			TASK = new LinkedBlockingDeque<Runnable>();
-			delayedTaskThread.start();
+			executorService.submit(new DelayedTaskHandler(interrupt, TASK));
 			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 				@Override
 				public void run() {
 					interrupt = true;
+					executorService.shutdown();
 				}
 			}));
 		}
+		executorService.submit(new NotFoundCustomerService(NOT_FOUND_CUSTOMER_SERVICE_QUEUE));
 	}
 
 	private String getInConversationQueueKey(String psid, String client) {
@@ -135,11 +131,13 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	}
 
 	@Override
-	public void destory(DefaultMessageInbound c) throws RedisExcecption {
-		CONNECTION.remove(c.getPartyId());
+	public void destory(final DefaultMessageInbound c) throws RedisExcecption {
+		if (null != c.getPartyId()) {
+			CONNECTION.remove(c.getPartyId());
+		}
+		SYSTEM.remove(c);
 		if (SenderType.CUSTOMER_SERVICE == c.getSender()) {
 			redis.mapRemove(customerServiceServerQueueName, comprise(c.getPsid(), c.getPartyId()));
-			// 移除客服
 			redis.removeListValue(getCustomerServiceQueueKey(c.getPsid()), c.getPartyId(), 10);
 			redis.removeListValue(getCustomerServiceCloneQueueKey(c.getPsid()), c.getPartyId(), 10);
 		}
@@ -159,7 +157,7 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	}
 
 	@Override
-	public void sendToConsumerService(MessagePackage message) throws Throwable {
+	public synchronized void sendToConsumerService(final MessagePackage message) throws Throwable {
 		if (message.getType() == MessagePackageType.WAITING_FOR_ACCESS) {
 			List<String> customerServiceList = redis.getMapList(customerServiceQueueName, comprise(message.getPsid(), message.getReceiver()));
 			if (null != customerServiceList) {
@@ -168,16 +166,17 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 				}
 			}
 		} else if (message.getType() == MessagePackageType.SERVICE_DISTRIBUTION) {// 分配客服
-			// 检查是否已在对话队列
 			String inConversationQueueKey = getInConversationQueueKey(message.getPsid(), message.getSender());
 			String consumerService = redis.get(inConversationQueueKey);
 			if (null == consumerService) {// 分配客服
 				String consumerServiceKey = getCustomerServiceCloneQueueKey(message.getPsid());
 				consumerService = redis.popListFirst(consumerServiceKey);
-				// 检查是否空/队列有没有
-				System.out.println(consumerService);
+				if (null == consumerService) {
+					message.setType(MessagePackageType.NO_CUSTOMER_SERVICE);
+					dispatcher(message);
+					return;
+				}
 				redis.addListLast(consumerServiceKey, consumerService);
-				// 添加会话列表
 				redis.set(getInConversationQueueKey(message.getPsid(), message.getSender()), consumerService, inConversationTimeOut);
 			}
 			message.setType(null).setReceiver(consumerService);
@@ -187,22 +186,26 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 		}
 	}
 
-	private void doSendToConsumerService(MessagePackage message) throws Throwable {
+	private void doSendToConsumerService(final MessagePackage message) throws Throwable {
 		String value = mapper.writeValueAsString(message);
 		DefaultMessageInbound service;
-		// 从Redis取客服所在服务器
+		WsOutbound out;
 		String tempServerName = redis.getMapValue(customerServiceServerQueueName, comprise(message.getPsid(), message.getReceiver()));
 		if (null != tempServerName && !this.serverName.equals(tempServerName)) {
 			if (isLedder) {// 当前主机是集群的中心机
 				service = CLUSTER_SERVER.get(tempServerName);
 				if (null != service) {
-					service.getWsOutbound().writeTextMessage(CharBuffer.wrap(value));
+					out = service.getWsOutbound();
+					out.writeTextMessage(CharBuffer.wrap(value));
+					out.flush();
 					return;
 				}
 			} else {
 				Session session = CLUSTER.get(tempServerName);
 				if (null != session) {
-					session.getBasicRemote().sendText(value);
+					RemoteEndpoint.Basic remote = session.getBasicRemote();
+					remote.sendText(value);
+					remote.flushBatch();
 					return;
 				}
 			}
@@ -210,7 +213,9 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 		if (this.serverName.equals(tempServerName)) {// 客服在当前实例中
 			service = CONNECTION.get(message.getReceiver());
 			if (null != service) {
-				service.getWsOutbound().writeTextMessage(CharBuffer.wrap(value));
+				out = service.getWsOutbound();
+				out.writeTextMessage(CharBuffer.wrap(value));
+				out.flush();
 				return;
 			}
 		}
@@ -218,13 +223,16 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	}
 
 	@Override
-	public void sendToSystem(MessagePackage message) throws Throwable {
+	public void sendToSystem(final MessagePackage message) throws Throwable {
 		// System.out.println(message.getReceiver() + "：接收消息:" + message.getMsg());
 		String value = mapper.writeValueAsString(message);
 		DefaultMessageInbound system = SYSTEM.pollFirst();
+		WsOutbound out;
 		try {
 			if (null != system) {
-				system.getWsOutbound().writeTextMessage(CharBuffer.wrap(value));
+				out = system.getWsOutbound();
+				out.writeTextMessage(CharBuffer.wrap(value));
+				out.flush();
 			}
 		} finally {
 			if (null != system) {
@@ -233,18 +241,21 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 		}
 	}
 
-	public void dispatcher(MessagePackage messagePackage) throws Throwable {
+	public void dispatcher(final MessagePackage messagePackage) throws Throwable {
 		if (MessagePackageType.HEART_BEAT == messagePackage.getType()) {
 			return;
 		} else if (MessagePackageType.CLOSE == messagePackage.getType()) {
 
+		} else if (MessagePackageType.NO_CUSTOMER_SERVICE == messagePackage.getType()) {
+			sendToSystem(messagePackage.setReceiver(messagePackage.getSender()));
 		} else if (MessagePackageType.CLUSTER_REFRESH == messagePackage.getType()) {// 刷新集群列表
 			clusterRefresh(messagePackage);
+		} else if (MessagePackageType.SEND_TO_SYSTEM == messagePackage.getType()) {// 刷新集群列表
+			sendToSystem(messagePackage);
 		} else if (SenderType.SYSTEM == messagePackage.getSenderType()) {
 			sendToConsumerService(messagePackage);
 		} else if (SenderType.CUSTOMER_SERVICE == messagePackage.getSenderType()) {
 			sendToSystem(messagePackage);
-			// 更新会话列表
 			redis.set(getInConversationQueueKey(messagePackage.getPsid(), messagePackage.getReceiver()), messagePackage.getSender(), inConversationTimeOut);
 		}
 	}
@@ -252,13 +263,13 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	@Override
 	public void dispatcher(String message) throws Throwable {
 		System.out.println(message);
-		MessagePackage messagePackage = mapper.readValue(message, MessagePackage.class);
+		final MessagePackage messagePackage = mapper.readValue(message, MessagePackage.class);
 		dispatcher(messagePackage);
 	}
 
 	@Override
-	public void notFoundCustomerService(MessagePackage message) throws Throwable {
-
+	public void notFoundCustomerService(final MessagePackage message) throws Throwable {
+		NOT_FOUND_CUSTOMER_SERVICE_QUEUE.addLast(message);
 	}
 
 	/***
@@ -269,7 +280,7 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public void clusterRefresh(MessagePackage message) throws DeploymentException, IOException, URISyntaxException {
+	public void clusterRefresh(final MessagePackage message) throws DeploymentException, IOException, URISyntaxException {
 		StringTokenizer tokenizer = new StringTokenizer(message.getMsg(), ",");
 		String tempServerName;
 		while (tokenizer.hasMoreTokens()) {
@@ -288,13 +299,13 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	 * @throws JsonMappingException
 	 * @throws IOException
 	 */
-	public void clusterRefreshHandle() throws JsonGenerationException, JsonMappingException, IOException {
+	public void clusterRefreshHandle() {
 		// 延迟任务
 		Runnable delayedTask = new Runnable() {
 			@Override
 			public void run() {
 				try {
-					MessagePackage message = new MessagePackage();
+					final MessagePackage message = new MessagePackage();
 					message.setType(MessagePackageType.CLUSTER_REFRESH);
 					StringBuilder sb = new StringBuilder();
 					for (Entry<String, DefaultMessageInbound> single : CLUSTER_SERVER.entrySet()) {
@@ -305,10 +316,10 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 					}
 					message.setMsg(sb.toString());
 					CharBuffer value = CharBuffer.wrap(mapper.writeValueAsString(message));
-					DefaultMessageInbound def;
+					DefaultMessageInbound defaultMessageInbound;
 					for (Entry<String, DefaultMessageInbound> single : CLUSTER_SERVER.entrySet()) {
-						def = single.getValue();
-						WsOutbound ws = def.getWsOutbound();
+						defaultMessageInbound = single.getValue();
+						WsOutbound ws = defaultMessageInbound.getWsOutbound();
 						ws.writeTextMessage(value);
 						ws.flush();
 						value.rewind();
@@ -336,5 +347,44 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 			sb.setLength(sb.length() - 1);
 		}
 		return sb.toString();
+	}
+
+	final class NotFoundCustomerService implements Runnable {
+		private final BlockingDeque<MessagePackage> notFoundCustomerServiceQueue;
+
+		@Override
+		public void run() {
+			MessagePackage messagePackage;
+			try {
+				while (!interrupt) {
+					if (null != (messagePackage = notFoundCustomerServiceQueue.pollFirst(500, TimeUnit.MILLISECONDS))) {
+						if (maxAttempts <= messagePackage.getAndAddAttempts(1)) {
+							if (maxAttempts <= messagePackage.getAttempts()) {
+								if (maxAttempts <= messagePackage.getAttempts() && messagePackage.isChange() < 0) {
+									messagePackage.setType(MessagePackageType.NO_CUSTOMER_SERVICE);
+								} else {
+									redis.delete(getInConversationQueueKey(messagePackage.getPsid(), messagePackage.getSender()));
+									messagePackage.setType(MessagePackageType.SERVICE_DISTRIBUTION);
+
+									MessagePackage message = new MessagePackage().setAdditional(messagePackage.getAdditional()).setReceiver(messagePackage.getSender());
+									message.setPsid(messagePackage.getPsid()).setMsg("正在为你转接.请稍候...").setType(MessagePackageType.SEND_TO_SYSTEM);
+									dispatcher(message);
+								}
+								messagePackage.setIsChange(-1);
+								messagePackage.setAttempts(0);
+							}
+						}
+						dispatcher(messagePackage);
+						Thread.sleep(500);
+					}
+				}
+			} catch (Throwable e) {
+				LOG.error("", e);
+			}
+		}
+
+		public NotFoundCustomerService(final BlockingDeque<MessagePackage> notFoundCustomerServiceQueue) {
+			this.notFoundCustomerServiceQueue = notFoundCustomerServiceQueue;
+		}
 	}
 }
