@@ -359,20 +359,14 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 				while (!interrupt) {
 					if (null != (messagePackage = notFoundCustomerServiceQueue.pollFirst(500, TimeUnit.MILLISECONDS))) {
 						if (maxAttempts <= messagePackage.getAndAddAttempts(1)) {
-							if (maxAttempts <= messagePackage.getAttempts()) {
-								if (maxAttempts <= messagePackage.getAttempts() && messagePackage.isChange() < 0) {
-									messagePackage.setType(MessagePackageType.NO_CUSTOMER_SERVICE);
-								} else {
-									redis.delete(getInConversationQueueKey(messagePackage.getPsid(), messagePackage.getSender()));
-									messagePackage.setType(MessagePackageType.SERVICE_DISTRIBUTION);
+							messagePackage.setType(MessagePackageType.NO_CUSTOMER_SERVICE);
+						} else if (maxAttempts / 2 == messagePackage.getAttempts()) {
+							redis.delete(getInConversationQueueKey(messagePackage.getPsid(), messagePackage.getSender()));
+							messagePackage.setType(MessagePackageType.SERVICE_DISTRIBUTION);
 
-									MessagePackage message = new MessagePackage().setAdditional(messagePackage.getAdditional()).setReceiver(messagePackage.getSender());
-									message.setPsid(messagePackage.getPsid()).setMsg("正在为你转接.请稍候...").setType(MessagePackageType.SEND_TO_SYSTEM);
-									dispatcher(message);
-								}
-								messagePackage.setIsChange(-1);
-								messagePackage.setAttempts(0);
-							}
+							MessagePackage message = new MessagePackage().setAdditional(messagePackage.getAdditional()).setReceiver(messagePackage.getSender());
+							message.setPsid(messagePackage.getPsid()).setMsg("正在为你转接.请稍候...").setType(MessagePackageType.SEND_TO_SYSTEM);
+							dispatcher(message);
 						}
 						dispatcher(messagePackage);
 						Thread.sleep(500);

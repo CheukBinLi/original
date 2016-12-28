@@ -69,7 +69,7 @@ public class ElasticSearchHelpper {
 
 	public XContentBuilder buildTemplate(Class<?> entity, int shards) throws Throwable {
 		XContentBuilder builder = XContentFactory.jsonBuilder();
-		List<FieldList> fieldList = Reflection.newInstance().getSettingField(entity, false);
+		List<FieldList> fieldList = Reflection.newInstance().getSettingFieldListList(entity, false);
 		builder.startObject().startObject(entity.getSimpleName()).startObject("properties");
 		fieldListNode(builder, fieldList);
 		builder.endObject().endObject().endObject();

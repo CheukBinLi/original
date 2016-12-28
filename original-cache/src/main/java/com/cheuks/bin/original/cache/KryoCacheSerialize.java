@@ -7,6 +7,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
+@SuppressWarnings("unchecked")
 public class KryoCacheSerialize implements CacheSerialize {
 
 	private static final Kryo kryo = new KryoEx();

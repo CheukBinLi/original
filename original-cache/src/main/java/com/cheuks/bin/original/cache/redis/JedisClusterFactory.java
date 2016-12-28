@@ -10,7 +10,6 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cheuks.bin.original.cache.DefaultCacheSerialize;
 import com.cheuks.bin.original.cache.KryoCacheSerialize;
 import com.cheuks.bin.original.common.cache.redis.RedisExcecption;
 import com.cheuks.bin.original.common.cache.redis.RedisFactory;

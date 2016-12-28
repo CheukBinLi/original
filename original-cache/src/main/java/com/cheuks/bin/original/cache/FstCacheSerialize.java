@@ -4,6 +4,7 @@ import org.nustaq.serialization.FSTConfiguration;
 
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 
+@SuppressWarnings("unchecked")
 public class FstCacheSerialize implements CacheSerialize {
 
 	static FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();

@@ -35,6 +35,7 @@ public class CollectionUtil {
 		return map;
 	}
 
+	@SuppressWarnings("unchecked")
 	public <K> Map<K, Object> toMap(boolean isWeak, Object... params) {
 		if (null == params || 0 != (params.length % 2))
 			return null;
@@ -45,11 +46,12 @@ public class CollectionUtil {
 		return result;
 	}
 
-	// public final <T> T convery(Object o) {
-	// if (null == o) {
-	// return null;
-	// }
-	// return (T) o;
-	// }
+	public static void main(String[] args) {
+
+		Map<String, Object> a = newInstance.toMap(true, new Object[] { 1, "1", 2, "2" });
+		Map<String, Object> b = newInstance.toMap("1", 1, "2", 2);
+		System.out.println(a);
+		System.out.println(b);
+	}
 
 }

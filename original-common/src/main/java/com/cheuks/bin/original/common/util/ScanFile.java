@@ -204,7 +204,6 @@ public class ScanFile extends AbstractScan {
 
 	}
 
-	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
 		Object o = new ScanFile().doScan("*.xml");
 		System.out.println(o);

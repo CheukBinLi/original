@@ -10,7 +10,6 @@ import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.cheuks.bin.original.common.cache.redis.RedisExcecption;
 import com.cheuks.bin.original.common.cache.redis.RedisFactory;
 
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 
 @SuppressWarnings({ "unchecked" })
