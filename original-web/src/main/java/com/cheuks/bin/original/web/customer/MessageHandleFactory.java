@@ -47,9 +47,11 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	final BlockingDeque<MessagePackage> NOT_FOUND_CUSTOMER_SERVICE_QUEUE = new LinkedBlockingDeque<MessagePackage>();
 	final ObjectMapper mapper = new ObjectMapper();// json
 	private int inConversationTimeOut = 600000;// 10分钟结束
+
 	{
 		mapper.setSerializationInclusion(Inclusion.NON_NULL);
 	}
+
 	final String customerServiceQueueName = "CUSTOMER_SERVICE_QUEUE_NAME";// 客服名
 	final String customerServiceCloneQueueName = "CUSTOMER_SERVICE_CLONE_QUEUE_NAME";// 作用：分配客服
 	final String customerServiceServerQueueName = "CUSTOMER_SERVICE_SERVER_QUEUE_NAME";// 客服所在服务器名
@@ -85,7 +87,6 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 			TASK = new LinkedBlockingDeque<Runnable>();
 			executorService.submit(new DelayedTaskHandler(interrupt, TASK));
 			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-				@Override
 				public void run() {
 					interrupt = true;
 					executorService.shutdown();
@@ -108,7 +109,7 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	}
 
 	// 客户过期检查
-	@Override
+
 	public MessageHandleFactory addConnection(DefaultMessageInbound c) throws RedisExcecption, JsonGenerationException, JsonMappingException, IOException {
 		// 直接覆盖，后期修改，只覆盖连接，保留连接了的客户
 		if (null != c.getPartyId()) {
@@ -130,7 +131,6 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 		return this;
 	}
 
-	@Override
 	public void destory(final DefaultMessageInbound c) throws RedisExcecption {
 		if (null != c.getPartyId()) {
 			CONNECTION.remove(c.getPartyId());
@@ -144,19 +144,16 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 		System.out.println("断开连接:" + c.getPartyId());
 	}
 
-	@Override
 	public void destory(ContainerType containerType, Object o) throws Throwable {
 		if (ContainerType.CLUSTER == containerType) {
 			CLUSTER.remove(o);
 		}
 	}
 
-	@Override
 	public int activityNumber() {
 		return CONNECTION.size();
 	}
 
-	@Override
 	public synchronized void sendToConsumerService(final MessagePackage message) throws Throwable {
 		if (message.getType() == MessagePackageType.WAITING_FOR_ACCESS) {
 			List<String> customerServiceList = redis.getMapList(customerServiceQueueName, comprise(message.getPsid(), message.getReceiver()));
@@ -222,7 +219,6 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 		notFoundCustomerService(message);
 	}
 
-	@Override
 	public void sendToSystem(final MessagePackage message) throws Throwable {
 		// System.out.println(message.getReceiver() + "：接收消息:" + message.getMsg());
 		String value = mapper.writeValueAsString(message);
@@ -260,14 +256,12 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 		}
 	}
 
-	@Override
 	public void dispatcher(String message) throws Throwable {
 		System.out.println(message);
 		final MessagePackage messagePackage = mapper.readValue(message, MessagePackage.class);
 		dispatcher(messagePackage);
 	}
 
-	@Override
 	public void notFoundCustomerService(final MessagePackage message) throws Throwable {
 		NOT_FOUND_CUSTOMER_SERVICE_QUEUE.addLast(message);
 	}
@@ -302,7 +296,7 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	public void clusterRefreshHandle() {
 		// 延迟任务
 		Runnable delayedTask = new Runnable() {
-			@Override
+
 			public void run() {
 				try {
 					final MessagePackage message = new MessagePackage();
@@ -352,7 +346,6 @@ public class MessageHandleFactory implements MessageHandle<DefaultMessageInbound
 	final class NotFoundCustomerService implements Runnable {
 		private final BlockingDeque<MessagePackage> notFoundCustomerServiceQueue;
 
-		@Override
 		public void run() {
 			MessagePackage messagePackage;
 			try {

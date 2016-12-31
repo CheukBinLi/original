@@ -6,7 +6,6 @@ public final class DelayedTaskHandler implements Runnable {
 	private final boolean interrupt;
 	private final BlockingDeque<Runnable> task;
 
-	@Override
 	public void run() {
 		Runnable job;
 		try {

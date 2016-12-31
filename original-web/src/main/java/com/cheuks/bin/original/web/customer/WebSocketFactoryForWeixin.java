@@ -36,7 +36,6 @@ public class WebSocketFactoryForWeixin {
 	final ObjectMapper mapper = new ObjectMapper();
 	private String ipAddress = "localhost:8888";
 	private final Thread sendToCustomerServiceTaskThread = new Thread(new Runnable() {
-		@Override
 		public void run() {
 			MessagePackage messagePackage;
 			try {
@@ -55,7 +54,6 @@ public class WebSocketFactoryForWeixin {
 	});
 
 	private final Thread sendToCustomerTaskThread = new Thread(new Runnable() {
-		@Override
 		public void run() {
 			MessagePackage messagePackage;
 			try {
