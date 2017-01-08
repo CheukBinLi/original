@@ -34,9 +34,16 @@ public class ElasticSearchHelpper {
 		return null;
 	}
 
-	private String defaultIkName = "ik";
+	// private String defaultIkName = "ik";
 	// private String defaultIkName = "ik_max_word";
 
+	/***
+	 * 搜索生成器，方向有误，等修改
+	 * 
+	 * @param params
+	 * @param withOutParams
+	 * @return
+	 */
 	public QueryBuilder createQueryBuilder(final Map<String, Object> params, String... withOutParams) {
 		String key;
 		Object value;
@@ -67,6 +74,16 @@ public class ElasticSearchHelpper {
 		return null;
 	}
 
+	/***
+	 * 建立索引
+	 * 
+	 * @param entity
+	 *            模版对象
+	 * @param shards
+	 *            分块数量
+	 * @return
+	 * @throws Throwable
+	 */
 	public XContentBuilder buildTemplate(Class<?> entity, int shards) throws Throwable {
 		XContentBuilder builder = XContentFactory.jsonBuilder();
 		List<FieldList> fieldList = Reflection.newInstance().getSettingFieldListList(entity, false);
@@ -100,14 +117,4 @@ public class ElasticSearchHelpper {
 			}
 		}
 	}
-
-	public String getDefaultIkName() {
-		return defaultIkName;
-	}
-
-	public ElasticSearchHelpper setDefaultIkName(String defaultIkName) {
-		this.defaultIkName = defaultIkName;
-		return this;
-	}
-
 }
