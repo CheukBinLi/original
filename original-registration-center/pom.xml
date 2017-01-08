@@ -9,38 +9,35 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<groupId>com.cheuks.bin</groupId>
-	<artifactId>original-reflect</artifactId>
+	<artifactId>original-registration-center</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>original-reflect</name>
+	<name>original-registration-center</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>${javassist.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-all</artifactId>
-			<version>${netty-all.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.cheuks.bin</groupId>
-			<artifactId>original-annotation</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.cheuks.bin</groupId>
 			<artifactId>original-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<!-- zookeeper客户端 -->
 		<dependency>
-			<groupId>com.cheuks.bin</groupId>
-			<artifactId>original-cache</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-framework</artifactId>
+			<version>${curator.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-recipes</artifactId>
+			<version>${curator.version}</version>
+		</dependency>
+<!-- 		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-test</artifactId>
+			<version>${curator.version}</version>
+		</dependency> -->
 	</dependencies>
 </project>

@@ -22,6 +22,9 @@
 		<elasticsearch.version>2.4.0</elasticsearch.version>
 		<kryo.version>3.0.3</kryo.version>
 		<fst.version>2.48</fst.version>
+		<netty-all.version>4.1.6.Final</netty-all.version>
+		<javassist.version>3.20.0-GA</javassist.version>
+		<curator.version>2.10.0</curator.version>
 	</properties>
 	<distributionManagement>
 		<repository>
@@ -144,5 +147,6 @@
 		<module>original-annotation</module>
 		<module>original-config</module>
 		<module>original-reflect</module>
+		<module>original-registration-center</module>
 	</modules>
 </project>

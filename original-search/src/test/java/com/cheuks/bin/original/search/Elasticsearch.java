@@ -34,6 +34,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.junit.Test;
 
+import com.cheuks.bin.original.annotation.IndexField;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -170,9 +171,9 @@ public class Elasticsearch {
 
 	}
 
-	public static void main(String[] args) throws Throwable {
-		new Elasticsearch().create();
-	}
+	// public static void main(String[] args) throws Throwable {
+	// new Elasticsearch().create();
+	// }
 
 	private Map listMapConvertToMap(List<Map> data, String fireIdField, String idFiead, String subListName) {
 		Map<String, Map> result = new HashMap<String, Map>();

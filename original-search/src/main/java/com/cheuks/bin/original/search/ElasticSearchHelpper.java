@@ -86,19 +86,13 @@ public class ElasticSearchHelpper {
 			} else {
 				IndexField index = list.getField().getAnnotation(IndexField.class);
 				builder.startObject(list.getField().getName());
-				if (null == index) {
-					builder.field("store", "yes");
-					builder.field("index", "not_analyzed");
-					if (list.getField().getType().equals(String.class)) {
-						builder.field("analyzer", getDefaultIkName());
-						// builder.field("searchAnalyzer", getDefaultIkName());
-					}
-				} else {
+				if (null != index) {
 					builder.field("store", index.store());
 					builder.field("index", index.index());
 					if (list.getField().getType().equals(String.class)) {
-						builder.field("analyzer", index.analyzer());
-						// builder.field("searchAnalyzer", index.analyzer());
+						builder.field(index.analyzerFieldName(), index.analyzer());
+						// builder.field("analyzer", getDefaultIkName());
+						// builder.field("searchAnalyzer", getDefaultIkName());
 					}
 				}
 				builder.field("type", Reflection.newInstance().getPackageType(list.getField().getType()));

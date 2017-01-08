@@ -24,7 +24,7 @@ public class SubPathListener {
 		curatorFramework.start();
 
 		if (null == curatorFramework.checkExists().forPath("/config")) {
-			curatorFramework.create().withMode(CreateMode.PERSISTENT).forPath("/config", "default".getBytes());
+			curatorFramework.create().withMode(CreateMode.PERSISTENT).forPath("/config", null);
 		}
 
 		final PathChildrenCache pathChildrenCache = new PathChildrenCache(curatorFramework, "/config", true);
@@ -50,16 +50,16 @@ public class SubPathListener {
 		}, executor);
 		Thread.sleep(5000);
 		if (null == curatorFramework.checkExists().forPath("/config/aa"))
-			curatorFramework.create().withMode(CreateMode.PERSISTENT).forPath("/config/aa", "aa".getBytes());
+			curatorFramework.create().withMode(CreateMode.EPHEMERAL).forPath("/config/aa", "aa".getBytes());
 		Thread.sleep(5000);
 		System.out.println(curatorFramework.getData().forPath("/config/aa"));
 		curatorFramework.setData().forPath("/config/aa", "bb".getBytes());
 		Thread.sleep(5000);
 		curatorFramework.delete().forPath("/config/aa");
 		Thread.sleep(5000);
-		if (null == curatorFramework.checkExists().forPath("/config/aa"))
+		if (null != curatorFramework.checkExists().forPath("/config/bb"))
 			curatorFramework.delete().forPath("/config/bb");
-		curatorFramework.create().withMode(CreateMode.PERSISTENT).forPath("/config/bb", "bb".getBytes());
+		curatorFramework.create().withMode(CreateMode.EPHEMERAL).forPath("/config/bb", "bb".getBytes());
 		Thread.sleep(5000);
 	}
 }

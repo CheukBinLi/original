@@ -3,13 +3,12 @@ package com.cheuks.bin.original.search;
 import java.util.List;
 
 import com.cheuks.bin.original.annotation.IndexField;
-import com.cheuks.bin.original.annotation.IndexField.index;
-import com.cheuks.bin.original.annotation.IndexField.store;
 
 public class EsModel {
 
 	private int id;
 	private String name;
+	@IndexField(analyzer = IndexField.ANALYZED_IK)
 	private String searchWord;
 	private double count;
 

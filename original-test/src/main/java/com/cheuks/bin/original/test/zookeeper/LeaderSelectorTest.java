@@ -3,7 +3,6 @@ package com.cheuks.bin.original.test.zookeeper;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -13,6 +12,7 @@ import org.apache.curator.framework.recipes.leader.LeaderSelectorListener;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.CreateMode;
 
 public class LeaderSelectorTest {
 
@@ -72,7 +72,7 @@ public class LeaderSelectorTest {
 				init();
 		}
 		if (null == client.checkExists().forPath(leaderPath + "_election"))
-			client.create().forPath(leaderPath + "_election");
+			client.create().withMode(CreateMode.EPHEMERAL).forPath(leaderPath + "_election");
 		COUNT_DOWN_LATCH.countDown();
 		COUNT_DOWN_LATCH.await();
 		leaderSelector.start();

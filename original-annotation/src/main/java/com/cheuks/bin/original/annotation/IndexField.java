@@ -12,39 +12,36 @@ import java.lang.annotation.Target;
 @Inherited
 @Documented
 public @interface IndexField {
-	String analyzer() default "ik";// ik_max_word
 
-	store store() default store.YES;
+	public static final String ANALYZED_IK = "ik";
+	public static final String INDEX_ANALYZED = "analyzed";
+	public static final String INDEX_NOT_ANALYZED = "not_analyzed";
 
-	index index() default index.NOT_ANALYZED;
+	public static final String STORE_YES = "yes";
+	public static final String STORE_NO = "no";
 
-	static enum index {
-		NOT_ANALYZED {
-			@Override
-			public String toString() {
-				return super.toString().toLowerCase();
-			}
-		},
-		NALYZED {
-			@Override
-			public String toString() {
-				return super.toString().toLowerCase();
-			}
-		}
-	}
+	public static final String ANALYZED_FIELD_NAME_ANALYZED = "analyzer";
 
-	static enum store {
-		YES {
-			@Override
-			public String toString() {
-				return super.toString().toLowerCase();
-			}
-		},
-		NO {
-			@Override
-			public String toString() {
-				return super.toString().toLowerCase();
-			}
-		}
-	}
+	/***
+	 * 使用的分析器
+	 * 
+	 * @return
+	 */
+	String analyzerFieldName() default ANALYZED_FIELD_NAME_ANALYZED;
+
+	String analyzer();// ik_max_word
+
+	/***
+	 * 
+	 * @return
+	 */
+	String store() default STORE_YES;
+
+	/***
+	 * 是否拆分
+	 * 
+	 * @return
+	 */
+	String index() default INDEX_ANALYZED;
+
 }
