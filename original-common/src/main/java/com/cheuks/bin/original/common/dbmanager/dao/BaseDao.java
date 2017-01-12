@@ -49,8 +49,6 @@ public interface BaseDao<entity, ID extends Serializable> {
 	 * @return
 	 * @throws Throwable
 	 */
-	// List<Object[]> getList(String queryName, Map<String, Object> params,
-	// boolean isHql, boolean isFormat, int page, int size) throws Throwable;
 	<T> List<T> getList(String queryName, Map<String, Object> params, boolean isFormat, int page, int size) throws Throwable;
 
 	List<entity> getListEntity(String queryName, Map<String, Object> params, boolean isFormat, int page, int size) throws Throwable;
@@ -69,11 +67,6 @@ public interface BaseDao<entity, ID extends Serializable> {
 	 * @return
 	 * @throws Throwable
 	 */
-	// <T> List<T> getListCustomQueryName(String queryName, Map<String, Object>
-	// params, boolean isFromat, int page, int size) throws Throwable;
-
-	// List<entity> getListEntityCustomQueryName(String queryName, Map<String,
-	// Object> params, boolean isFromat, int page, int size) throws Throwable;
 
 	entity save(entity o) throws Throwable;
 
@@ -89,9 +82,6 @@ public interface BaseDao<entity, ID extends Serializable> {
 
 	int executeUpdate(String queryName, Map<String, Object> params, boolean isHql, boolean isFromat) throws Throwable;
 
-	// int executeUpdateCustomQueryName(String queryName, Map<String, Object>
-	// params, boolean isHql, boolean isFromat) throws Throwable;
-
 	/***
 	 * 单一返回值
 	 * <p>
@@ -104,13 +94,5 @@ public interface BaseDao<entity, ID extends Serializable> {
 	 * @return
 	 * @throws Throwable
 	 */
-	// Object uniqueResult(String queryName, boolean isHql, boolean isFormat,
-	// Map<String, Object> params) throws Throwable;
 	Object uniqueResult(String queryName, boolean isFormat, Map<String, Object> params) throws Throwable;
-
-	// Object uniqueResultCustomQueryName(String queryName, boolean isFormat,
-	// Map<String, Object> params) throws Throwable;
-
-	// List<entity> getListByHql(String hql, Object params) throws Throwable;
-
 }

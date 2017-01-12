@@ -21,9 +21,11 @@ import java.util.Map;
  * @see 数据源协同适配器
  *
  */
-public interface DBAdapter {
+public interface DBAdapter<Session> {
 
-	public DBAdapter setSessionFactory(String name);
+	public DBAdapter<Session> setSessionFactory(String name);
+
+	public Session getSession();
 
 	/***
 	 * 列表

@@ -30,7 +30,7 @@ import com.cheuks.bin.original.common.dbmanager.QueryFactory;
 import com.cheuks.bin.original.common.util.SoftConcurrentHashMap;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public abstract class AbstractHibernateDBAdapter implements DBAdapter {
+public abstract class AbstractHibernateDBAdapter implements DBAdapter<Session> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractHibernateDBAdapter.class);
 
@@ -41,8 +41,6 @@ public abstract class AbstractHibernateDBAdapter implements DBAdapter {
 	}
 
 	private QueryFactory queryFactory;
-
-	public abstract Session getSession();
 
 	protected CacheFactory<String, Object> cache = new CacheFactory<String, Object>() {
 
@@ -352,5 +350,10 @@ public abstract class AbstractHibernateDBAdapter implements DBAdapter {
 	public final AbstractHibernateDBAdapter setDataSource(Map<String, SessionFactory> dataSource) {
 		this.dataSource.putAll(dataSource);
 		return this;
+	}
+
+	public Session getSession() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

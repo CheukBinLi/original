@@ -10,7 +10,7 @@ public abstract class AbstractDao<entity, ID extends Serializable> implements Ba
 
 	public abstract Class<entity> getEntityClass();
 
-	public abstract DBAdapter getDBAdapter();
+	public abstract DBAdapter<?> getDBAdapter();
 
 	public final String entityName = getEntityClass().getName();
 

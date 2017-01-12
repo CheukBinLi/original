@@ -13,7 +13,7 @@ import org.apache.zookeeper.CreateMode;
 
 public class ZConnection {
 	// 192.168.168.150:2181,192.168.168.119:2181,192.168.168.124:2181,192.168.1.30:2181
-	private final static String serverList = "127.0.0.1:2181";
+	private final static String serverList = "192.168.3.12:2181";
 
 	public static void main(String[] args) throws Exception {
 
