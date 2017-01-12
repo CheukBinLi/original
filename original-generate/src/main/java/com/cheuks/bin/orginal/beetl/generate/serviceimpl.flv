@@ -1,0 +1,23 @@
+package ${entityPackage}.service.impl;
+
+import ${entityFullName};
+import ${entityPackage}.service.impl.${entitySimpleName}ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.cheuks.bin.original.common.dbmanager.dao.BaseDao;
+import com.cheuks.bin.original.common.dbmanager.service.AbstractService;
+import com.cheuks.bin.original.web.service.UserService;
+
+@Component
+public class ${entitySimpleName}ServiceImpl extends AbstractService<${entitySimpleName}, ${idType}> implements ${entitySimpleName}Service {
+
+	@Autowired
+	private ${entitySimpleName}Dao ${@com.cheuks.bin.orginal.beetl.generate.CreateFile.toLowerCaseFirstOne(entitySimpleName)}Dao;
+
+	@Override
+	public BaseDao<${entitySimpleName}, ${idType}> getService() {
+		return ${@com.cheuks.bin.orginal.beetl.generate.CreateFile.toLowerCaseFirstOne(entitySimpleName)}Dao;
+	}
+
+}
