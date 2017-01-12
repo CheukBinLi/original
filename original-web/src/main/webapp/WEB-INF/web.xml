@@ -42,7 +42,7 @@
 		<!-- <url-pattern>/*</url-pattern> -->
 	</servlet-mapping>
 
-	<servlet>
+	<!-- <servlet>
 		<servlet-name>test</servlet-name>
 		<servlet-class>
 			com.cheuks.bin.original.web.customer.CustomerServiceServlet
@@ -52,7 +52,7 @@
 	<servlet-mapping>
 		<servlet-name>test</servlet-name>
 		<url-pattern>/test</url-pattern>
-	</servlet-mapping>
+	</servlet-mapping> -->
 
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>

@@ -23,13 +23,13 @@
 		<property name="scanPath" value="*.query.xml" />
 	</bean>
 	<!-- QueryFile 注入 -->
-	<bean id="queryFactory" class="com.cheuks.bin.original.db.manager.QueryFactory">
+	<bean id="queryFactory" class="com.cheuks.bin.original.db.manager.hibernate.BeetlQueryFactory">
 		<property name="index" value="*.query.xml" />
 		<property name="scan" ref="scan" />
 	</bean>
 
 	<!--Single DBAdapter 注入 -->
-	<bean id="dBAdapter" class="com.cheuks.bin.original.db.manager.HibernateDBAdapter">
+	<bean id="dBAdapter" class="com.cheuks.bin.original.db.manager.hibernate.HibernateDBAdapter">
 		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="queryFactory" ref="queryFactory" />
 	</bean>

@@ -40,6 +40,10 @@
 			<artifactId>beetl</artifactId>
 			<version>${beetl.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>${mybatis.version}</version>
+		</dependency>
 	</dependencies>
 </project>
