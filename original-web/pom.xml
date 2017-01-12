@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
-<project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.cheuks.bin</groupId>
@@ -22,6 +20,7 @@
 		<aspectjweaver.version>1.8.9</aspectjweaver.version><!-- apo/Spring Aspects依赖 -->
 		<spring.version>4.3.3.RELEASE</spring.version>
 		<spring-session.version>1.2.1.RELEASE</spring-session.version>
+		<spring-security.version>4.1.2.RELEASE</spring-security.version>
 		<hibernate.version>5.1.0.Final</hibernate.version>
 		<hibernate-common.annotation.version>5.0.1.Final</hibernate-common.annotation.version>
 		<hibernate-jpa-2.0-api.version>1.0.1.Final</hibernate-jpa-2.0-api.version>
@@ -131,6 +130,27 @@
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session-data-redis</artifactId>
 			<version>${spring-session.version}</version>
+		</dependency>
+		<!-- security -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+			<version>${spring-security.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring-security.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${spring-security.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+			<version>${spring-security.version}</version>
 		</dependency>
 		<!-- spring end -->
 		<!-- Hibernate start -->
@@ -256,12 +276,17 @@
 		<dependency>
 			<groupId>com.cheuks.bin</groupId>
 			<artifactId>original-common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cheuks.bin</groupId>
 			<artifactId>original-cache</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.cheuks.bin</groupId>
+			<artifactId>original-db-manager</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

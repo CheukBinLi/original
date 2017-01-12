@@ -150,6 +150,13 @@ public class Reflection {
 		return result;
 	}
 
+	public String getElasticsearchMappingType(Class<?> type) {
+		String result = getPackageType(type).toLowerCase();
+		if ("string".equals(result))
+			return "text";
+		return result;
+	}
+
 	/***
 	 * 
 	 * @param method

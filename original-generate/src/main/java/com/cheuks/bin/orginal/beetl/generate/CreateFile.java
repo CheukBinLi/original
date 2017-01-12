@@ -16,6 +16,8 @@ import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
 import org.beetl.core.resource.FileResourceLoader;
 
+import com.cheuks.bin.original.web.entity.User;
+
 //import freemarker.cache.FileTemplateLoader;
 //import freemarker.template.Configuration;
 //import freemarker.template.TemplateException;
@@ -156,10 +158,11 @@ public class CreateFile {
 		// CreateFile.create(Authority.class, Integer.class, true, true);
 		// CreateFile.create(Dict.class, Integer.class, true, true);
 		// CreateFile.create(OOO.class, Integer.class, true, true);
-//		CreateFile.create(Fundraising.class, Integer.class, true, true);
-//		CreateFile.create(FundraisingLog.class, Integer.class, true, true);
-//		CreateFile.create(WeiXinInfo.class, String.class, true, true);
-//		CreateFile.create(UnifiedOrder.class, String.class, true, true);
+		// CreateFile.create(Fundraising.class, Integer.class, true, true);
+		// CreateFile.create(FundraisingLog.class, Integer.class, true, true);
+		// CreateFile.create(WeiXinInfo.class, String.class, true, true);
+		// CreateFile.create(UnifiedOrder.class, String.class, true, true);
+		CreateFile.create(User.class, String.class, true, true);
 	}
 
 }

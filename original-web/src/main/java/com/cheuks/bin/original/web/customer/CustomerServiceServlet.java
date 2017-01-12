@@ -34,6 +34,7 @@ public class CustomerServiceServlet extends WebSocketServlet {
 	public void init() throws ServletException {
 		super.init();
 		servletPath = getServletContext().getContextPath() + "/" + getServletName();
+		System.err.println(servletPath);
 		if (null == messageHandle) {
 			synchronized (this) {
 				if (null == messageHandle) {

@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cheuks.bin.original.web.entity.User;
+
 import freemarker.cache.FileTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -143,6 +145,7 @@ public class CreateFile {
 		// CreateFile.create(FundraisingLog.class, Integer.class, true, true);
 		// CreateFile.create(WeiXinInfo.class, String.class, true, true);
 		// CreateFile.create(UnifiedOrder.class, String.class, true, true);
+		CreateFile.create(User.class, String.class, true, true);
 	}
 
 }

@@ -8,7 +8,7 @@ public class EsModel {
 
 	private int id;
 	private String name;
-	@IndexField(analyzer = IndexField.ANALYZED_IK)
+	@IndexField(analyzer = "ik_smart")
 	private String searchWord;
 	private double count;
 

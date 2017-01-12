@@ -1,20 +1,21 @@
 package com.cheuks.bin.original.search;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.client.transport.TransportClient.Builder;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 import com.cheuks.bin.original.annotation.IndexField;
 import com.cheuks.bin.original.reflect.Reflection;
@@ -22,12 +23,19 @@ import com.cheuks.bin.original.reflect.Reflection.FieldList;
 
 public class ElasticSearchHelpper {
 
+	public static enum ConditionType {
+		IN, EQUALS, NOT_IN, NOT_EQUALS, LIKE, IS_NULL, NOT_NULL
+	}
+
 	public Client getClient() {
 		try {
-			Builder builder = TransportClient.builder();
-			TransportClient client = builder.build();
-			client.addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
-			return client;
+			// Builder builder = TransportClient.builder();
+			// TransportClient client = builder.build();
+			// client.addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
+			// return client;
+
+			TransportClient client = new PreBuiltTransportClient(Settings.EMPTY).addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -106,15 +114,62 @@ public class ElasticSearchHelpper {
 				if (null != index) {
 					builder.field("store", index.store());
 					builder.field("index", index.index());
-					if (list.getField().getType().equals(String.class)) {
-						builder.field(index.analyzerFieldName(), index.analyzer());
-						// builder.field("analyzer", getDefaultIkName());
-						// builder.field("searchAnalyzer", getDefaultIkName());
-					}
+					builder.field("search_analyzer", index.searchAnalyzer());
+					builder.field("term_vector", index.termVector());
+					builder.field("include_in_all", index.INCLUDE_IN_ALL_false);
+					// if (list.getField().getType().equals(String.class)) {
+					builder.field(index.analyzerFieldName(), index.analyzer());
+					// builder.field("analyzer", getDefaultIkName());
+					// builder.field("searchAnalyzer", getDefaultIkName());
+					// }
 				}
-				builder.field("type", Reflection.newInstance().getPackageType(list.getField().getType()));
+				builder.field("type", Reflection.newInstance().getElasticsearchMappingType(list.getField().getType()));
 				builder.endObject();
 			}
 		}
+	}
+
+	/***
+	 * 
+	 * @param boolQueryBuilder
+	 * @param conditionType
+	 *            Note LIKE is to slow。
+	 * @param name
+	 * @param values
+	 * @return
+	 * @throws Throwable
+	 */
+	public QueryBuilder condition(final BoolQueryBuilder boolQueryBuilder, ConditionType conditionType, String name, Object... values) throws Throwable {
+		switch (conditionType) {
+		case IN: {
+			boolQueryBuilder.must(QueryBuilders.termsQuery(name, values));
+			break;
+		}
+		case EQUALS: {
+			boolQueryBuilder.must(QueryBuilders.termsQuery(name, values));
+			break;
+		}
+		case IS_NULL: {
+			boolQueryBuilder.must(QueryBuilders.termQuery(name, null));
+			break;
+		}
+		case NOT_NULL: {
+			boolQueryBuilder.mustNot(QueryBuilders.termQuery(name, null));
+			break;
+		}
+		case LIKE: {
+			boolQueryBuilder.must(QueryBuilders.wildcardQuery(name, "*" + values[0].toString() + "*"));
+			break;
+		}
+		case NOT_EQUALS: {
+			boolQueryBuilder.mustNot(QueryBuilders.termsQuery(name, values));
+			break;
+		}
+		case NOT_IN: {
+			boolQueryBuilder.mustNot(QueryBuilders.termsQuery(name, values));
+			break;
+		}
+		}
+		return boolQueryBuilder;
 	}
 }

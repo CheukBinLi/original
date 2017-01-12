@@ -1,5 +1,6 @@
 package com.cheuks.bin.original.search;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,21 +21,23 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.client.transport.TransportClient.Builder;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.Test;
 
-import com.cheuks.bin.original.annotation.IndexField;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,10 +45,17 @@ public class Elasticsearch {
 
 	public Client getClient() {
 		try {
-			Builder builder = TransportClient.builder();
-			TransportClient client = builder.build();
-			client.addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
+			// Builder builder = TransportClient.builder();
+			// Settings settings = Settings.settingsBuilder().put("cluster.name", "yq-tTom").build();
+			// TransportClient client = builder.settings(settings).build();
+			// client.addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9200)));
+			//
+			// return client;
+
+			TransportClient client = new PreBuiltTransportClient(Settings.EMPTY).addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
+
 			return client;
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -63,16 +73,16 @@ public class Elasticsearch {
 		// featuer.subAggregation(subFeature);
 
 		// 品牌
-		TermsBuilder products = AggregationBuilders.terms("brand").field("productCategoryId");
+		TermsAggregationBuilder products = AggregationBuilders.terms("brand").field("productCategoryId");
 		products.size(10000);
 		// // 品牌数
 		// TermsBuilder brand = AggregationBuilders.terms("category").field("productCategoryId");
 		// products.subAggregation(brand);
 
 		// 规格
-		TermsBuilder feature = AggregationBuilders.terms("features").field("productFeature.productFeatureCategoryId");
+		TermsAggregationBuilder feature = AggregationBuilders.terms("features").field("productFeature.productFeatureCategoryId");
 		Script script = new Script("doc['productFeature.productFeatureId'].value");
-		TermsBuilder sbuFeature = AggregationBuilders.terms("subList").field("productFeature.productFeatureId");
+		TermsAggregationBuilder sbuFeature = AggregationBuilders.terms("subList").field("productFeature.productFeatureId");
 		feature.subAggregation(sbuFeature);
 
 		// SearchRequestBuilder searchRequestBuilder = getClient().prepareSearch("zurich_product").setTypes("product");
@@ -171,9 +181,9 @@ public class Elasticsearch {
 
 	}
 
-	// public static void main(String[] args) throws Throwable {
-	// new Elasticsearch().create();
-	// }
+	public static void main(String[] args) throws Throwable {
+		new Elasticsearch().create();
+	}
 
 	private Map listMapConvertToMap(List<Map> data, String fireIdField, String idFiead, String subListName) {
 		Map<String, Map> result = new HashMap<String, Map>();
@@ -267,15 +277,46 @@ public class Elasticsearch {
 	}
 
 	@Test
+	public void inster2() throws JsonProcessingException {
+		Client client = getClient();
+		ObjectMapper mapper = new ObjectMapper();
+		EsModel es = new EsModel();
+		MMX wahaha = new MMX();
+		List<MMX> list = new ArrayList<MMX>();
+		list.add(wahaha);
+		wahaha.setIdx(1).setNamex("哇哈哈").setRemarkx("MBA-CC1");
+		es.setCount(11).setId(2).setName("小黄帽").setSearchWord("小黄帽").setWahaha(list);
+		IndexRequestBuilder index = client.prepareIndex("com", "EsModel", "2");
+		index.setSource(mapper.writeValueAsBytes(es));
+		index.execute().actionGet();
+	}
+
+	@Test
+	public void inster3() throws JsonProcessingException {
+		Client client = getClient();
+		ObjectMapper mapper = new ObjectMapper();
+		EsModel es = new EsModel();
+		MMX wahaha = new MMX();
+		List<MMX> list = new ArrayList<MMX>();
+		list.add(wahaha);
+		wahaha.setIdx(1).setNamex("哇哈哈").setRemarkx("MMX-0083");
+		es.setCount(11).setId(3).setName("小黄帽").setSearchWord("小黄帽").setWahaha(list);
+		IndexRequestBuilder index = client.prepareIndex("com", "EsModel", "3");
+		index.setSource(mapper.writeValueAsBytes(es));
+		index.execute().actionGet();
+	}
+
+	@Test
 	public void filderT() {
 		Client client = getClient();
 		SearchRequestBuilder search = client.prepareSearch("");
 		BoolQueryBuilder bool = new BoolQueryBuilder();
-		bool.must(QueryBuilders.filteredQuery(QueryBuilders.matchQuery("a", "1"), QueryBuilders.queryFilter(QueryBuilders.termQuery("b", "2"))));
+		// bool.must(QueryBuilders.filteredQuery(QueryBuilders.matchQuery("a", "1"), QueryBuilders.queryFilter(QueryBuilders.termQuery("b", "2"))));
+		// bool.must(QueryBuilders.filteredQuery(QueryBuilders.matchQuery("a", "1"), QueryBuilders.fi);
 		System.out.println(bool);
 	}
 
-	@Test
+	// @Test
 	public void deleteClusterAllIndex() throws InterruptedException, ExecutionException {
 		Client client = getClient();
 		ClusterStateResponse response = client.admin().cluster().prepareState().execute().get();
@@ -286,12 +327,12 @@ public class Elasticsearch {
 			// 清空所有索引。
 
 			DeleteIndexResponse deleteIndexResponse = client.admin().indices().prepareDelete(index).execute().actionGet();
-			System.out.println(deleteIndexResponse.getHeaders());
+			System.out.println(deleteIndexResponse.toString());
 
 		}
 	}
 
-	@Test
+	// @Test
 	public void deleteAllIndex() throws InterruptedException, ExecutionException {
 		Client client = getClient();
 		IndicesStatsResponse response = client.admin().indices().prepareStats(null).execute().get();
@@ -307,6 +348,55 @@ public class Elasticsearch {
 		//
 		// }
 		System.out.println((Integer) 129 == (Integer) 129);
+	}
+
+	@Test
+	public void select() throws Throwable {
+		Client client = getClient();
+		ElasticSearchHelpper helper = new ElasticSearchHelpper();
+		BoolQueryBuilder query = new BoolQueryBuilder();
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch("com");
+		searchRequestBuilder.setTypes("EsModel");
+		query.must(QueryBuilders.termQuery("searchWord", "小黄帽"));
+		searchRequestBuilder.setQuery(query);
+		System.out.println(query);
+		// searchRequestBuilder.setQuery(helper.condition(query, ConditionType.EQUALS, "searchWord", "黄帽", "小蓝", "小紫", "小红"));
+		// searchRequestBuilder.setQuery(helper.condition(query, ConditionType.NOT_EQUALS, "searchWord", "小黄", "小蓝", "小紫"));
+		// searchRequestBuilder.setQuery(helper.condition(query, ConditionType.LIKE, "searchWord", "小", "小蓝", "小紫"));
+		HighlightBuilder highlightBuilder = new HighlightBuilder();
+		highlightBuilder.preTags("<h2>");
+		highlightBuilder.postTags("</h2>");
+		highlightBuilder.field("title");
+		searchRequestBuilder.highlighter(highlightBuilder);
+
+		Object response = searchRequestBuilder.execute().get();
+		System.err.println(response);
+	}
+
+	@Test
+	public void select2() throws Throwable {
+		Client client = getClient();
+		ElasticSearchHelpper helper = new ElasticSearchHelpper();
+		BoolQueryBuilder query = new BoolQueryBuilder();
+		SearchRequestBuilder searchRequestBuilder = client.prepareSearch("com");
+
+		// searchRequestBuilder.setQuery(helper.condition(query, ConditionType.EQUALS, "searchWord", "小黄", "小蓝", "小紫"));
+		QueryStringQueryBuilder qb = QueryBuilders.queryStringQuery("小黄帽");
+		qb.field("searchWord");
+		qb.analyzer("ik_max_word");
+		searchRequestBuilder.setQuery(qb);
+		System.out.println(qb);
+		// searchRequestBuilder.setQuery(helper.condition(query, ConditionType.NOT_EQUALS, "searchWord", "小黄", "小蓝", "小紫"));
+		// searchRequestBuilder.setQuery(helper.condition(query, ConditionType.EQUALS, "searchWord", "小红帽"));
+		HighlightBuilder highlightBuilder = new HighlightBuilder();
+		highlightBuilder.preTags("<h2>");
+		highlightBuilder.postTags("</h2>");
+		highlightBuilder.field("searchWord");
+		searchRequestBuilder.highlighter(highlightBuilder);
+		Object response = searchRequestBuilder.execute().get();
+		// QueryBuilders.queryStringQuery(queryString)
+		System.err.println(response);
+
 	}
 
 }

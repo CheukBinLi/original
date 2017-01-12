@@ -26,15 +26,12 @@
 			<artifactId>beetl</artifactId>
 			<version>2.5.2</version>
 		</dependency>
-<!-- 		<dependency>
-			<groupId>com</groupId>
-			<artifactId>welfare-fundraising</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
 		<dependency>
-			<groupId>com</groupId>
-			<artifactId>welfare-core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency> -->
+			<groupId>com.cheuks.bin</groupId>
+			<artifactId>original-web</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<!-- <dependency> <groupId>com</groupId> <artifactId>welfare-fundraising</artifactId> <version>0.0.1-SNAPSHOT</version> </dependency> <dependency> <groupId>com</groupId> <artifactId>welfare-core</artifactId> <version>0.0.1-SNAPSHOT</version> </dependency> -->
 	</dependencies>
 </project>

@@ -35,12 +35,11 @@
 
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
 		<property name="dataSource" ref="dynamicRoutingDataSource" />
-		<property name="packagesToScan" value="com.welfare">
+		<property name="packagesToScan" value="${mapping.classPath}">
 		</property>
 		<property name="hibernateProperties">
 			<props>
-				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate5.SpringSessionContext
-				</prop>
+				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate5.SpringSessionContext</prop>
 				<prop key="javax.persistence.validation.mode">none</prop>
 				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
 				<prop key="hibernate.autoReconnect">true</prop>

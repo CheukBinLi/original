@@ -13,7 +13,8 @@ import java.lang.annotation.Target;
 @Documented
 public @interface IndexField {
 
-	public static final String ANALYZED_IK = "ik";
+	public static final String ANALYZED_IK_MAX_WORD = "ik_max_word";
+	public static final String ANALYZED_IK_SMART = "ik_smart";
 	public static final String INDEX_ANALYZED = "analyzed";
 	public static final String INDEX_NOT_ANALYZED = "not_analyzed";
 
@@ -22,6 +23,12 @@ public @interface IndexField {
 
 	public static final String ANALYZED_FIELD_NAME_ANALYZED = "analyzer";
 
+	public static final String TERM_VECTOR_YES = "yes";
+	public static final String TERM_VECTOR_NO = "no";
+
+	public static final String INCLUDE_IN_ALL_TRUE = "true";
+	public static final String INCLUDE_IN_ALL_false = "false";
+
 	/***
 	 * 使用的分析器
 	 * 
@@ -29,13 +36,13 @@ public @interface IndexField {
 	 */
 	String analyzerFieldName() default ANALYZED_FIELD_NAME_ANALYZED;
 
-	String analyzer();// ik_max_word
+	String analyzer() default ANALYZED_IK_MAX_WORD;// ik_max_word
 
 	/***
 	 * 
 	 * @return
 	 */
-	String store() default STORE_YES;
+	String store() default STORE_NO;
 
 	/***
 	 * 是否拆分
@@ -43,5 +50,11 @@ public @interface IndexField {
 	 * @return
 	 */
 	String index() default INDEX_ANALYZED;
+
+	String searchAnalyzer() default ANALYZED_IK_MAX_WORD;
+
+	String termVector() default TERM_VECTOR_NO;
+
+	String includeInAll() default INCLUDE_IN_ALL_TRUE;
 
 }
