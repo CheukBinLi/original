@@ -42,8 +42,6 @@ public abstract class AbstractHibernateDBAdapter implements DBAdapter<Session> {
 
 	private QueryFactory queryFactory;
 
-	public abstract Session getSession();
-
 	protected CacheFactory<String, Object> cache = new CacheFactory<String, Object>() {
 
 		SoftConcurrentHashMap<String, Object> cache = new SoftConcurrentHashMap<String, Object>();
@@ -87,11 +85,11 @@ public abstract class AbstractHibernateDBAdapter implements DBAdapter<Session> {
 		return null == list ? null : list;
 	}
 
-	public <T> List<T> getListByHQL(String hql, Object... params) throws Throwable {
-		return getListByHQL(hql, -1, -1, params);
+	public <T> List<T> getListByCustomSQL(String hql, Object... params) throws Throwable {
+		return getListByCustomSQL(hql, -1, -1, params);
 	}
 
-	public <T> List<T> getListByHQL(String hql, int page, int size, Object... params) throws Throwable {
+	public <T> List<T> getListByCustomSQL(String hql, int page, int size, Object... params) throws Throwable {
 		Query query = fillParams(getSession().createQuery(hql), params);
 		List list = page > 0 ? page(query, page, page).list() : query.list();
 		return null == list ? null : list;

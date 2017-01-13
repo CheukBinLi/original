@@ -58,7 +58,7 @@ public interface DBAdapter<Session> {
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getListByHQL(String hql, Object... params) throws Throwable;
+	public <T> List<T> getListByCustomSQL(String hql, Object... params) throws Throwable;
 
 	/***
 	 * 
@@ -75,7 +75,7 @@ public interface DBAdapter<Session> {
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getListByHQL(String hql, int page, int size, Object... params) throws Throwable;
+	public <T> List<T> getListByCustomSQL(String hql, int page, int size, Object... params) throws Throwable;
 
 	/***
 	 * SQL列表查询
@@ -106,9 +106,9 @@ public interface DBAdapter<Session> {
 	 */
 	public <T> List<T> getListBySQL(String sql, int page, int size, Object... params) throws Throwable;
 
-	public Object uniqueResult(String xql, boolean isHql, Object... params) throws Throwable;
+	public Object uniqueResult(String xql, boolean isCustomSQL, Object... params) throws Throwable;
 
-	public Object uniqueResult(String queryName, boolean isHql, boolean isFormat, Map<String, Object> params) throws Throwable;
+	public Object uniqueResult(String queryName, boolean isCustomSQL, boolean isFormat, Map<String, Object> params) throws Throwable;
 
 	/***
 	 * query模板查询
@@ -120,7 +120,7 @@ public interface DBAdapter<Session> {
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, boolean isFormat, Map<String, Object> params) throws Throwable;
+	public <T> List<T> getListByXqlQueryName(String queryName, boolean isCustomSQL, boolean isFormat, Map<String, Object> params) throws Throwable;
 
 	/***
 	 * 
@@ -131,9 +131,9 @@ public interface DBAdapter<Session> {
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, Object... params) throws Throwable;
+	public <T> List<T> getListByXqlQueryName(String queryName, boolean isCustomSQL, Object... params) throws Throwable;
 
-	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, int page, int size, Object... params) throws Throwable;
+	public <T> List<T> getListByXqlQueryName(String queryName, boolean isCustomSQL, int page, int size, Object... params) throws Throwable;
 
 	/***
 	 * 
@@ -146,7 +146,7 @@ public interface DBAdapter<Session> {
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, boolean isFormat, Map<String, Object> params, int page, int size) throws Throwable;
+	public <T> List<T> getListByXqlQueryName(String queryName, boolean isCustomSQL, boolean isFormat, Map<String, Object> params, int page, int size) throws Throwable;
 
 	/***
 	 * 通过ID查询
@@ -239,11 +239,11 @@ public interface DBAdapter<Session> {
 	 */
 	public void saveOrUpdate(Object t) throws Throwable;
 
-	int executeUpdate(String xql, boolean isHql) throws Throwable;
+	int executeUpdate(String xql, boolean isCustomSQL) throws Throwable;
 
-	int executeUpdate(String xql, Map<String, Object> params, boolean isHql) throws Throwable;
+	int executeUpdate(String xql, Map<String, Object> params, boolean isCustomSQL) throws Throwable;
 
-	int executeUpdate(String queryName, Map<String, Object> params, boolean isHql, boolean isFromat) throws Throwable;
+	int executeUpdate(String queryName, Map<String, Object> params, boolean isCustomSQL, boolean isFromat) throws Throwable;
 
 	public int generateInsertSQL(Serializable entity) throws Throwable;
 
