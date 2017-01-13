@@ -1,15 +1,17 @@
 package com.cheuks.bin.original.web.security;
 
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-public class UserServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		// org.springframework.security.util.FilterChainProxy
 		UserDetails details = null;
+		System.err.println("UserDetailsServiceImpl");
 		// try {
 		// // 用户名,密码,是否激活,accountnonexpired如果帐户没有过期设置为true
 		// // credentialsnonexpired如果证书没有过期设置为true
@@ -25,7 +27,8 @@ public class UserServiceImpl implements UserDetailsService {
 		// e.printStackTrace();
 		// }
 		// return details;
-		return null;
+		return new User("sa", "123456", true, true, true, true, AuthorityUtils.createAuthorityList("ROLE_USER"));
+		// return null;
 	}
 
 }
