@@ -1,6 +1,8 @@
 package com.cheuks.bin.original.web.controller;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,6 +52,15 @@ public class BaseController {
 		// System.out.println(request.getScheme());
 		// System.out.println(request.getPathInfo());
 		return new ModelAndView(request.getPathInfo());
+	}
+
+	@RequestMapping("callBackTest")
+	public void callBackTest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		System.out.println(request.getParameterMap());
+		Map<String, String[]> parameter = request.getParameterMap();
+		System.out.println("DataSign" + parameter.get("DataSign")[0]);
+		System.out.println("RequestData" + new String(parameter.get("RequestData")[0].getBytes(), "utf-8"));
+		response.getOutputStream().write(request.getParameterMap().toString().getBytes());
 	}
 
 	@RequestMapping("hh")

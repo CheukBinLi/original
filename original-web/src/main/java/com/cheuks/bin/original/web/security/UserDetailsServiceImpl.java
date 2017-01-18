@@ -10,10 +10,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		// org.springframework.security.util.FilterChainProxy
-		
-//		org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy
-//		org.springframework.security.core.session.SessionRegistryImpl
-		
+
+		// org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy
+		// org.springframework.security.core.session.SessionRegistryImpl
+
 		UserDetails details = null;
 		System.err.println("UserDetailsServiceImpl");
 		// try {

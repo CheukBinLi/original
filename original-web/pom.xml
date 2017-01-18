@@ -31,6 +31,7 @@
 		<com.cheuks.bin.version>0.0.1-SNAPSHOT</com.cheuks.bin.version>
 		<c3p0.version>0.9.1.2</c3p0.version>
 		<mysql-connector-java.version>5.0.8</mysql-connector-java.version>
+		<druid.version>1.0.26</druid.version>
 		<!-- <mysql-connector-java.version>6.0.4</mysql-connector-java.version> -->
 		<freemarker.version>2.3.23</freemarker.version>
 		<ehcache.version>2.6.11</ehcache.version>
@@ -222,6 +223,14 @@
 			<artifactId>c3p0</artifactId>
 			<version>${c3p0.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>${druid.version}</version>
+		</dependency>
+
+
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
