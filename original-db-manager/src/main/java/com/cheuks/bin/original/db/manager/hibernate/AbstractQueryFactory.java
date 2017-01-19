@@ -63,7 +63,7 @@ public abstract class AbstractQueryFactory implements QueryType, QueryFactory {
 		XMLReader xmlReader = parser.getXMLReader();
 		xmlReader.setEntityResolver(new EntityResolver() {
 			public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-				return new InputSource(this.getClass().getClassLoader().getResourceAsStream("dtd/Query.dtd"));
+				return new InputSource(this.getClass().getClassLoader().getResourceAsStream("META-INF/dtd/Query.dtd"));
 			}
 		});
 		while (it.hasNext()) {

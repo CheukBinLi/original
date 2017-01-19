@@ -140,7 +140,6 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory {
 								final ClassBean classBean = new ClassBean(tempClass, serviceName, version, multiInstance);
 
 								CLASS_BEAN.add(classBean);
-								System.out.println(tempClass.getName());
 								// 生成代理类
 								classBean.setProxyClassFile(classRefactor(classBean, com.cheuks.bin.original.reflect.rmi.RmiClient.class, SimpleRmiClient.class));
 								if (!classBean.isMultiInstance())
@@ -149,6 +148,9 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory {
 								BEAN.put(classBean.getRegistrationServiceName(), classBean);
 								CLASS_NAME_BEAN.put(classBean.getOriginalClassFile().getName(), classBean);
 								SIMPLE_CLASS_NAME_BEAN.put(classBean.getOriginalClassFile().getSimpleName().toUpperCase(), classBean);
+
+								if (LOG.isDebugEnabled())
+									LOG.debug("RmiClient:" + classBean.getProxyClassFile().getName() + " ||  register:" + classBean.getRegistrationServiceName());
 							} else if (null != (tempAnnotation = tempClass.getDeclaredAnnotation(RmiServer.class))) {
 								// Rmi注解
 								server = (RmiServer) tempAnnotation;
@@ -169,6 +171,8 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory {
 									final MethodBean bean = MethodBean.builder(classBean, m);
 									METHOD_BEAN.put(bean.getMd5Code(), bean);
 								}
+								if (LOG.isDebugEnabled())
+									LOG.debug("RmiServer:" + classBean.getProxyClassFile().getName() + "||   register:" + classBean.getRegistrationServiceName());
 							}
 						}
 					} catch (ClassNotFoundException e) {

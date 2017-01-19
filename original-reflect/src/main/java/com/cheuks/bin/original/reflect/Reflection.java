@@ -45,6 +45,7 @@ public class Reflection {
 	 * @throws IllegalArgumentException
 	 * @throws InvocationTargetException
 	 */
+	@SuppressWarnings({ "rawtypes", "unused" })
 	public <T> Class<T> getGenericName(Collection<T> collection) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Method collectionToArray = Collection.class.getDeclaredMethod("toArray");
 		Object current = collectionToArray.invoke(collection, null);
