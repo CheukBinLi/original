@@ -18,11 +18,22 @@ import java.lang.annotation.Target;
 @Inherited
 @Documented
 public @interface RmiServer {
-
+	/***
+	 * 注解实例名字
+	 * @return
+	 */
 	String serviceName() default "";
 
+	/***
+	 * 版本
+	 * @return
+	 */
 	String version() default "1.0";
 
+	/**
+	 * 多例
+	 * @return
+	 */
 	boolean multiInstance() default false;
 
 }

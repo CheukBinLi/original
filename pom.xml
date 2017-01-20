@@ -66,9 +66,8 @@
 		<module>original-common</module>
 		<module>original-cache</module>
 		<module>original-db-manager</module>
-<!-- 		<module>original-generate</module>
-		<module>original-weixin</module> -->
-		<!-- <module>original-test</module> -->
+		<!-- <module>original-generate</module> <module>original-weixin</module> -->
+		<module>original-test</module>
 		<module>original-web</module>
 		<module>original-search</module>
 		<module>original-annotation</module>
