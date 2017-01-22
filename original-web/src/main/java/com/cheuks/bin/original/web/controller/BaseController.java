@@ -11,11 +11,15 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.cheuks.bin.original.config.Service;
 import com.cheuks.bin.original.web.Client;
 import com.cheuks.bin.original.web.customer.MessageOption.SenderType;
 import com.cheuks.bin.original.web.customer.MessagePackage;
@@ -23,6 +27,9 @@ import com.cheuks.bin.original.web.customer.MessagePackage;
 @Controller
 @Scope("prototype")
 public class BaseController {
+
+	@Autowired
+	private ApplicationContext applicationContext;
 
 	/***
 	 * 
@@ -64,9 +71,10 @@ public class BaseController {
 	}
 
 	@RequestMapping("hh")
-	public ModelAndView hh(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView hh(HttpServletRequest  request, HttpServletResponse response) {
 		// System.out.println(request.getScheme());
 		// System.out.println(request.getPathInfo());
+		Object o = applicationContext.getBean("INTERFACE_3");
 		return new ModelAndView("hh");
 	}
 
