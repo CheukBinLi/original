@@ -38,6 +38,12 @@ public interface RegistrationFactory<SubNodeEvent, NodeEvent> {
 
 	String getValue(String serviceDirectory, String key) throws Throwable;
 
+	/***
+	 * 删除服务节点
+	 * 
+	 * @param serviceDirectory
+	 * @throws Throwable
+	 */
 	void removeServiceDirectory(String serviceDirectory) throws Throwable;
 
 	/***
