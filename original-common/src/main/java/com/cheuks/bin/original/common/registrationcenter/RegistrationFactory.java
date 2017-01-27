@@ -36,6 +36,10 @@ public interface RegistrationFactory<SubNodeEvent, NodeEvent> {
 	 */
 	String setValue(String serviceDirectory, String key, String value) throws Throwable;
 
+	String getValue(String serviceDirectory, String key) throws Throwable;
+
+	void removeServiceDirectory(String serviceDirectory) throws Throwable;
+
 	/***
 	 * 是否已注册
 	 * 

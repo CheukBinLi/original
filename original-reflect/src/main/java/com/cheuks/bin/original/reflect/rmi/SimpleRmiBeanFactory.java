@@ -3,20 +3,27 @@ package com.cheuks.bin.original.reflect.rmi;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import com.cheuks.bin.original.annotation.RmiClient;
 import com.cheuks.bin.original.annotation.RmiServer;
+import com.cheuks.bin.original.common.util.ConverType;
 import com.cheuks.bin.original.common.util.Scan;
 import com.cheuks.bin.original.common.util.ScanSimple;
 import com.cheuks.bin.original.reflect.Reflection;
+import com.cheuks.bin.original.reflect.config.ReferenceConfig;
+import com.cheuks.bin.original.reflect.config.ServiceConfig;
 import com.cheuks.bin.original.reflect.rmi.model.ClassBean;
 import com.cheuks.bin.original.reflect.rmi.model.MethodBean;
 
@@ -33,9 +40,13 @@ import javassist.NotFoundException;
  * @author ben
  *
  */
-public class SimpleRmiBeanFactory implements RmiBeanFactory {
+public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextAware {
 
 	private final static Logger LOG = LoggerFactory.getLogger(SimpleRmiBeanFactory.class);
+
+	private ApplicationContext applicationContext;
+
+	private DefaultListableBeanFactory defaultListableBeanFactory;
 
 	private ClassPool pool = ClassPool.getDefault();
 
@@ -47,10 +58,6 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory {
 	private volatile boolean isActivate;
 
 	private final Map<String, MethodBean> METHOD_BEAN = new ConcurrentHashMap<String, MethodBean>();
-	private final Map<String, ClassBean> BEAN = new ConcurrentHashMap<String, ClassBean>();
-	private final Map<String, ClassBean> CLASS_NAME_BEAN = new ConcurrentHashMap<String, ClassBean>();
-	private final Map<String, ClassBean> SIMPLE_CLASS_NAME_BEAN = new ConcurrentHashMap<String, ClassBean>();
-	private final List<ClassBean> CLASS_BEAN = new CopyOnWriteArrayList<ClassBean>();
 
 	public synchronized boolean isActivate() {
 		return isActivate;
@@ -69,28 +76,13 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory {
 	}
 
 	public <T> T getBean(Class<T> c) throws Throwable {
-		return getBean(c.getName());
+		return applicationContext.getBean(c);
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> T getBean(String serviceName) throws Throwable {
-		ClassBean o = BEAN.get(serviceName);
-		if (null == o)
-			o = CLASS_NAME_BEAN.get(serviceName);
-		if (null == o)
-			o = SIMPLE_CLASS_NAME_BEAN.get(serviceName.toUpperCase());
-		if (LOG.isDebugEnabled())
-			LOG.debug("getBean:serviceName:" + serviceName + " result is null:" + (null == o));
-		if (null != o) {
-			synchronized (o) {
-				if (o.isMultiInstance())
-					return (T) o.getClass().newInstance();
-				if (null == o.getInstance())
-					return (T) o.setInstance(o.getClass().newInstance()).getInstance();
-			}
-			return (T) o.getInstance();
-		}
-		return null;
+		Object result = applicationContext.getBean(serviceName);
+		return null == result ? null : (T) result;
 	}
 
 	public MethodBean getMethod(String code) throws Throwable {
@@ -99,11 +91,11 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory {
 
 	public void scanRegistered(String path) throws Throwable {
 		isActivate = true;
-		String[] paths = path.split(",");
 		if (null == scan)
 			scan = new ScanSimple();
 		Map<String, Set<String>> classes = scan.doScan(path);
 		// 过滤
+		String id;
 		Class<?> tempClass;
 		String version;
 		boolean multiInstance;
@@ -112,13 +104,13 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory {
 		Iterator<String> it;
 		RmiClient client;
 		RmiServer server;
-		// MethodBean bean;
 		Annotation tempAnnotation;
 		String serviceName;
 		Method[] methods;
 		// 扫描CLASS
-		for (String p : paths) {
-			classPaths = classes.get(p);
+		// for (String p : paths) {
+		for (Entry<String, Set<String>> en : classes.entrySet()) {
+			classPaths = en.getValue();
 			if (null != classPaths) {
 				it = classPaths.iterator();
 				while (it.hasNext()) {
@@ -126,32 +118,34 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory {
 					try {
 						if (className.endsWith("class")) {
 							tempClass = Class.forName(className.replace("/", ".").replace(".class", ""));
-							// tempAnnotation = tempClass.getDeclaredAnnotation(RmiClient.class);
+							// 注解/xml
 							if (null != (tempAnnotation = tempClass.getDeclaredAnnotation(RmiClient.class))) {
 								// Rmi注解
 								client = (RmiClient) tempAnnotation;
 
+								id = (id = client.id()).length() > 0 ? id : ConverType.newInstance().toLowerCaseFirstOne(tempClass.getSimpleName());
 								version = client.version();
 								multiInstance = client.multiInstance();
 								// 注册名
 								serviceName = client.serviceImplementation();
-								// serviceName = serviceName.length() < 1 ? tempClass.getName() : serviceName;
 
 								final ClassBean classBean = new ClassBean(tempClass, serviceName, version, multiInstance);
 
-								CLASS_BEAN.add(classBean);
 								// 生成代理类
 								classBean.setProxyClassFile(classRefactor(classBean, com.cheuks.bin.original.reflect.rmi.RmiClient.class, SimpleRmiClient.class));
 								if (!classBean.isMultiInstance())
 									classBean.setInstance(classBean.getProxyClassFile().newInstance());
 
-								BEAN.put(classBean.getRegistrationServiceName(), classBean);
-								CLASS_NAME_BEAN.put(classBean.getOriginalClassFile().getName(), classBean);
-								SIMPLE_CLASS_NAME_BEAN.put(classBean.getOriginalClassFile().getSimpleName().toUpperCase(), classBean);
+								// 注册
+								BeanDefinitionBuilder bean = BeanDefinitionBuilder.genericBeanDefinition(classBean.getProxyClassFile());
+								if (multiInstance)
+									bean.setScope("prototype");
+//								defaultListableBeanFactory.registerBeanDefinition(id, bean.getRawBeanDefinition());
 
 								if (LOG.isDebugEnabled())
 									LOG.debug("RmiClient:" + classBean.getProxyClassFile().getName() + " ||  register:" + classBean.getRegistrationServiceName());
-							} else if (null != (tempAnnotation = tempClass.getDeclaredAnnotation(RmiServer.class))) {
+							} // 注解/xml
+							else if (null != (tempAnnotation = tempClass.getDeclaredAnnotation(RmiServer.class))) {
 								// Rmi注解
 								server = (RmiServer) tempAnnotation;
 
@@ -159,7 +153,6 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory {
 								multiInstance = server.multiInstance();
 								// 注册名
 								serviceName = server.serviceName();
-								// serviceName = serviceName.length() < 1 ? tempClass.getName() : serviceName;
 
 								final ClassBean classBean = new ClassBean(tempClass, serviceName, version, multiInstance);
 								classBean.setProxyClassFile(tempClass);
@@ -185,6 +178,83 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory {
 		}
 	}
 
+	@SuppressWarnings("static-access")
+	protected void xmlRegistered() throws Throwable {
+		// ProtocolConfig protocolConfig = applicationContext.getBean(ProtocolConfig.class);
+		// ReferenceConfig referenceConfig = applicationContext.getBean(ReferenceConfig.class);
+		// ServiceConfig serviceConfig = applicationContext.getBean(ServiceConfig.class);
+
+		// 过滤
+		String id = null;
+		Class<?> tempClass;
+		String version;
+		boolean multiInstance;
+		ReferenceConfig tempReferenceConfig;
+		ServiceConfig tempServiceConfig;
+		Iterator<ReferenceConfig> referenceConfigIt;
+		Iterator<ServiceConfig> serviceConfigIt;
+		Method[] methods;
+		referenceConfigIt = ReferenceConfig.getBeans().iterator();
+		serviceConfigIt = ServiceConfig.getBeans().iterator();
+		try {
+			while (referenceConfigIt.hasNext()) {
+				tempReferenceConfig = referenceConfigIt.next();
+				tempClass = Class.forName(tempReferenceConfig.getInterfaceName().replace("/", ".").replace(".class", ""));
+				// 注解/xml
+				// Rmi注解
+
+				id = tempReferenceConfig.getId();
+				version = tempReferenceConfig.getVersion();
+				multiInstance = tempReferenceConfig.isMultiInstance();
+				// // 注册名
+				// serviceName = client.serviceImplementation();
+
+				final ClassBean classBean = new ClassBean(tempClass, id, version, multiInstance);
+
+				// 生成代理类
+				classBean.setProxyClassFile(classRefactor(classBean, com.cheuks.bin.original.reflect.rmi.RmiClient.class, SimpleRmiClient.class));
+				if (!classBean.isMultiInstance())
+					classBean.setInstance(classBean.getProxyClassFile().newInstance());
+
+				// 注册
+				BeanDefinitionBuilder bean = BeanDefinitionBuilder.genericBeanDefinition(classBean.getProxyClassFile());
+				if (multiInstance)
+					bean.setScope("prototype");
+				defaultListableBeanFactory.registerBeanDefinition(id, bean.getRawBeanDefinition());
+
+				if (LOG.isDebugEnabled())
+					LOG.debug("RmiClient:" + classBean.getProxyClassFile().getName() + " ||  register:" + classBean.getRegistrationServiceName());
+				// 注解/xml
+			}
+			while (serviceConfigIt.hasNext()) {
+				tempServiceConfig = serviceConfigIt.next();
+				tempClass = Class.forName(tempServiceConfig.getInterfaceName().replace("/", ".").replace(".class", ""));
+				// 注解/xml
+				id = tempServiceConfig.getId();
+				version = tempServiceConfig.getVersion();
+				multiInstance = tempServiceConfig.isMultiInstance();
+				// 注册名
+
+				final ClassBean classBean = new ClassBean(tempClass, id, version, multiInstance);
+				classBean.setProxyClassFile(tempClass);
+				// 分解Method
+				//
+				// 服务端
+				methods = classBean.getOriginalClassFile().getDeclaredMethods();
+				for (Method m : methods) {
+					final MethodBean bean = MethodBean.builder(classBean, m);
+					METHOD_BEAN.put(bean.getMd5Code(), bean);
+				}
+				if (LOG.isDebugEnabled())
+					LOG.debug("RmiServer:" + classBean.getProxyClassFile().getName() + "||   register:" + classBean.getRegistrationServiceName());
+			}
+		} catch (ClassNotFoundException e) {
+			System.out.println(id);
+			e.printStackTrace();
+		}
+
+	}
+
 	// 普通类
 	public Class<?> classRefactor(final ClassBean classBean, final Class<?> rmiClientInterface, final Class<?> rmiClientImpl) throws Throwable {
 
@@ -199,6 +269,7 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory {
 		else
 			newClass.setSuperclass(orginalClass);
 
+		// 添加注入
 		// 添加 rmiclient里的field
 		CtField rmiClientInvokeMethod = CtField.make(String.format("public %s rmiClientInvokeMethod=new %s();", rmiClientInterface.getName(), rmiClientImpl.getName()), newClass);
 		newClass.addField(rmiClientInvokeMethod);
@@ -271,6 +342,11 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory {
 			return "((Float" + objectName + ").floatValue()";
 		}
 		return String.format("(%s)%s", t.getName(), objectName);
+	}
+
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+		defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
 	}
 
 	public String getSuffixName() {

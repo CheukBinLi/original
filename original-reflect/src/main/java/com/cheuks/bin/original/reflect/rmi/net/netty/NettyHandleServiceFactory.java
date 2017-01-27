@@ -14,7 +14,7 @@ public class NettyHandleServiceFactory extends HandleService<ChannelHandlerConte
 			synchronized (ChannelHandlerContext.class) {
 				if (null == newInstance) {
 					newInstance = new NettyHandleServiceFactory();
-					newInstance().start(poolSize);
+					newInstance.start(poolSize);
 				}
 			}
 		}

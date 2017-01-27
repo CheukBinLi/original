@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://cheuks.bin.com/schema/rmi" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans" targetNamespace="http://cheuks.bin.com/schema/rmi">
+
+	<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[ Namespace support for the dubbo services provided by original framework.]]></xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="service">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[remote invoke server]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:string" use="required">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[register name]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="interface" type="xsd:token" use="required" />
+			<xsd:attribute name="class" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[Implementation class]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="ref" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[ref Implementation bean]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="version" type="xsd:string" default="1.0" />
+			<xsd:attribute name="multiInstance" type="xsd:boolean" default="false" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="reference">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[reference remote invoke service]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:string" use="required">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[register name]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="interface" type="xsd:string" use="required" />
+			<xsd:attribute name="version" type="xsd:string" default="1.0" />
+			<xsd:attribute name="multiInstance" type="xsd:boolean" default="false" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="registry">
+		<xsd:complexType>
+			<xsd:attribute name="applicationAddress" use="optional" type="xsd:string" default="">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[server name]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="baseSleepTimeMs" use="optional" type="xsd:integer" default="500">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[baseSleepTimeMs initial amount of time to wait between retries]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="maxRetries" use="optional" type="xsd:integer" default="20">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[maxRetries max number of times to retry]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="address" use="required">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[zookeeper register]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="protocol">
+		<xsd:complexType>
+			<xsd:attribute name="port" use="required" type="xsd:integer">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[listen port]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="scanPackage" use="optional" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[listen port]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="netWorkThreads" use="optional" type="xsd:integer" default="4">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[listen port]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="handleThreads" use="optional" type="xsd:integer" default="4">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[listen port]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="charset" use="optional" type="xsd:string" default="utf-8">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[listen port]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="heartbeat" use="optional" type="xsd:integer" default="600">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[heartbeat interval second,default 10m]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="payload" use="optional" type="xsd:integer" default="5000">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[Maximum packet size,default 5M]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="refSerialize" use="optional" type="xsd:string" default="">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[The serialized object references]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="refRmiBeanFactory" use="optional" type="xsd:string" default="">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[The remote invocation interface implementation class]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="refHandleServiceFactory" use="optional" type="xsd:string" default="">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[The remote invocation interface implementation class]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>

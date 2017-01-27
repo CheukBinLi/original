@@ -41,7 +41,19 @@ public class ConverType {
 		return (T) o;
 	}
 
-	public static void main(String[] args) {
+	public String toUpperCaseFirstOne(String name) {
+		char[] ch = name.toCharArray();
+		ch[0] = Character.toUpperCase(ch[0]);
+		return new String(ch);
+	}
+
+	public String toLowerCaseFirstOne(String name) {
+		char[] ch = name.toCharArray();
+		ch[0] = Character.toLowerCase(ch[0]);
+		return new String(ch);
+	}
+
+	public void main(String[] args) {
 		System.out.println(Thread.currentThread().getContextClassLoader().getResource(""));
 		int a = (Integer) ConverType.newInstance.convery(1);
 		int[] b = new int[0];

@@ -48,6 +48,8 @@ public class ScanSimple extends AbstractScan {
 
 	public final Map<String, Set<String>> doScan(String path) throws IOException, InterruptedException, ExecutionException {
 		Map<String, Set<String>> result = new HashMap<String, Set<String>>();
+		if (null == path)
+			return result;
 		String[] originalPaths = path.split(",");
 		path = path.replace(".", "/");
 		path = path.replace(File.separator, "/").replace("$", ".");

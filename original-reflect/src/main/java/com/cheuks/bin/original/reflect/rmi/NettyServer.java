@@ -1,10 +1,21 @@
 package com.cheuks.bin.original.reflect.rmi;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.CountDownLatch;
+
+import org.apache.curator.framework.recipes.cache.NodeCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import com.cheuks.bin.original.cache.FstCacheSerialize;
 import com.cheuks.bin.original.common.cache.CacheSerialize;
+import com.cheuks.bin.original.common.registrationcenter.ElectionCallBack;
+import com.cheuks.bin.original.common.registrationcenter.RegistrationEventListener;
+import com.cheuks.bin.original.common.registrationcenter.RegistrationFactory;
 import com.cheuks.bin.original.common.util.CollectionUtil;
 import com.cheuks.bin.original.reflect.rmi.net.MessageHandle;
 import com.cheuks.bin.original.reflect.rmi.net.netty.NettyHandleServiceFactory;
@@ -13,6 +24,7 @@ import com.cheuks.bin.original.reflect.rmi.net.netty.NettyMessageDecoder;
 import com.cheuks.bin.original.reflect.rmi.net.netty.NettyMessageEncoder;
 import com.cheuks.bin.original.reflect.rmi.net.netty.NettyServerHandle;
 import com.cheuks.bin.original.reflect.rmi.net.netty.RmiServiceHandle;
+import com.cheuks.bin.original.registration.center.ZookeeperRegistrationFactory;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -25,9 +37,11 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
-public class NettyServer {
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NettyServer.class);
+	private Thread task;
 
 	private CacheSerialize cacheSerialize;
 	private int port = 10086;
@@ -35,19 +49,43 @@ public class NettyServer {
 	private int heartBeatTimeoutSecond = 120;
 	private RmiBeanFactory rmiBeanFactory;
 	private int maxFrameLength = 5000;
+	private int handleThreads = 10;
+	private String scanPath;
+	private String zookeeperServerList = "127.0.0.1:2181";
+	private String applicationName;
+	private int baseSleepTimeMs = 5000;
+	private int maxRetries = 20;
 
-	private MessageHandle<Object, Object, Object> messageHandle;
+	private MessageHandle messageHandle;
 
-	public void run() throws InterruptedException, NullPointerException {
-		start(this.poolSize);
+	private RegistrationFactory registrationFactory;
+
+	public synchronized void run() throws InterruptedException, NullPointerException {
+		if (null == task || !task.isInterrupted()) {
+			task = new Thread(new Runnable() {
+				public void run() {
+					try {
+						start(poolSize);
+					} catch (Throwable e) {
+						LOG.error("NettyServer.class -method: run()", e);
+					}
+				}
+			});
+			task.start();
+		}
 	}
 
-	public void start(int poolSize) throws InterruptedException, NullPointerException {
-		LOG.info("server is start.");
-		if (null == rmiBeanFactory)
+	private void start(int poolSize) throws Throwable {
+		if (LOG.isDebugEnabled())
+			LOG.info("server is start.");
+		if (null == rmiBeanFactory) {
 			throw new NullPointerException("rmiBeanFactory is null");
+		}
+		rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", scanPath));
+
 		if (null == messageHandle)
-			throw new NullPointerException("messageHandle is null");
+			messageHandle = NettyHandleServiceFactory.newInstance(handleThreads);
+		// throw new NullPointerException("messageHandle is null");
 		if (null == cacheSerialize)
 			cacheSerialize = new FstCacheSerialize();
 		// 心跳
@@ -56,6 +94,13 @@ public class NettyServer {
 			// RMI服务
 			messageHandle.addHandle(MessageHandle.RMI_REQUEST, new RmiServiceHandle(rmiBeanFactory));
 		}
+		// 注解目录
+		if (null == registrationFactory) {
+			registrationFactory = new ZookeeperRegistrationFactory(zookeeperServerList, baseSleepTimeMs, maxRetries);
+		}
+		registrationFactory.init();
+		registrationFactory.createService("/aa", null);
+		registrationFactory.register("/aa", "/" + InetAddress.getLocalHost().getHostName(), InetAddress.getLocalHost().getHostAddress() + ":" + this.port, null);
 
 		final EventLoopGroup bossGroup = new NioEventLoopGroup(poolSize);
 		final EventLoopGroup workerGroup = new NioEventLoopGroup(poolSize);
@@ -146,14 +191,86 @@ public class NettyServer {
 		return this;
 	}
 
-	public MessageHandle<Object, Object, Object> getMessageHandle() {
+	public MessageHandle getMessageHandle() {
 		return messageHandle;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public NettyServer setMessageHandle(MessageHandle messageHandle) {
 		this.messageHandle = messageHandle;
 		return this;
+	}
+
+	public int getHandleThreads() {
+		return handleThreads;
+	}
+
+	public NettyServer setHandleThreads(int handleThreads) {
+		this.handleThreads = handleThreads;
+		return this;
+	}
+
+	public String getScanPath() {
+		return scanPath;
+	}
+
+	public NettyServer setScanPath(String scanPath) {
+		this.scanPath = scanPath;
+		return this;
+	}
+
+	public String getZookeeperServerList() {
+		return zookeeperServerList;
+	}
+
+	public NettyServer setZookeeperServerList(String zookeeperServerList) {
+		this.zookeeperServerList = zookeeperServerList;
+		return this;
+	}
+
+	public int getBaseSleepTimeMs() {
+		return baseSleepTimeMs;
+	}
+
+	public NettyServer setBaseSleepTimeMs(int baseSleepTimeMs) {
+		this.baseSleepTimeMs = baseSleepTimeMs;
+		return this;
+	}
+
+	public int getMaxRetries() {
+		return maxRetries;
+	}
+
+	public NettyServer setMaxRetries(int maxRetries) {
+		this.maxRetries = maxRetries;
+		return this;
+	}
+
+	public RegistrationFactory getRegistrationFactory() {
+		return registrationFactory;
+	}
+
+	public NettyServer setRegistrationFactory(RegistrationFactory registrationFactory) {
+		this.registrationFactory = registrationFactory;
+		return this;
+	}
+
+	public String getApplicationName() {
+		return applicationName;
+	}
+
+	public NettyServer setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
+		return this;
+	}
+
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+		try {
+			if (LOG.isDebugEnabled())
+				LOG.debug("init -- NettyServer");
+			run();
+		} catch (Exception e) {
+			LOG.error("NettyServer.class", e);
+		}
 	}
 
 	public static void main(String[] args) throws Throwable {
@@ -164,5 +281,16 @@ public class NettyServer {
 
 		ns.setPoolSize(5).setMessageHandle(handleServiceFactory).setPort(10087).setRmiBeanFactory(rmiBeanFactory).setCacheSerialize(new FstCacheSerialize());
 		ns.run();
+
+		// NettyServer ns = new NettyServer();
+		//
+		// RegistrationFactory register = new ZookeeperRegistrationFactory(ns.getZookeeperServerList(), ns.baseSleepTimeMs, ns.maxRetries);
+		// register.init();
+		// register.createService("/abcdefg", new RegistrationEventListener<PathChildrenCacheEvent>() {
+		// public void nodeChanged(PathChildrenCacheEvent params) throws Exception {
+		// System.err.println("createService:" + new String(params.getData().getData()));
+		// }
+		// });
+
 	}
 }

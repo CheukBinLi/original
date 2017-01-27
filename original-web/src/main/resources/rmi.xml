@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+   	http://cheuks.bin.com/schema/rmi
+	http://cheuks.bin.com/schema/rmi.xsd
+	">
+
+	<rmi:protocol port="10086" />
+	<rmi:service interface="com.a.b.c" id="110" />
+	<rmi:service interface="com.a.b.c.a" id="111" />
+	<rmi:service interface="com.a.b.c.b" id="112" />
+	<rmi:service interface="com.a.b.c.c" id="113" />
+
+	<rmi:reference interface="com.a.b.c.c" id="114" />
+</beans>

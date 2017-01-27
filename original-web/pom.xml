@@ -303,6 +303,11 @@
 			<artifactId>original-config</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.cheuks.bin</groupId>
+			<artifactId>original-reflect</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>original-web</finalName>

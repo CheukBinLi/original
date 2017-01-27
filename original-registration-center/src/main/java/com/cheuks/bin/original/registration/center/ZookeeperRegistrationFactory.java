@@ -68,7 +68,7 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<PathChi
 
 	public String register(String serviceDirectory, String key, String value, final RegistrationEventListener<NodeCache> eventListener) throws Throwable {
 		if (null == serviceDirectory || !serviceDirectory.startsWith("/") || null == key || !key.startsWith("/"))
-			throw new Throwable("the serviceDirectory must be start with /");
+			throw new Throwable("the serviceDirectory must be start with /  ,serviceDirectory:" + serviceDirectory);
 		if (null == curatorFramework.checkExists().forPath(serviceDirectory))
 			throw new Throwable("can't found " + serviceDirectory + " service.");
 
@@ -99,6 +99,20 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<PathChi
 			result = curatorFramework.setData().forPath(serviceDirectory + key, value.getBytes());
 		}
 		return null == result ? null : serviceDirectory;
+	}
+
+	public String getValue(String serviceDirectory, String key) throws Throwable {
+		if (null == serviceDirectory || !serviceDirectory.startsWith("/") || null == key || !key.startsWith("/"))
+			throw new Throwable("the serviceDirectory must be start with /");
+		byte[] result;
+		result = curatorFramework.getData().forPath(serviceDirectory + key);
+		return null == result ? null : new String(result);
+	}
+
+	public void removeServiceDirectory(String serviceDirectory) throws Throwable {
+		if (null == serviceDirectory || !serviceDirectory.startsWith("/"))
+			throw new Throwable("the serviceDirectory must be start with /");
+		curatorFramework.delete().forPath(serviceDirectory);
 	}
 
 	public boolean isRegister(String directory, String value) throws Throwable {
