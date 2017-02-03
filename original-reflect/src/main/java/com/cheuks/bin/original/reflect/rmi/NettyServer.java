@@ -83,11 +83,11 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
 		}
 		rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", scanPath));
 
+		if (null == cacheSerialize)
+			cacheSerialize = new FstCacheSerialize();
 		if (null == messageHandle)
 			messageHandle = NettyHandleServiceFactory.newInstance(handleThreads);
 		// throw new NullPointerException("messageHandle is null");
-		if (null == cacheSerialize)
-			cacheSerialize = new FstCacheSerialize();
 		// 心跳
 		messageHandle.addHandle(MessageHandle.HEAR_BEAT, new NettyHearBeatServiceHandle());
 		if (!messageHandle.handleContains(MessageHandle.RMI_REQUEST)) {

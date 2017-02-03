@@ -28,7 +28,7 @@ import com.cheuks.bin.original.common.registrationcenter.RegistrationFactory;
 @SuppressWarnings("resource")
 public class ZookeeperRegistrationFactory implements RegistrationFactory<PathChildrenCacheEvent, NodeCache> {
 
-	private String serverList = "127.0.0.2:2181,127.0.0.1:2181,";
+	private String serverList = "127.0.0.2:2181,127.0.0.1:2181,192.168.3.12:2181";
 
 	private CuratorFramework curatorFramework;
 
@@ -237,6 +237,7 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<PathChi
 				}
 			});
 			zrf.register(directory, "/mmx_4", "我是mmx_4", null);
+			zrf.register(directory, "/mmx_4/temp_node", "我是mmx_4的临时节点字节点", null);
 
 			zrf.setValue(directory, "/mmx_1", "441");
 
