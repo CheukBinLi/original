@@ -6,6 +6,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 import com.cheuks.bin.original.reflect.config.ProtocolConfig;
 import com.cheuks.bin.original.reflect.config.ReferenceConfig;
+import com.cheuks.bin.original.reflect.config.RegistryConfig;
 import com.cheuks.bin.original.reflect.config.ServiceConfig;
 
 public class RmiNamespaceHandler extends NamespaceHandlerSupport {
@@ -17,6 +18,7 @@ public class RmiNamespaceHandler extends NamespaceHandlerSupport {
 			registerBeanDefinitionParser("service", new RmiBeanDefinitionParser(ServiceConfig.class));
 			registerBeanDefinitionParser("reference", new RmiBeanDefinitionParser(ReferenceConfig.class));
 			registerBeanDefinitionParser("protocol", new RmiBeanDefinitionParser(ProtocolConfig.class));
+			registerBeanDefinitionParser("registry", new RmiBeanDefinitionParser(RegistryConfig.class));
 		} catch (Exception e) {
 			LOG.error("RmiNamespaceHandler.class", e);
 		}

@@ -1,20 +1,12 @@
 package com.cheuks.bin.original.reflect.rmi;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.CountDownLatch;
 
-import org.apache.curator.framework.recipes.cache.NodeCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import com.cheuks.bin.original.cache.FstCacheSerialize;
 import com.cheuks.bin.original.common.cache.CacheSerialize;
-import com.cheuks.bin.original.common.registrationcenter.ElectionCallBack;
-import com.cheuks.bin.original.common.registrationcenter.RegistrationEventListener;
 import com.cheuks.bin.original.common.registrationcenter.RegistrationFactory;
 import com.cheuks.bin.original.common.util.CollectionUtil;
 import com.cheuks.bin.original.reflect.rmi.net.MessageHandle;
@@ -38,7 +30,7 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
+public class NettyServer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NettyServer.class);
 	private Thread task;
@@ -53,12 +45,17 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
 	private String scanPath;
 	private String zookeeperServerList = "127.0.0.1:2181";
 	private String applicationName;
+	private String applicationUrl;
 	private int baseSleepTimeMs = 5000;
 	private int maxRetries = 20;
+	private boolean isServer;
+	private boolean isClient;
 
 	private MessageHandle messageHandle;
 
 	private RegistrationFactory registrationFactory;
+
+	private RegisterServiceServerHandler registerServiceHandler;
 
 	public synchronized void run() throws InterruptedException, NullPointerException {
 		if (null == task || !task.isInterrupted()) {
@@ -79,7 +76,8 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
 		if (LOG.isDebugEnabled())
 			LOG.info("server is start.");
 		if (null == rmiBeanFactory) {
-			throw new NullPointerException("rmiBeanFactory is null");
+			rmiBeanFactory = new SimpleRmiBeanFactory();
+			// throw new NullPointerException("rmiBeanFactory is null");
 		}
 		rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", scanPath));
 
@@ -98,9 +96,17 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
 		if (null == registrationFactory) {
 			registrationFactory = new ZookeeperRegistrationFactory(zookeeperServerList, baseSleepTimeMs, maxRetries);
 		}
-		registrationFactory.init();
-		registrationFactory.createService("/aa", null);
-		registrationFactory.register("/aa", "/" + InetAddress.getLocalHost().getHostName(), InetAddress.getLocalHost().getHostAddress() + ":" + this.port, null);
+		if (null == applicationUrl) {
+			applicationUrl = InetAddress.getLocalHost().getHostAddress();
+		}
+		if (null == registerServiceHandler) {
+			registrationFactory.setUrl(zookeeperServerList);
+			registerServiceHandler = new RegisterServiceServerHandler(applicationName, applicationUrl + ":" + port, registrationFactory);
+		}
+		registerServiceHandler.register();
+		// registrationFactory.init();
+		// registrationFactory.createService("/aa", null);
+		// registrationFactory.register("/aa", "/" + InetAddress.getLocalHost().getHostName(), InetAddress.getLocalHost().getHostAddress() + ":" + this.port, null);
 
 		final EventLoopGroup bossGroup = new NioEventLoopGroup(poolSize);
 		final EventLoopGroup workerGroup = new NioEventLoopGroup(poolSize);
@@ -263,14 +269,40 @@ public class NettyServer implements ApplicationListener<ContextRefreshedEvent> {
 		return this;
 	}
 
-	public void onApplicationEvent(ContextRefreshedEvent event) {
-		try {
-			if (LOG.isDebugEnabled())
-				LOG.debug("init -- NettyServer");
-			run();
-		} catch (Exception e) {
-			LOG.error("NettyServer.class", e);
-		}
+	public String getApplicationUrl() {
+		return applicationUrl;
+	}
+
+	public NettyServer setApplicationUrl(String applicationUrl) {
+		this.applicationUrl = applicationUrl;
+		return this;
+	}
+
+	public boolean isServer() {
+		return isServer;
+	}
+
+	public NettyServer setIsServer(boolean isServer) {
+		this.isServer = isServer;
+		return this;
+	}
+
+	public boolean isClient() {
+		return isClient;
+	}
+
+	public NettyServer setIsClient(boolean isClient) {
+		this.isClient = isClient;
+		return this;
+	}
+
+	public RegisterServiceServerHandler getRegisterServiceHandler() {
+		return registerServiceHandler;
+	}
+
+	public NettyServer setRegisterServiceHandler(RegisterServiceServerHandler registerServiceHandler) {
+		this.registerServiceHandler = registerServiceHandler;
+		return this;
 	}
 
 	public static void main(String[] args) throws Throwable {

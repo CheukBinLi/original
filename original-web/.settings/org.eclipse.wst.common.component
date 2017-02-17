@@ -13,6 +13,18 @@
         <dependent-module archiveName="original-db-manager-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/original-db-manager/original-db-manager">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="original-config-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/original-config/original-config">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="original-reflect-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/original-reflect/original-reflect">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="original-annotation-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/original-annotation/original-annotation">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="original-registration-center-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/original-registration-center/original-registration-center">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="context-root" value="original-web"/>
         <property name="java-output-path" value="/original-web/target/classes"/>
     </wb-module>

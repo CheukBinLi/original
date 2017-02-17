@@ -10,7 +10,9 @@ public class ProtocolConfig extends AbstractConfig {
 	private static final long serialVersionUID = 1L;
 
 	private String name;// 服务协议()
+	private String host;// 地址
 	private int port;// 端口
+	private String serviceType;// 服务类型 :服务端/客户端
 	private String scanPackage;// 扫描目录
 	private int netWorkThreads;// 网络你监听线程数
 	private int handleThreads;// 处理线程数
@@ -19,6 +21,7 @@ public class ProtocolConfig extends AbstractConfig {
 	private int payload;// 最大请求数据长度
 	private String refSerialize;// 序列化接口
 	private String refRmiBeanFactory;// 远程调用接口
+	private String refHandleServiceFactory;// 远程服务处理接口
 
 	@Override
 	public AbstractConfig makeConfig(Element element, ParserContext parserContext) {
@@ -35,7 +38,9 @@ public class ProtocolConfig extends AbstractConfig {
 		// parserContext.getRegistry().registerBeanDefinition("rmiProtocolConfig", BeanDefinitionBuilder.);
 		BeanDefinition beanDefinition = new RootBeanDefinition(ProtocolConfig.class);
 		beanDefinition.getPropertyValues().add("name", element.getAttribute("name"));
+		beanDefinition.getPropertyValues().add("host", element.getAttribute("host"));
 		beanDefinition.getPropertyValues().add("port", Integer.valueOf(element.getAttribute("port")));
+		beanDefinition.getPropertyValues().add("serviceType", element.getAttribute("serviceType"));
 		beanDefinition.getPropertyValues().add("scanPackage", element.getAttribute("scanPackage"));
 		beanDefinition.getPropertyValues().add("netWorkThreads", Integer.valueOf(element.getAttribute("netWorkThreads")));
 		beanDefinition.getPropertyValues().add("handleThreads", Integer.valueOf(element.getAttribute("handleThreads")));
@@ -44,6 +49,7 @@ public class ProtocolConfig extends AbstractConfig {
 		beanDefinition.getPropertyValues().add("payload", Integer.valueOf(element.getAttribute("payload")));
 		beanDefinition.getPropertyValues().add("refSerialize", element.getAttribute("refSerialize"));
 		beanDefinition.getPropertyValues().add("refRmiBeanFactory", element.getAttribute("refRmiBeanFactory"));
+		beanDefinition.getPropertyValues().add("refHandleServiceFactory", element.getAttribute("refHandleServiceFactory"));
 		parserContext.getRegistry().registerBeanDefinition("rmiProtocolConfig", beanDefinition);
 		return this;
 	}
@@ -57,12 +63,30 @@ public class ProtocolConfig extends AbstractConfig {
 		return this;
 	}
 
+	public String getHost() {
+		return host;
+	}
+
+	public ProtocolConfig setHost(String host) {
+		this.host = host;
+		return this;
+	}
+
 	public int getPort() {
 		return port;
 	}
 
 	public ProtocolConfig setPort(int port) {
 		this.port = port;
+		return this;
+	}
+
+	public String getServiceType() {
+		return serviceType;
+	}
+
+	public ProtocolConfig setServiceType(String serviceType) {
+		this.serviceType = serviceType;
 		return this;
 	}
 
@@ -135,6 +159,15 @@ public class ProtocolConfig extends AbstractConfig {
 
 	public ProtocolConfig setRefRmiBeanFactory(String refRmiBeanFactory) {
 		this.refRmiBeanFactory = refRmiBeanFactory;
+		return this;
+	}
+
+	public String getRefHandleServiceFactory() {
+		return refHandleServiceFactory;
+	}
+
+	public ProtocolConfig setRefHandleServiceFactory(String refHandleServiceFactory) {
+		this.refHandleServiceFactory = refHandleServiceFactory;
 		return this;
 	}
 

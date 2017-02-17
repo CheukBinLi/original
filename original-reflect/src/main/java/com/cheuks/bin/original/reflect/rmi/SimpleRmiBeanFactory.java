@@ -69,6 +69,7 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 		try {
 			String scanPath = (String) args.get("scan");
 			scanRegistered(scanPath);
+			xmlRegistered();
 		} catch (Throwable e) {
 			LOG.error(null, e);
 		}
@@ -140,7 +141,7 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 								BeanDefinitionBuilder bean = BeanDefinitionBuilder.genericBeanDefinition(classBean.getProxyClassFile());
 								if (multiInstance)
 									bean.setScope("prototype");
-//								defaultListableBeanFactory.registerBeanDefinition(id, bean.getRawBeanDefinition());
+								// defaultListableBeanFactory.registerBeanDefinition(id, bean.getRawBeanDefinition());
 
 								if (LOG.isDebugEnabled())
 									LOG.debug("RmiClient:" + classBean.getProxyClassFile().getName() + " ||  register:" + classBean.getRegistrationServiceName());
@@ -178,7 +179,6 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 		}
 	}
 
-	@SuppressWarnings("static-access")
 	protected void xmlRegistered() throws Throwable {
 		// ProtocolConfig protocolConfig = applicationContext.getBean(ProtocolConfig.class);
 		// ReferenceConfig referenceConfig = applicationContext.getBean(ReferenceConfig.class);

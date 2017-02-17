@@ -7,6 +7,6 @@ package com.cheuks.bin.original.common.registrationcenter;
  */
 public interface RegistrationEventListener<T> {
 
-	void nodeChanged(T params) throws Exception;
+	void nodeChanged(T params, Object... other) throws Exception;
 
 }

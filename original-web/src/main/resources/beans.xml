@@ -27,4 +27,6 @@
 	<bean id="redisLua" class="com.cheuks.bin.original.cache.redis.RedisLuaSimple">
 	</bean>
 
+	<bean id="nettyServer" class="com.cheuks.bin.original.reflect.rmi.NettyServer" />
+
 </beans>

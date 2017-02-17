@@ -25,6 +25,8 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.AttributeKey;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 
 /***
  * 默认多线程客户端池实现
@@ -113,7 +115,13 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 	public void addObject(final InetSocketAddress socketAddress) throws IllegalStateException, UnsupportedOperationException, Exception {
 		// Channel channel = client.connect(socketAddress).sync().channel();
 		// super.addObject(channel);
-		client.connect(socketAddress).sync().channel();
+		// client.connect(socketAddress).sync().channel();
+		client.connect(socketAddress).sync().addListener(new GenericFutureListener<Future<? super Void>>() {
+
+			public void operationComplete(Future<? super Void> future) throws Exception {
+
+			}
+		}).channel();
 	}
 
 	@Override

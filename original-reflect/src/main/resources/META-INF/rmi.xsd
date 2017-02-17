@@ -52,11 +52,7 @@
 
 	<xsd:element name="registry">
 		<xsd:complexType>
-			<xsd:attribute name="applicationAddress" use="optional" type="xsd:string" default="">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[server name]]></xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
+			<!-- <xsd:attribute name="applicationAddress" use="optional" type="xsd:string" default=""> <xsd:annotation> <xsd:documentation><![CDATA[server name]]></xsd:documentation> </xsd:annotation> </xsd:attribute> -->
 			<xsd:attribute name="baseSleepTimeMs" use="optional" type="xsd:integer" default="500">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[baseSleepTimeMs initial amount of time to wait between retries]]></xsd:documentation>
@@ -77,6 +73,20 @@
 
 	<xsd:element name="protocol">
 		<xsd:complexType>
+			<xsd:attribute name="serviceType" use="optional" default="both">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="server" />
+						<xsd:enumeration value="client" />
+						<xsd:enumeration value="both" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="host" use="optional" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[listen port]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 			<xsd:attribute name="port" use="required" type="xsd:integer">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[listen port]]></xsd:documentation>
