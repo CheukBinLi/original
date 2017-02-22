@@ -137,6 +137,11 @@
 					<xsd:documentation><![CDATA[The remote invocation interface implementation class]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
+			<xsd:attribute name="refHandleClientFactory" use="optional" type="xsd:string" default="">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[The remote invocation interface implementation class]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 
