@@ -1,6 +1,8 @@
 package com.cheuks.bin.original.reflect.rmi;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +45,9 @@ public class NettyServer {
 	private int maxFrameLength = 5000;
 	private int handleThreads = 10;
 	private String scanPath;
-	private String zookeeperServerList = "127.0.0.1:2181";
 	private String applicationName;
 	private String applicationUrl;
+	private String zookeeperServerList = "127.0.0.1:2181";
 	private int baseSleepTimeMs = 5000;
 	private int maxRetries = 20;
 	private boolean isServer;
@@ -55,20 +57,25 @@ public class NettyServer {
 
 	private RegistrationFactory registrationFactory;
 
-	private RegisterServiceServerHandler registerServiceHandler;
+	private RegisterService registerServiceHandler;
 
 	public synchronized void run() throws InterruptedException, NullPointerException {
 		if (null == task || !task.isInterrupted()) {
-			task = new Thread(new Runnable() {
-				public void run() {
-					try {
-						start(poolSize);
-					} catch (Throwable e) {
-						LOG.error("NettyServer.class -method: run()", e);
-					}
-				}
-			});
-			task.start();
+			//			task = new Thread(new Runnable() {
+			//				public void run() {
+			//					try {
+			//						start(poolSize);
+			//					} catch (Throwable e) {
+			//						LOG.error("NettyServer.class -method: run()", e);
+			//					}
+			//				}
+			//			});
+			//			task.start();
+			try {
+				start(poolSize);
+			} catch (Throwable e) {
+				LOG.error("NettyServer.class -method: run()", e);
+			}
 		}
 	}
 
@@ -76,10 +83,10 @@ public class NettyServer {
 		if (LOG.isDebugEnabled())
 			LOG.info("server is start.");
 		if (null == rmiBeanFactory) {
-			rmiBeanFactory = new SimpleRmiBeanFactory();
-			// throw new NullPointerException("rmiBeanFactory is null");
+			//			rmiBeanFactory = new SimpleRmiBeanFactory();
+			throw new NullPointerException("rmiBeanFactory is null");
 		}
-		rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", scanPath));
+		rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", scanPath, "isServer", true));
 
 		if (null == cacheSerialize)
 			cacheSerialize = new FstCacheSerialize();
@@ -97,6 +104,16 @@ public class NettyServer {
 			registrationFactory = new ZookeeperRegistrationFactory(zookeeperServerList, baseSleepTimeMs, maxRetries);
 		}
 		if (null == applicationUrl) {
+			Enumeration<NetworkInterface> ens = NetworkInterface.getNetworkInterfaces();
+			int count = 0;
+			while (ens.hasMoreElements()) {
+				ens.nextElement();
+				count++;
+				if (count > 1) {
+					throw new Exception("NetWorkInterface is more than 1.you music setting server ipaddress or domain name.");
+				}
+			}
+
 			applicationUrl = InetAddress.getLocalHost().getHostAddress();
 		}
 		if (null == registerServiceHandler) {
@@ -123,7 +140,8 @@ public class NettyServer {
 					ch.pipeline().addLast(new NettyServerHandle(messageHandle));
 				}
 			});
-			server.bind(port).sync().channel().closeFuture().sync();
+			//			server.bind(port).sync().channel().closeFuture().sync();
+			server.bind(port).sync().channel().closeFuture();
 			LOG.warn("service is close.");
 
 		} finally {
@@ -296,7 +314,7 @@ public class NettyServer {
 		return this;
 	}
 
-	public RegisterServiceServerHandler getRegisterServiceHandler() {
+	public RegisterService getRegisterServiceHandler() {
 		return registerServiceHandler;
 	}
 

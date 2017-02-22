@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.websocket.ContainerProvider;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.cheuks.bin.original.reflect.test;
+import com.cheuks.bin.original.reflect.test2I;
 import com.cheuks.bin.original.reflect.config.ProtocolConfig;
 import com.cheuks.bin.original.reflect.config.ServiceConfig;
 import com.cheuks.bin.original.web.Client;
@@ -30,6 +33,8 @@ public class BaseController {
 
 	@Autowired
 	private ApplicationContext applicationContext;
+	@Autowired
+	private test2I test;
 
 	/***
 	 * 
@@ -78,6 +83,7 @@ public class BaseController {
 		Object o = applicationContext.getBeanDefinitionNames();
 		Object x = ServiceConfig.getBeans();
 		Object z = applicationContext.getBean(ProtocolConfig.class);
+		System.out.println(test.a5());
 		return new ModelAndView("hh");
 	}
 

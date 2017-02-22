@@ -302,6 +302,7 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 
 	public static void main(String[] args) {
 		ZookeeperRegistrationFactory zrf = new ZookeeperRegistrationFactory();
+		zrf.serverList="192.168.3.12:2181";
 		try {
 			zrf.init();
 			String directory = zrf.createService("/service", new RegistrationEventListener<PathChildrenCacheEvent>() {

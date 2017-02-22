@@ -14,7 +14,7 @@ public class RegisterServiceClientHandler implements RegisterService {
 	private String applicationName;
 	private Object lock = new Object();
 
-	public RegisterServiceClientHandler(String applicationName, String applicationUrl, final RegistrationFactory<CuratorFramework, PathChildrenCacheEvent, NodeCache> registrationFactory) {
+	public RegisterServiceClientHandler(String applicationName, final RegistrationFactory<CuratorFramework, PathChildrenCacheEvent, NodeCache> registrationFactory) {
 		super();
 		this.applicationName = applicationName;
 		this.registrationFactory = registrationFactory;
@@ -30,16 +30,17 @@ public class RegisterServiceClientHandler implements RegisterService {
 				if (data.length > 5) {
 					result = new String(data);
 				}
+				System.out.println(result);
 				synchronized (lock) {
-					this.notify();
+					lock.notify();
 				}
 			}
 		});
 
 		synchronized (lock) {
-			this.wait();
+			lock.wait();
 		}
-		return result;
+		return result.substring(result.indexOf(SEPARATOR) + 1);
 	}
 
 }

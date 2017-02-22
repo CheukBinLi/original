@@ -2,6 +2,7 @@ package com.cheuks.bin.original.reflect.rmi;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.cheuks.bin.original.reflect.rmi.model.TransmissionModel;
 import com.cheuks.bin.original.reflect.rmi.net.HandleType;
@@ -17,7 +18,8 @@ public class SimpleRmiClient implements RmiClient {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SimpleRmiClient.class);
 
-	private NettyClient nettyClientFactory = NettyClientAdapter.newInstance();
+	@Autowired
+	private NettyClient nettyClientFactory;
 
 	public Object rmiInvoke(String methodName, Object... params) {
 		TransmissionModel transmissionModel = new TransmissionModel();

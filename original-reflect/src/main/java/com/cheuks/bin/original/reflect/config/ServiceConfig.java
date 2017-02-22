@@ -27,7 +27,7 @@ public class ServiceConfig extends AbstractConfig {
 		this.id = element.getAttribute("id");
 		this.interfaceName = element.getAttribute("interface");
 		this.ref = element.getAttribute("ref");
-		this.refClass = element.getAttribute("refClass");
+		this.refClass = element.getAttribute("class");
 		this.version = element.getAttribute("version");
 		this.multiInstance = Boolean.valueOf(element.getAttribute("multiInstance"));
 		beans.add(this);

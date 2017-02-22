@@ -2,7 +2,9 @@ package com.cheuks.bin.original.reflect.rmi;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ApplicationListener;
@@ -12,6 +14,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.cheuks.bin.original.reflect.config.ProtocolConfig;
 import com.cheuks.bin.original.reflect.config.RegistryConfig;
+import com.cheuks.bin.original.reflect.rmi.net.MessageHandle;
 
 public class SimpleRmiService implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -32,7 +35,7 @@ public class SimpleRmiService implements ApplicationListener<ContextRefreshedEve
 	private boolean isServer;
 	private boolean isClient;
 
-	private RegisterServiceServerHandler registerServiceHandler;
+	private MessageHandle messageHandle;//MessageHandle messageHandle
 
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		try {
@@ -51,7 +54,12 @@ public class SimpleRmiService implements ApplicationListener<ContextRefreshedEve
 			heartBeatTimeoutSecond = protocolConfig.getHeartbeat();
 
 			rmiBeanFactory = (tempString = protocolConfig.getRefSerialize()).length() > 0 ? (RmiBeanFactory) applicationContext.getBean(tempString) : null;
-			registerServiceHandler = (tempString = protocolConfig.getRefHandleServiceFactory()).length() > 0 ? (RegisterServiceServerHandler) applicationContext.getBean(tempString) : null;
+			if (null == rmiBeanFactory) {
+				BeanDefinition rmiBeanFactoryBean = new RootBeanDefinition(SimpleRmiBeanFactory.class);
+				defaultListableBeanFactory.registerBeanDefinition("rmiBeanFactory", rmiBeanFactoryBean);
+				rmiBeanFactory = (RmiBeanFactory) applicationContext.getBean("rmiBeanFactory");
+			}
+			messageHandle = (tempString = protocolConfig.getRefHandleServiceFactory()).length() > 0 ? (MessageHandle) applicationContext.getBean(tempString) : null;
 
 			maxFrameLength = protocolConfig.getPayload();
 			handleThreads = protocolConfig.getHandleThreads();
@@ -65,32 +73,52 @@ public class SimpleRmiService implements ApplicationListener<ContextRefreshedEve
 			isServer = ("server".equals(tempString) || "both".equals(tempString)) ? true : false;
 			isClient = ("client".equals(tempString) || "both".equals(tempString)) ? true : false;
 
-			BeanDefinition nettyRmiServerBean = new RootBeanDefinition(NettyServer.class);
-			nettyRmiServerBean.getPropertyValues().add("port", port);
-			nettyRmiServerBean.getPropertyValues().add("poolSize", poolSize);
-			nettyRmiServerBean.getPropertyValues().add("heartBeatTimeoutSecond", heartBeatTimeoutSecond);
-			nettyRmiServerBean.getPropertyValues().add("maxFrameLength", maxFrameLength);
-			nettyRmiServerBean.getPropertyValues().add("handleThreads", handleThreads);
-			nettyRmiServerBean.getPropertyValues().add("scanPath", scanPath);
-			nettyRmiServerBean.getPropertyValues().add("zookeeperServerList", zookeeperServerList);
-			nettyRmiServerBean.getPropertyValues().add("applicationName", applicationName);
-			// nettyRmiServerBean.getPropertyValues().add("applicationUrl", applicationUrl);
-			nettyRmiServerBean.getPropertyValues().add("baseSleepTimeMs", baseSleepTimeMs);
-			nettyRmiServerBean.getPropertyValues().add("maxRetries", maxRetries);
-			nettyRmiServerBean.getPropertyValues().add("isServer", isServer);
-			nettyRmiServerBean.getPropertyValues().add("isClient", isClient);
-			nettyRmiServerBean.getPropertyValues().add("cacheSerialize", cacheSerialize);
-			nettyRmiServerBean.getPropertyValues().add("rmiBeanFactory", rmiBeanFactory);
-			// nettyServerBean.getPropertyValues().add("messageHandle", messageHandle);
-			// nettyServerBean.getPropertyValues().add("registrationFactory", registrationFactory);
-			nettyRmiServerBean.getPropertyValues().add("registerServiceHandler", registerServiceHandler);
-			defaultListableBeanFactory.registerBeanDefinition("nettyRmiServer", nettyRmiServerBean);
+			if (isServer) {
+				BeanDefinition nettyRmiServerBean = new RootBeanDefinition(NettyServer.class);
+				nettyRmiServerBean.getPropertyValues().add("port", port);
+				nettyRmiServerBean.getPropertyValues().add("poolSize", poolSize);
+				nettyRmiServerBean.getPropertyValues().add("heartBeatTimeoutSecond", heartBeatTimeoutSecond);
+				nettyRmiServerBean.getPropertyValues().add("maxFrameLength", maxFrameLength);
+				nettyRmiServerBean.getPropertyValues().add("handleThreads", handleThreads);
+				nettyRmiServerBean.getPropertyValues().add("scanPath", scanPath);
+				nettyRmiServerBean.getPropertyValues().add("zookeeperServerList", zookeeperServerList);
+				nettyRmiServerBean.getPropertyValues().add("applicationName", applicationName);
+				nettyRmiServerBean.getPropertyValues().add("applicationUrl", applicationUrl);
+				nettyRmiServerBean.getPropertyValues().add("baseSleepTimeMs", baseSleepTimeMs);
+				nettyRmiServerBean.getPropertyValues().add("maxRetries", maxRetries);
+				nettyRmiServerBean.getPropertyValues().add("isServer", isServer);
+				nettyRmiServerBean.getPropertyValues().add("isClient", isClient);
+				nettyRmiServerBean.getPropertyValues().add("cacheSerialize", cacheSerialize);
 
-			NettyServer nettyServer = (NettyServer) applicationContext.getBean("nettyRmiServer");
-			nettyServer.run();
-			NettyClient nettyClient;
+				nettyRmiServerBean.getPropertyValues().add("rmiBeanFactory", rmiBeanFactory);
+				// nettyServerBean.getPropertyValues().add("registrationFactory", registrationFactory);
+				nettyRmiServerBean.getPropertyValues().add("messageHandle", messageHandle);
+				defaultListableBeanFactory.registerBeanDefinition("nettyRmiServer", nettyRmiServerBean);
 
-		} catch (Exception e) {
+				NettyServer nettyServer = (NettyServer) applicationContext.getBean("nettyRmiServer");
+				nettyServer.run();
+			}
+			if (isClient) {
+				ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
+				if (poolSize > 0)
+					constructorArgumentValues.addGenericArgumentValue(poolSize);
+				MutablePropertyValues mutablePropertyValues = new MutablePropertyValues();
+				BeanDefinition nettyRmiClientBean = new RootBeanDefinition(NettyClient.class, constructorArgumentValues, mutablePropertyValues);
+				nettyRmiClientBean.getPropertyValues().add("applicationName", applicationName);
+				nettyRmiClientBean.getPropertyValues().add("rmiBeanFactory", rmiBeanFactory);
+				nettyRmiClientBean.getPropertyValues().add("scanPath", scanPath);
+				nettyRmiClientBean.getPropertyValues().add("zookeeperServerList", zookeeperServerList);
+				nettyRmiClientBean.getPropertyValues().add("baseSleepTimeMs", baseSleepTimeMs);
+				nettyRmiClientBean.getPropertyValues().add("maxRetries", maxRetries);
+				nettyRmiClientBean.getPropertyValues().add("cacheSerialize", cacheSerialize);
+				defaultListableBeanFactory.registerBeanDefinition("nettyRmiClient", nettyRmiClientBean);
+				BeanDefinition rmiClientBean = new RootBeanDefinition(SimpleRmiClient.class);
+				defaultListableBeanFactory.registerBeanDefinition("rmiClientBean", rmiClientBean);
+				NettyClient nettyClient = (NettyClient) applicationContext.getBean("nettyRmiClient");
+				nettyClient.start();
+			}
+			System.err.println("aaaaa");
+		} catch (Throwable e) {
 			LOG.error("NettyServer.class", e);
 		}
 	}

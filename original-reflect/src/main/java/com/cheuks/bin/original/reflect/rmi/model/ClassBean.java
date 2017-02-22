@@ -86,6 +86,14 @@ public class ClassBean implements Serializable {
 		this.multiInstance = multiInstance;
 	}
 
+	public ClassBean(Class<?> originalClassFile, String registrationServiceName, Object instance, String version) {
+		super();
+		this.originalClassFile = originalClassFile;
+		this.registrationServiceName = registrationServiceName;
+		this.version = version;
+		this.instance = instance;
+	}
+
 	// public ClassBean() {
 	// super();
 	// }
