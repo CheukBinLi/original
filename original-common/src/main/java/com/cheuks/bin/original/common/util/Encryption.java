@@ -28,12 +28,15 @@ public class Encryption {
 	}
 
 	public synchronized String MD5(String strSrc) {
+		String strDes = null;
 		try {
 			byte[] bt = strSrc.getBytes();
 			MD5.update(bt);
-			String strDes = bytes2Hex(MD5.digest()); // to HexString
+			strDes = bytes2Hex(MD5.digest()); // to HexString
 			return strDes;
 		} finally {
+			if (LOG.isDebugEnabled())
+				LOG.debug("strSrc:{} MD5:{}", strSrc, strDes);
 			MD5.reset();
 		}
 	}

@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.cheuks.bin</groupId>
@@ -30,8 +32,8 @@
 		<gson.version>2.6.2</gson.version>
 		<com.cheuks.bin.version>0.0.1-SNAPSHOT</com.cheuks.bin.version>
 		<c3p0.version>0.9.1.2</c3p0.version>
-		<!-- <mysql-connector-java.version>5.0.8</mysql-connector-java.version> -->
-		<mysql-connector-java.version>6.0.4</mysql-connector-java.version>
+		<mysql-connector-java.version>5.0.8</mysql-connector-java.version>
+		<!-- <mysql-connector-java.version>6.0.4</mysql-connector-java.version> -->
 		<druid.version>1.0.26</druid.version>
 		<freemarker.version>2.3.23</freemarker.version>
 		<ehcache.version>2.6.11</ehcache.version>

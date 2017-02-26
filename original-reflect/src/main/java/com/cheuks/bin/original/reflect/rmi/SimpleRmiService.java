@@ -112,6 +112,7 @@ public class SimpleRmiService implements ApplicationListener<ContextRefreshedEve
 				nettyRmiClientBean.getPropertyValues().add("maxRetries", maxRetries);
 				nettyRmiClientBean.getPropertyValues().add("cacheSerialize", cacheSerialize);
 				defaultListableBeanFactory.registerBeanDefinition("nettyRmiClient", nettyRmiClientBean);
+				
 				BeanDefinition rmiClientBean = new RootBeanDefinition(SimpleRmiClient.class);
 				defaultListableBeanFactory.registerBeanDefinition("rmiClientBean", rmiClientBean);
 				NettyClient nettyClient = (NettyClient) applicationContext.getBean("nettyRmiClient");

@@ -5,8 +5,9 @@
 	http://cheuks.bin.com/schema/rmi.xsd
 	">
 
-	<rmi:protocol port="10086" serviceType="both" host="192.168.3.4"/>
-	<rmi:registry address="192.168.3.12:2181"/>
+	<rmi:protocol port="10086" serviceType="both" host="localhost"/>
+<!-- 	<rmi:protocol port="10086" serviceType="both" host="192.168.56.101"/> -->
+	<rmi:registry address="192.168.56.101:2181"/>
 <!-- 	<rmi:service interface="com.a.b.c" id="110" />
 	<rmi:service interface="com.a.b.c.a" id="111" />
 	<rmi:service interface="com.a.b.c.b" id="112" />
@@ -14,6 +15,6 @@
 
 	<rmi:reference interface="com.a.b.c.c" id="114" /> -->
 	<!-- <rmi:service interface="com.a.b.c.c" id="113" /> -->
-	<!-- <rmi:service interface="com.cheuks.bin.original.reflect.test2I" class="com.cheuks.bin.original.reflect.test2" id="testiiii"/> -->
+	<rmi:service interface="com.cheuks.bin.original.reflect.test2I" class="com.cheuks.bin.original.reflect.test2" id="testiiii"/> 
 	 <rmi:reference id="test" interface="com.cheuks.bin.original.reflect.test2I"/>
 </beans>

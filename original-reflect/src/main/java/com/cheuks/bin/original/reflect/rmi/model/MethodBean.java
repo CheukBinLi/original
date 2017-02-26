@@ -27,7 +27,7 @@ public class MethodBean implements Serializable {
 		// sb.append(classBean.getVersion()).append(":");
 		// sb.append(Reflection.newInstance().genericMethod(currentMethod));
 		// return Encryption.newInstance().MD5(sb.toString());
-		return Reflection.newInstance().genericRmiMethodMd5Code(classBean.getRegistrationServiceName(), classBean.getVersion(), currentMethod);
+		return Reflection.newInstance().genericRmiMethodMd5Code(classBean.getInterfaceClassFile().getName(),classBean.getVersion(), currentMethod);
 	}
 
 	public MethodBean(ClassBean classBean, Method currentMethod, String md5Code) {

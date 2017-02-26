@@ -137,27 +137,33 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 								// Rmi注解
 								client = (RmiClient) tempAnnotation;
 
-								id = (id = client.id()).length() > 0 ? id : ConverType.newInstance().toLowerCaseFirstOne(tempClass.getSimpleName());
+								id = (id = client.id()).length() > 0 ? id
+										: ConverType.newInstance().toLowerCaseFirstOne(tempClass.getSimpleName());
 								version = client.version();
 								multiInstance = client.multiInstance();
 								// 注册名
 								serviceName = client.serviceImplementation();
 
-								final ClassBean classBean = new ClassBean(tempClass, serviceName, version, multiInstance);
+								final ClassBean classBean = new ClassBean(tempClass, serviceName, version,
+										multiInstance);
 
 								// 生成代理类
-								classBean.setProxyClassFile(classRefactor(classBean, com.cheuks.bin.original.reflect.rmi.RmiClient.class, SimpleRmiClient.class));
+								classBean.setProxyClassFile(classRefactor(classBean,
+										com.cheuks.bin.original.reflect.rmi.RmiClient.class, SimpleRmiClient.class));
 								if (!classBean.isMultiInstance())
 									classBean.setInstance(classBean.getProxyClassFile().newInstance());
 
 								// 注册
-								BeanDefinitionBuilder bean = BeanDefinitionBuilder.genericBeanDefinition(classBean.getProxyClassFile());
+								BeanDefinitionBuilder bean = BeanDefinitionBuilder
+										.genericBeanDefinition(classBean.getProxyClassFile());
 								if (multiInstance)
 									bean.setScope("prototype");
-								// defaultListableBeanFactory.registerBeanDefinition(id, bean.getRawBeanDefinition());
+								// defaultListableBeanFactory.registerBeanDefinition(id,
+								// bean.getRawBeanDefinition());
 
 								if (LOG.isDebugEnabled())
-									LOG.debug("RmiClient:" + classBean.getProxyClassFile().getName() + " ||  register:" + classBean.getRegistrationServiceName());
+									LOG.debug("RmiClient:" + classBean.getProxyClassFile().getName() + " ||  register:"
+											+ classBean.getRegistrationServiceName());
 							} // 注解/xml
 							else if (null != (tempAnnotation = tempClass.getDeclaredAnnotation(RmiServer.class))) {
 								// Rmi注解
@@ -168,7 +174,8 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 								// 注册名
 								serviceName = server.serviceName();
 
-								final ClassBean classBean = new ClassBean(tempClass, serviceName, version, multiInstance);
+								final ClassBean classBean = new ClassBean(tempClass, serviceName, version,
+										multiInstance);
 								classBean.setProxyClassFile(tempClass);
 								// 分解Method
 								//
@@ -179,7 +186,8 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 									METHOD_BEAN.put(bean.getMd5Code(), bean);
 								}
 								if (LOG.isDebugEnabled())
-									LOG.debug("RmiServer:" + classBean.getProxyClassFile().getName() + "||   register:" + classBean.getRegistrationServiceName());
+									LOG.debug("RmiServer:" + classBean.getProxyClassFile().getName() + "||   register:"
+											+ classBean.getRegistrationServiceName());
 							}
 						}
 					} catch (ClassNotFoundException e) {
@@ -193,14 +201,18 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 	}
 
 	protected void xmlRegistered() throws Throwable {
-		// ProtocolConfig protocolConfig = applicationContext.getBean(ProtocolConfig.class);
-		// ReferenceConfig referenceConfig = applicationContext.getBean(ReferenceConfig.class);
-		// ServiceConfig serviceConfig = applicationContext.getBean(ServiceConfig.class);
+		// ProtocolConfig protocolConfig =
+		// applicationContext.getBean(ProtocolConfig.class);
+		// ReferenceConfig referenceConfig =
+		// applicationContext.getBean(ReferenceConfig.class);
+		// ServiceConfig serviceConfig =
+		// applicationContext.getBean(ServiceConfig.class);
 
 		// 过滤
 		String tempValue;
 		String id = null;
 		Class<?> tempClass;
+		Class<?> tempInterface;
 		String version;
 		boolean multiInstance;
 		ReferenceConfig tempReferenceConfig = null;
@@ -213,7 +225,8 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 		try {
 			while (!isServer && referenceConfigIt.hasNext()) {
 				tempReferenceConfig = referenceConfigIt.next();
-				tempClass = Class.forName(tempReferenceConfig.getInterfaceName().replace("/", ".").replace(".class", ""));
+				tempClass = Class
+						.forName(tempReferenceConfig.getInterfaceName().replace("/", ".").replace(".class", ""));
 				// 注解/xml
 				// Rmi注解
 
@@ -224,47 +237,54 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 				// serviceName = client.serviceImplementation();
 
 				final ClassBean classBean = new ClassBean(tempClass, id, version, multiInstance);
-
+				classBean.setInterfaceClassFile(tempClass);
 				// 生成代理类
-				classBean.setProxyClassFile(classRefactor(classBean, com.cheuks.bin.original.reflect.rmi.RmiClient.class, SimpleRmiClient.class));
-//				if (!classBean.isMultiInstance())
-//					classBean.setInstance(classBean.getProxyClassFile().newInstance());
+				classBean.setProxyClassFile(classRefactor(classBean,
+						com.cheuks.bin.original.reflect.rmi.RmiClient.class, SimpleRmiClient.class));
+				// if (!classBean.isMultiInstance())
+				// classBean.setInstance(classBean.getProxyClassFile().newInstance());
 
 				// 注册
 				BeanDefinitionBuilder bean = BeanDefinitionBuilder.genericBeanDefinition(classBean.getProxyClassFile());
-				bean.addPropertyValue("rmiClientInvokeMethod", applicationContext.getBean("nettyRmiClient"));
+				bean.addPropertyValue("rmiClientInvokeMethod", applicationContext.getBean("rmiClientBean"));
 				if (multiInstance)
 					bean.setScope("prototype");
 				defaultListableBeanFactory.registerBeanDefinition(id, bean.getRawBeanDefinition());
 
 				if (LOG.isDebugEnabled())
-					LOG.debug("RmiClient:" + classBean.getProxyClassFile().getName() + " ||  register:" + classBean.getRegistrationServiceName());
+					LOG.debug("RmiClient:" + classBean.getProxyClassFile().getName() + " ||  register:"
+							+ classBean.getRegistrationServiceName());
 				// 注解/xml
 			}
 			while (isServer && serviceConfigIt.hasNext()) {
 				tempServiceConfig = serviceConfigIt.next();
-				//				Class tempInterface = Class.forName(tempReferenceConfig.getInterfaceName());
+				// Class tempInterface =
+				// Class.forName(tempReferenceConfig.getInterfaceName());
 				Object instance;
 				// 注解/xml
 				id = tempServiceConfig.getId();
+				tempServiceConfig.getInterfaceName();
 				String beanRef = id;
 				version = tempServiceConfig.getVersion();
 				multiInstance = tempServiceConfig.isMultiInstance();
 				if (null != (tempValue = tempServiceConfig.getRef()) && tempValue.length() > 1) {
 					beanRef = tempServiceConfig.getRef();
-					//					defaultListableBeanFactory.registerAlias(tempServiceConfig.getId(), tempServiceConfig.getRef());
+					// defaultListableBeanFactory.registerAlias(tempServiceConfig.getId(),
+					// tempServiceConfig.getRef());
 				} else {
-					BeanDefinition beanDefinition = new RootBeanDefinition(Class.forName(tempServiceConfig.getRefClass()));
+					BeanDefinition beanDefinition = new RootBeanDefinition(
+							Class.forName(tempServiceConfig.getRefClass()));
 					defaultListableBeanFactory.registerBeanDefinition(id, beanDefinition);
 				}
 				instance = applicationContext.getBean(beanRef);
-				//				tempClass = Class.forName(tempServiceConfig.getInterfaceName().replace("/", ".").replace(".class", ""));
+				tempInterface = Class.forName(tempServiceConfig.getInterfaceName());
 
 				// 注册名
 
 				Object o = instance.getClass();
 				final ClassBean classBean = new ClassBean(instance.getClass(), id, instance, version);
 				classBean.setProxyClassFile(instance.getClass());
+				classBean.setInterfaceClassFile(tempInterface);
 				// 分解Method
 				//
 				// 服务端
@@ -274,7 +294,8 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 					METHOD_BEAN.put(bean.getMd5Code(), bean);
 				}
 				if (LOG.isDebugEnabled())
-					LOG.debug("RmiServer:" + classBean.getProxyClassFile().getName() + "||   register:" + classBean.getRegistrationServiceName());
+					LOG.debug("RmiServer:" + classBean.getProxyClassFile().getName() + "||   register:"
+							+ classBean.getRegistrationServiceName());
 			}
 		} catch (ClassNotFoundException e) {
 			System.out.println(id);
@@ -284,7 +305,8 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 	}
 
 	// 普通类
-	public Class<?> classRefactor(final ClassBean classBean, final Class<?> rmiClientInterface, final Class<?> rmiClientImpl) throws Throwable {
+	public Class<?> classRefactor(final ClassBean classBean, final Class<?> rmiClientInterface,
+			final Class<?> rmiClientImpl) throws Throwable {
 
 		boolean isInterface = classBean.getOriginalClassFile().isInterface();
 		final String orginalClassName = classBean.getOriginalClassFile().getName();
@@ -299,26 +321,44 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 
 		// 添加注入
 		// 添加 rmiclient里的field
-		CtField rmiClientInvokeMethod = CtField.make(String.format("public %s rmiClientInvokeMethod;", rmiClientInterface.getName(), rmiClientImpl.getName()), newClass);
+		CtField rmiClientInvokeMethod = CtField.make(String.format("public %s rmiClientInvokeMethod;",
+				rmiClientInterface.getName(), rmiClientImpl.getName()), newClass);
 		CtClass autowiredClazz = pool.get("org.springframework.beans.factory.annotation.Autowired");
-		AnnotationsAttribute autoired = new AnnotationsAttribute(newClass.getClassFile().getConstPool(), AnnotationsAttribute.visibleTag);
-		javassist.bytecode.annotation.Annotation annotation = new javassist.bytecode.annotation.Annotation(newClass.getClassFile().getConstPool(), autowiredClazz);
+		AnnotationsAttribute autoired = new AnnotationsAttribute(newClass.getClassFile().getConstPool(),
+				AnnotationsAttribute.visibleTag);
+		javassist.bytecode.annotation.Annotation annotation = new javassist.bytecode.annotation.Annotation(
+				newClass.getClassFile().getConstPool(), autowiredClazz);
 		autoired.addAnnotation(annotation);
-		//		CtField rmiClientInvokeMethod = CtField.make(String.format("public %s rmiClientInvokeMethod=new %s();", rmiClientInterface.getName(), rmiClientImpl.getName()), newClass);
+		// CtField rmiClientInvokeMethod = CtField.make(String.format("public %s
+		// rmiClientInvokeMethod=new %s();", rmiClientInterface.getName(),
+		// rmiClientImpl.getName()), newClass);
 		rmiClientInvokeMethod.getFieldInfo().addAttribute(autoired);
 		newClass.addField(rmiClientInvokeMethod);
-		
+
+		CtMethod getting = CtMethod.make(
+				"public com.cheuks.bin.original.reflect.rmi.RmiClient getRmiClientInvokeMethod(){return rmiClientInvokeMethod;}",
+				newClass);
+		CtMethod setting = CtMethod.make(
+				"public void setRmiClientInvokeMethod(com.cheuks.bin.original.reflect.rmi.RmiClient rmiClientInvokeMethod){this.rmiClientInvokeMethod=rmiClientInvokeMethod;}",
+				newClass);
+		newClass.addMethod(getting);
+		newClass.addMethod(setting);
+
 		// 方法重现
 		CtMethod[] orginalClassMethods = orginalClass.getDeclaredMethods();
 		// StringBuilder methodString = new StringBuilder();
 		String methodString;
 		for (final CtMethod m : orginalClassMethods) {
 			// 转换模版: ((Integer) 1).intValue();
-			methodString = generateMethod(m, null, convery4CodeByCtClass("rmiClientInvokeMethod.rmiInvoke(\"" + reflection.genericRmiMethodMd5Code(classBean.getRegistrationServiceName(), classBean.getVersion(), m) + "\",$args)", m.getReturnType()));
+			methodString = generateMethod(m, null,
+					convery4CodeByCtClass(
+							"rmiClientInvokeMethod.rmiInvoke(\"" + reflection.genericRmiMethodMd5Code(
+									classBean.getInterfaceClassFile().getName(), classBean.getVersion(), m) + "\",$args)",
+							m.getReturnType()));
 			newClass.addMethod(CtNewMethod.make(methodString, newClass));
 		}
 		// class输出
-		 newClass.writeFile("D:/Desktop/1");
+		newClass.writeFile("D:/Desktop/1");
 
 		return newClass.toClass();
 	}

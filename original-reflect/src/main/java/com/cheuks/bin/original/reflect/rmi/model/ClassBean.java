@@ -9,12 +9,22 @@ public class ClassBean implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private Class<?> interfaceClassFile;
 	private Class<?> originalClassFile;
 	private Class<?> proxyClassFile;
 	private String registrationServiceName;
 	private String version;
 	private Object instance;
 	private boolean multiInstance;
+
+	public Class<?> getInterfaceClassFile() {
+		return interfaceClassFile;
+	}
+
+	public ClassBean setInterfaceClassFile(Class<?> interfaceClassFile) {
+		this.interfaceClassFile = interfaceClassFile;
+		return this;
+	}
 
 	public Class<?> getOriginalClassFile() {
 		return originalClassFile;
@@ -78,7 +88,8 @@ public class ClassBean implements Serializable {
 		return this;
 	}
 
-	public ClassBean(Class<?> originalClassFile, String registrationServiceName, String version, boolean multiInstance) {
+	public ClassBean(Class<?> originalClassFile, String registrationServiceName, String version,
+			boolean multiInstance) {
 		super();
 		this.originalClassFile = originalClassFile;
 		this.registrationServiceName = registrationServiceName;
