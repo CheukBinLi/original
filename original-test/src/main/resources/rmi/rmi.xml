@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://cheuks.bin.com/schema/rmi
+	http://cheuks.bin.com/schema/rmi.xsd
+	">
+
+	<rmi:protocol port="10086" serviceType="server" host="192.168.56.101"/>
+	<rmi:registry address="192.168.56.101:2181"/>
+
+	<rmi:service interface="com.cheuks.bin.original.reflect.test2I" class="com.cheuks.bin.original.reflect.test2" id="testiiii"/> 
+</beans>

@@ -91,12 +91,13 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 			if (null == cacheSerialize)
 				cacheSerialize = new FstCacheSerialize();
 			if (null == rmiBeanFactory) {
-				//				rmiBeanFactory = new SimpleRmiBeanFactory();
+				// rmiBeanFactory = new SimpleRmiBeanFactory();
 				throw new NullPointerException("rmiBeanFactory is null");
 			}
 			rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", scanPath, "isServer", false));
 			if (null == registrationFactory)
-				registrationFactory = new ZookeeperRegistrationFactory(zookeeperServerList, baseSleepTimeMs, maxRetries);
+				registrationFactory = new ZookeeperRegistrationFactory(zookeeperServerList, baseSleepTimeMs,
+						maxRetries);
 			registrationFactory.init();
 			if (null == registerClientHandler)
 				registerClientHandler = new RegisterServiceClientHandler(applicationName, registrationFactory);
@@ -120,7 +121,8 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 		}
 	}
 
-	public void start() throws NumberFormatException, IllegalStateException, UnsupportedOperationException, InterruptedException, Exception {
+	public void start() throws NumberFormatException, IllegalStateException, UnsupportedOperationException,
+			InterruptedException, Exception {
 		if (null == work || work.interrupted()) {
 			work = new Thread(new Runnable() {
 				public void run() {
@@ -154,7 +156,8 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 		}
 	}
 
-	public void addObject(final InetSocketAddress socketAddress) throws IllegalStateException, UnsupportedOperationException, Exception {
+	public void addObject(final InetSocketAddress socketAddress)
+			throws IllegalStateException, UnsupportedOperationException, Exception {
 		// Channel channel = client.connect(socketAddress).sync().channel();
 		// super.addObject(channel);
 		// client.connect(socketAddress).sync().channel();
@@ -163,6 +166,7 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 			client.connect(socketAddress).sync().addListener(new GenericFutureListener<Future<? super Void>>() {
 
 				public void operationComplete(Future<? super Void> future) throws Exception {
+					System.out.println("是否成功:"+future.isSuccess());
 					if (!future.isSuccess()) {
 						System.out.println("掉线更换服务器");
 					}

@@ -291,7 +291,7 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory, ApplicationContextA
 				methods = classBean.getOriginalClassFile().getDeclaredMethods();
 				for (Method m : methods) {
 					final MethodBean bean = MethodBean.builder(classBean, m);
-					METHOD_BEAN.put(bean.getMd5Code(), bean);
+ 					METHOD_BEAN.put(bean.getMd5Code(), bean);
 				}
 				if (LOG.isDebugEnabled())
 					LOG.debug("RmiServer:" + classBean.getProxyClassFile().getName() + "||   register:"
