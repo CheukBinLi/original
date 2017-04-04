@@ -21,15 +21,39 @@ public class T1 {
 	public void consumer() {
 		try {
 			CountDownLatch countDownLatch = new CountDownLatch(1);
-			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("10.73.11.117:9091,10.73.11.117:9092", "T1_TOPIC,T2_TOPIC", "CCTV_1").init(null);
+			//			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("10.73.11.117:9091,10.73.11.117:9092", "T1_TOPIC,T2_TOPIC", "CCTV_1").init(null);
+			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("192.168.3.27:9092", "T1_TOPIC,T2_TOPIC", "CCTV_1_2").init(null);
+			//topic_1
 			messageQueueConsumerFactory.RegisterHandler(new MessageQueueConsumerHandler() {
 
 				public void doProcess(String value, Object originalObject) {
-					System.out.println(value);
+					System.out.println("topic:T2_TOPIC ," + value);
 				}
 
 				public Object getQueueInfo() {
 					return "T2_TOPIC";
+				}
+			});
+			//topic_2
+			messageQueueConsumerFactory.RegisterHandler(new MessageQueueConsumerHandler() {
+
+				public void doProcess(String value, Object originalObject) {
+					System.err.println("topic:T1_TOPIC ," + value);
+				}
+
+				public Object getQueueInfo() {
+					return "T1_TOPIC";
+				}
+			});
+			//topic_3
+			messageQueueConsumerFactory.RegisterHandler(new MessageQueueConsumerHandler() {
+
+				public void doProcess(String value, Object originalObject) {
+					System.out.println("topic:* ," + value);
+				}
+
+				public Object getQueueInfo() {
+					return "*";
 				}
 			});
 			countDownLatch.await();
@@ -42,7 +66,8 @@ public class T1 {
 	public void producer() {
 		try {
 			final CountDownLatch countDownLatch = new CountDownLatch(1);
-			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("10.17.38.12:9089,10.73.11.117:9091,10.73.11.117:9092").init(null);
+			//			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("192.168.3.27:9092,10.17.38.12:9089,10.73.11.117:9091,10.73.11.117:9092").init(null);
+			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("192.168.3.27:9092").init(null);
 			ExecutorService executorService = Executors.newCachedThreadPool();
 			executorService.execute(new Runnable() {
 				public void run() {
@@ -50,11 +75,12 @@ public class T1 {
 					while (--count > 0) {
 						messageQueueProducerFactory.makeMessage("T2_TOPIC", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
 						try {
-							Thread.sleep(100);
+							Thread.sleep(1000);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
+					messageQueueProducerFactory.makeMessage("T1_TOPIC", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
 					countDownLatch.countDown();
 				}
 			});

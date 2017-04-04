@@ -1,5 +1,6 @@
 package com.cheuks.bin.message.queue.kafka;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -10,9 +11,12 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
+import org.apache.rocketmq.common.message.MessageExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.cheuks.bin.message.queue.rocketmq.RocketMqConsumerRecord;
 import com.cheuks.bin.original.common.message.queue.MessageQueueConsumerFactory;
 import com.cheuks.bin.original.common.message.queue.MessageQueueConsumerHandler;
 
@@ -20,7 +24,7 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 
 	private static final Logger LOG = LoggerFactory.getLogger(KafkaMessageQueueProducerFactory.class);
 
-	private final Map<String, MessageQueueConsumerHandler<String, ConsumerRecord<String, String>>> HANDLER_POOL = new ConcurrentSkipListMap<String, MessageQueueConsumerHandler<String, ConsumerRecord<String, String>>>();
+	private final Map<String, List<MessageQueueConsumerHandler<String, ConsumerRecord<String, String>>>> HANDLER_POOL = new ConcurrentSkipListMap<String, List<MessageQueueConsumerHandler<String, ConsumerRecord<String, String>>>>();
 
 	/***
 	 * 服务列表: 127.0.0.1:9092,127.0.0.2:9092,127.0.0.3:9092
@@ -57,8 +61,18 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 	private volatile boolean interrupted = false;
 	private volatile boolean isRunning = false;
 
+	public static final String ALL_TOPIC = "*";
+
 	public void RegisterHandler(MessageQueueConsumerHandler<String, ConsumerRecord<String, String>> handler) {
-		HANDLER_POOL.put(handler.getQueueInfo(), handler);
+		String[] topics = handler.getQueueInfo().split(",");
+		for (String topic : topics) {
+			List<MessageQueueConsumerHandler<String, ConsumerRecord<String, String>>> handlers = HANDLER_POOL.get(topic);
+			if (null == handlers) {
+				handlers = new ArrayList<MessageQueueConsumerHandler<String, ConsumerRecord<String, String>>>();
+				HANDLER_POOL.put(topic, handlers);
+			}
+			handlers.add(handler);
+		}
 	}
 
 	public void RegisterHandler(List<MessageQueueConsumerHandler<String, ConsumerRecord<String, String>>> handlers) {
@@ -113,11 +127,13 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 						for (TopicPartition partition : records.partitions()) {
 							List<ConsumerRecord<String, String>> partitionRecords = records.records(partition);
 							for (ConsumerRecord<String, String> record : partitionRecords) {
-								if (LOG.isInfoEnabled()) {
-									LOG.info("topic:{}\nkey{}\nvalue:{}", record.topic(), record.key(), record.value());
+								if (LOG.isDebugEnabled()) {
+									LOG.debug("topic:{}\nkey{}\nvalue:{}", record.topic(), record.key(), record.value());
 								}
-								messageQueueConsumerHandler = HANDLER_POOL.get(record.topic());
-								messageQueueConsumerHandler.doProcess(record.value(), record);
+								//all
+								iterador(HANDLER_POOL.get(ALL_TOPIC), record);
+								//过滤的topic
+								iterador(HANDLER_POOL.get(record.topic()), record);
 							}
 							consumer.commitSync();// 同步
 						}
@@ -131,6 +147,14 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 		});
 		listening.start();
 		return this;
+	}
+
+	private void iterador(final List<MessageQueueConsumerHandler<String, ConsumerRecord<String, String>>> handlers, final ConsumerRecord<String, String> record) {
+		if (null == handlers || null == record)
+			return;
+		for (MessageQueueConsumerHandler<String, ConsumerRecord<String, String>> messageQueueConsumerHandler : handlers) {
+			messageQueueConsumerHandler.doProcess(record.value(), record);
+		}
 	}
 
 	public String getServerList() {
