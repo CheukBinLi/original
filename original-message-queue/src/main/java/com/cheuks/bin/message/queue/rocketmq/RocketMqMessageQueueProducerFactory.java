@@ -67,6 +67,13 @@ public class RocketMqMessageQueueProducerFactory implements MessageQueueProducer
 	public RocketMqMessageQueueProducerFactory init(Map<String, Object> args) {
 		if (isRunning)
 			return this;
+		else if (null == producerGroupName) {
+			LOG.error("producerGroupName is null");
+			return this;
+		} else if (null == serverList) {
+			LOG.error("serverList is null");
+			return this;
+		}
 		isRunning = true;
 		try {
 			producer = new DefaultMQProducer(producerGroupName);

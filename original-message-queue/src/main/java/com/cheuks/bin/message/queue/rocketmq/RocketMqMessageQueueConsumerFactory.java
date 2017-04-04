@@ -26,6 +26,8 @@ public class RocketMqMessageQueueConsumerFactory implements MessageQueueConsumer
 
 	public static final String ALL_TAGS = "*";
 
+	private volatile boolean isRunning;
+
 	private String serverList;
 	private String topicList;
 	private String consumerGroup;
@@ -61,6 +63,19 @@ public class RocketMqMessageQueueConsumerFactory implements MessageQueueConsumer
 	}
 
 	public RocketMqMessageQueueConsumerFactory init(Map<String, Object> args) {
+		if (isRunning)
+			return this;
+		else if (null == consumerGroup) {
+			LOG.error("consumerGroup is null");
+			return this;
+		} else if (null == serverList) {
+			LOG.error("serverList is null");
+			return this;
+		} else if (null == topicList) {
+			LOG.error("topicList is null");
+			return this;
+		}
+		isRunning = true;
 		consumer = new DefaultMQPushConsumer(consumerGroup);
 		consumer.setNamesrvAddr(serverList);
 		if (null != instanceName) {
@@ -94,10 +109,9 @@ public class RocketMqMessageQueueConsumerFactory implements MessageQueueConsumer
 				}
 			});
 			consumer.start();
-			System.err.println("监听");
 		} catch (MQClientException e) {
 			LOG.error(null, e);
-			e.printStackTrace();
+			isRunning = false;
 		}
 
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -120,8 +134,10 @@ public class RocketMqMessageQueueConsumerFactory implements MessageQueueConsumer
 	}
 
 	public void destory() {
-		if (null != consumer)
+		if (null != consumer) {
 			consumer.shutdown();
+			isRunning = false;
+		}
 	}
 
 	public String getServerList() {
