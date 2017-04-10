@@ -11,12 +11,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
-import org.apache.rocketmq.common.message.MessageExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cheuks.bin.message.queue.rocketmq.RocketMqConsumerRecord;
 import com.cheuks.bin.original.common.message.queue.MessageQueueConsumerFactory;
 import com.cheuks.bin.original.common.message.queue.MessageQueueConsumerHandler;
 
@@ -63,7 +60,7 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 
 	public static final String ALL_TOPIC = "*";
 
-	public void RegisterHandler(MessageQueueConsumerHandler<String, ConsumerRecord<String, String>> handler) {
+	public void setMessageQueueConsumer(MessageQueueConsumerHandler<String, ConsumerRecord<String, String>> handler) {
 		String[] topics = handler.getQueueInfo().split(",");
 		for (String topic : topics) {
 			List<MessageQueueConsumerHandler<String, ConsumerRecord<String, String>>> handlers = HANDLER_POOL.get(topic);
@@ -75,14 +72,18 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 		}
 	}
 
-	public void RegisterHandler(List<MessageQueueConsumerHandler<String, ConsumerRecord<String, String>>> handlers) {
+	public void setMessageQueueConsumerHandler(List<MessageQueueConsumerHandler<String, ConsumerRecord<String, String>>> handlers) {
 		for (MessageQueueConsumerHandler<String, ConsumerRecord<String, String>> consumerHandler : handlers) {
-			RegisterHandler(consumerHandler);
+			setMessageQueueConsumer(consumerHandler);
 		}
 	}
 
 	public void destory() {
 		interrupted = true;
+	}
+
+	public MessageQueueConsumerFactory<String, ConsumerRecord<String, String>> init() {
+		return init(null);
 	}
 
 	public KafkaMessageQueueConsumerFactory init(Map<String, Object> args) {
@@ -121,7 +122,6 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 			public void run() {
 				System.out.println("开始");
 				try {
-					MessageQueueConsumerHandler<String, ConsumerRecord<String, String>> messageQueueConsumerHandler;
 					while (!interrupted) {// 轮询
 						ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);
 						for (TopicPartition partition : records.partitions()) {
@@ -229,6 +229,25 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 		return this;
 	}
 
+	public Properties getPropertie() {
+		return propertie;
+	}
+
+	public KafkaMessageQueueConsumerFactory setPropertie(Properties propertie) {
+		this.propertie.putAll(propertie);
+		return this;
+	}
+
+	public KafkaMessageQueueConsumerFactory setAutoCommitInterval(Integer autoCommitInterval) {
+		this.autoCommitInterval = autoCommitInterval;
+		return this;
+	}
+
+	public KafkaMessageQueueConsumerFactory setSessionTimeout(Integer sessionTimeout) {
+		this.sessionTimeout = sessionTimeout;
+		return this;
+	}
+
 	public KafkaMessageQueueConsumerFactory() {
 		super();
 	}
@@ -239,5 +258,4 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 		this.topicList = topicList;
 		this.groupId = groupId;
 	}
-
 }

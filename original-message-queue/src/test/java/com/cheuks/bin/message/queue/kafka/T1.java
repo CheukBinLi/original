@@ -24,7 +24,7 @@ public class T1 {
 			//			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("10.73.11.117:9091,10.73.11.117:9092", "T1_TOPIC,T2_TOPIC", "CCTV_1").init(null);
 			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("192.168.3.27:9092", "T1_TOPIC,T2_TOPIC", "CCTV_1").init(null);
 			//topic_1
-			messageQueueConsumerFactory.RegisterHandler(new MessageQueueConsumerHandler() {
+			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
 
 				public void doProcess(String value, Object originalObject) {
 					System.out.println("topic:T2_TOPIC ," + value);
@@ -35,7 +35,7 @@ public class T1 {
 				}
 			});
 			//topic_2
-			messageQueueConsumerFactory.RegisterHandler(new MessageQueueConsumerHandler() {
+			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
 
 				public void doProcess(String value, Object originalObject) {
 					System.err.println("topic:T1_TOPIC ," + value);
@@ -46,7 +46,7 @@ public class T1 {
 				}
 			});
 			//topic_3
-			messageQueueConsumerFactory.RegisterHandler(new MessageQueueConsumerHandler() {
+			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
 
 				public void doProcess(String value, Object originalObject) {
 					System.out.println("topic:* ," + value);

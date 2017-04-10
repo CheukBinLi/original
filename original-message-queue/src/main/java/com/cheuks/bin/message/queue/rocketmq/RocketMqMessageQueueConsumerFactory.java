@@ -1,8 +1,10 @@
 package com.cheuks.bin.message.queue.rocketmq;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
@@ -23,7 +25,7 @@ public class RocketMqMessageQueueConsumerFactory implements MessageQueueConsumer
 	private final static Logger LOG = LoggerFactory.getLogger(RocketMqMessageQueueConsumerFactory.class);
 
 	private final Map<String, List<MessageQueueConsumerHandler<String, RocketMqConsumerRecord>>> HANDLER_POOL = new ConcurrentSkipListMap<String, List<MessageQueueConsumerHandler<String, RocketMqConsumerRecord>>>();
-
+	
 	public static final String ALL_TAGS = "*";
 
 	private volatile boolean isRunning;
@@ -44,7 +46,7 @@ public class RocketMqMessageQueueConsumerFactory implements MessageQueueConsumer
 
 	private DefaultMQPushConsumer consumer;
 
-	public void RegisterHandler(MessageQueueConsumerHandler<String, RocketMqConsumerRecord> handler) {
+	public void setMessageQueueConsumer(MessageQueueConsumerHandler<String, RocketMqConsumerRecord> handler) {
 		String[] tags = handler.getQueueInfo().split(",");
 		for (String tag : tags) {
 			List<MessageQueueConsumerHandler<String, RocketMqConsumerRecord>> handlers = HANDLER_POOL.get(tag);
@@ -56,10 +58,14 @@ public class RocketMqMessageQueueConsumerFactory implements MessageQueueConsumer
 		}
 	}
 
-	public void RegisterHandler(List<MessageQueueConsumerHandler<String, RocketMqConsumerRecord>> handlers) {
+	public void setMessageQueueConsumerHandler(List<MessageQueueConsumerHandler<String, RocketMqConsumerRecord>> handlers) {
 		for (MessageQueueConsumerHandler<String, RocketMqConsumerRecord> consumerHandler : handlers) {
-			RegisterHandler(consumerHandler);
+			setMessageQueueConsumer(consumerHandler);
 		}
+	}
+
+	public MessageQueueConsumerFactory<String, RocketMqConsumerRecord> init() {
+		return init(null);
 	}
 
 	public RocketMqMessageQueueConsumerFactory init(Map<String, Object> args) {
@@ -116,14 +122,12 @@ public class RocketMqMessageQueueConsumerFactory implements MessageQueueConsumer
 
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 
-			public void run() {
-				if (null != consumer)
-					consumer.shutdown();
-			}
-
-		}));
-		return this;
+	public void run() {
+		if (null != consumer)
+			consumer.shutdown();
 	}
+
+	}));return this;}
 
 	private void iterador(final List<MessageQueueConsumerHandler<String, RocketMqConsumerRecord>> handlers, final MessageExt message, final ConsumeConcurrentlyContext context) {
 		if (LOG.isDebugEnabled())

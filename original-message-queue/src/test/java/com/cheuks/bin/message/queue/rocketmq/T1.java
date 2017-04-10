@@ -15,7 +15,7 @@ public class T1 {
 	public void consumer() throws InterruptedException {
 		CountDownLatch countDownLatch = new CountDownLatch(1);
 		MessageQueueConsumerFactory<String, RocketMqConsumerRecord> consumerFactory = new RocketMqMessageQueueConsumerFactory().setTopicList("rocketMq_Topic").setServerList("192.168.3.27:9876").setConsumerGroup("TEST_GROUP_ID").init(null);
-		consumerFactory.RegisterHandler(new MessageQueueConsumerHandler<String, RocketMqConsumerRecord>() {
+		consumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler<String, RocketMqConsumerRecord>() {
 
 			public String getQueueInfo() {
 				return "A1,A2,A3";
@@ -25,7 +25,7 @@ public class T1 {
 				System.out.println("tags:{A1,A2,A3}" + value);
 			}
 		});
-		consumerFactory.RegisterHandler(new MessageQueueConsumerHandler<String, RocketMqConsumerRecord>() {
+		consumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler<String, RocketMqConsumerRecord>() {
 
 			public String getQueueInfo() {
 				return "B1";
@@ -35,7 +35,7 @@ public class T1 {
 				System.out.println("tags:{B2}" + value);
 			}
 		});
-		consumerFactory.RegisterHandler(new MessageQueueConsumerHandler<String, RocketMqConsumerRecord>() {
+		consumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler<String, RocketMqConsumerRecord>() {
 
 			public String getQueueInfo() {
 				return "*";

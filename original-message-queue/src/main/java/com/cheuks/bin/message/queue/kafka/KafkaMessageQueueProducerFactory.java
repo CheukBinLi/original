@@ -120,6 +120,10 @@ public class KafkaMessageQueueProducerFactory implements MessageQueueProducerFac
 		producer.close();
 	}
 
+	public MessageQueueProducerFactory<Future<RecordMetadata>, RecordMetadata> init() {
+		return init(null);
+	}
+
 	public KafkaMessageQueueProducerFactory init(Map<String, Object> args) {
 		if (isInit)
 			return this;
@@ -242,7 +246,7 @@ public class KafkaMessageQueueProducerFactory implements MessageQueueProducerFac
 	}
 
 	public KafkaMessageQueueProducerFactory setPropertie(Properties propertie) {
-		this.propertie = propertie;
+		this.propertie.putAll(propertie);
 		return this;
 	}
 

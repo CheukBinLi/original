@@ -64,6 +64,10 @@ public class RocketMqMessageQueueProducerFactory implements MessageQueueProducer
 		}
 	}
 
+	public MessageQueueProducerFactory<SendResult, SendResult> init() {
+		return init(null);
+	}
+
 	public RocketMqMessageQueueProducerFactory init(Map<String, Object> args) {
 		if (isRunning)
 			return this;
