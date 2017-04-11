@@ -17,7 +17,8 @@ public class ComsunerDemo {
 
 		Properties props = new Properties();
 		props.put("bootstrap.servers", "10.73.11.117:9092");// 该地址是集群的子集，用来探测集群。
-		props.put("group.id", "test_MBA_AAAAA_1");// 不同ID 可以同时订阅消息
+//		props.put("bootstrap.servers", "10.17.38.12:9089");// 该地址是集群的子集，用来探测集群。
+		props.put("group.id", "test_MBA_AAAAA_10");// 不同ID 可以同时订阅消息
 		props.put("enable.auto.commit", "false");// 自动提交offsets
 		props.put("auto.commit.interval.ms", "1000");// 每隔1s，自动提交offsets
 		props.put("session.timeout.ms", "30000");// Consumer向集群发送自己的心跳，超时则认为Consumer已经死了，kafka会把它的分区分配给其他进程

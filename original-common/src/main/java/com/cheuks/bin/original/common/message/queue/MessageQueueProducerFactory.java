@@ -31,6 +31,8 @@ public interface MessageQueueProducerFactory<R, C> {
 	 */
 	MessageQueueProducerFactory<R, C> init(Map<String, Object> args);
 
+	MessageQueueProducerFactory<R, C> init();
+
 	/***
 	 * 销毁服务
 	 */

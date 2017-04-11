@@ -13,13 +13,12 @@ import javax.websocket.WebSocketContainer;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.cheuks.bin.original.config.Service;
+import com.cheuks.bin.original.common.message.queue.MessageQueueConsumerFactory;
 import com.cheuks.bin.original.web.Client;
 import com.cheuks.bin.original.web.customer.MessageOption.SenderType;
 import com.cheuks.bin.original.web.customer.MessagePackage;
@@ -31,14 +30,15 @@ public class BaseController {
 	@Autowired
 	private ApplicationContext applicationContext;
 
+	@Autowired
+	private MessageQueueConsumerFactory kafkaMq;
+	
 	/***
 	 * 
 	 * @param request
 	 * @param response
-	 * @param business
-	 *            业务名
-	 * @param process
-	 *            流程序号
+	 * @param business 业务名
+	 * @param process 流程序号
 	 * @return
 	 */
 	// @RequestMapping("**/{business}_{process}")
@@ -50,8 +50,7 @@ public class BaseController {
 	 * 
 	 * @param request
 	 * @param response
-	 * @param path
-	 *            所有路径
+	 * @param path 所有路径
 	 * @return
 	 */
 	@RequestMapping("**")
@@ -71,9 +70,10 @@ public class BaseController {
 	}
 
 	@RequestMapping("hh")
-	public ModelAndView hh(HttpServletRequest  request, HttpServletResponse response) {
+	public ModelAndView hh(HttpServletRequest request, HttpServletResponse response) {
 		// System.out.println(request.getScheme());
 		// System.out.println(request.getPathInfo());
+		request.getSession().setAttribute("aa", "aa");
 		Object o = applicationContext.getBean("INTERFACE_3");
 		return new ModelAndView("hh");
 	}

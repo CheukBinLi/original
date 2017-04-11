@@ -11,14 +11,16 @@ import java.util.Map;
  */
 public interface MessageQueueConsumerFactory<Q, M> {
 
-	void RegisterHandler(MessageQueueConsumerHandler<Q, M> handler);
+	void setMessageQueueConsumer(MessageQueueConsumerHandler<Q, M> handler);
 
-	void RegisterHandler(List<MessageQueueConsumerHandler<Q, M>> handlers);
+	void setMessageQueueConsumerHandler(List<MessageQueueConsumerHandler<Q, M>> handlers);
 
 	/***
 	 * 服务初始化
 	 */
 	MessageQueueConsumerFactory<Q, M> init(Map<String, Object> args);
+
+	MessageQueueConsumerFactory<Q, M> init();
 
 	/***
 	 * 销毁服务

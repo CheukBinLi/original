@@ -1,14 +1,38 @@
 package com.cheuks.bin.original.test.mq;
 
-public interface MessageQueueProducerFactory {
+import java.util.Map;
+
+public interface MessageQueueProducerFactory<R, C> {
 
 	/***
 	 * 消息生产
 	 * 
-	 * @param topic 主题
+	 * @param queueName 队列名/主题名
 	 * @param message 消息内容
-	 * @param additional 附加对象，扩展用
+	 * @param additional 附加对象，扩展用,特定的偶合
 	 * @return
+	 * @throws MessageQueueException
 	 */
-	Object makeMessage(String topic, String message, Object additional);
+	R makeMessage(String queueName, String message, Object additional) throws MessageQueueException;
+
+	/***
+	 * 
+	 * @param queueName 队列名/主题名
+	 * @param message 消息内容
+	 * @param additional 附加对象，扩展用,特定的偶合
+	 * @param callBack
+	 * @return
+	 * @throws MessageQueueException 回调
+	 */
+	R makeMessage(String queueName, String message, Object additional, MessageQueueCallBack<C> callBack) throws MessageQueueException;
+
+	/***
+	 * 服务初始化
+	 */
+	MessageQueueProducerFactory<R, C> init(Map<String, Object> args);
+
+	/***
+	 * 销毁服务
+	 */
+	void destory();
 }
