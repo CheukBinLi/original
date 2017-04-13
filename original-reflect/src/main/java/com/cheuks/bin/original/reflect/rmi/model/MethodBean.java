@@ -22,10 +22,10 @@ public class MethodBean implements Serializable {
 	}
 
 	public static String md5Code(final ClassBean classBean, final Method currentMethod) throws NotFoundException {
-		// StringBuilder sb = new StringBuilder();
-		// sb.append(classBean.getRegistrationServiceName()).append(":");
-		// sb.append(classBean.getVersion()).append(":");
-		// sb.append(Reflection.newInstance().genericMethod(currentMethod));
+		 StringBuilder sb = new StringBuilder();
+		 sb.append(classBean.getRegistrationServiceName()).append(":");
+		 sb.append(classBean.getVersion()).append(":");
+		 sb.append(Reflection.newInstance().genericMethod(currentMethod));
 		// return Encryption.newInstance().MD5(sb.toString());
 		return Reflection.newInstance().genericRmiMethodMd5Code(classBean.getInterfaceClassFile().getName(),classBean.getVersion(), currentMethod);
 	}

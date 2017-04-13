@@ -31,6 +31,7 @@ public class RegisterServiceServerHandler implements RegisterService {
 
 	private volatile boolean isRegister;
 	private volatile boolean isLedder;
+	private int eventHandleDelay = 5000;
 
 	private String applicationName = "temp_application";
 	private String applicationUrl = "127.0.0.1:10086";
@@ -72,6 +73,7 @@ public class RegisterServiceServerHandler implements RegisterService {
 				// String serverName = path.substring(path.lastIndexOf("/") + 1);
 				// 领导
 				if (isLedder) {
+					Thread.sleep(getEventHandleDelay());
 					dstributionService(path);
 				}
 
@@ -273,6 +275,15 @@ public class RegisterServiceServerHandler implements RegisterService {
 			this.serverUrl = serverUrl;
 			this.loadCount.set(loadCount);
 		}
+	}
+
+	public int getEventHandleDelay() {
+		return eventHandleDelay;
+	}
+
+	public RegisterServiceServerHandler setEventHandleDelay(int eventHandleDelay) {
+		this.eventHandleDelay = eventHandleDelay;
+		return this;
 	}
 
 }

@@ -74,5 +74,6 @@
 		<module>original-config</module>
 		<module>original-reflect</module>
 		<module>original-registration-center</module>
+		<module>original-session</module>
 	</modules>
 </project>

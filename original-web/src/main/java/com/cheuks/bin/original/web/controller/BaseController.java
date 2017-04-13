@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.websocket.ContainerProvider;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.cheuks.bin.original.reflect.test;
 import com.cheuks.bin.original.reflect.test2I;
 import com.cheuks.bin.original.reflect.config.ProtocolConfig;
 import com.cheuks.bin.original.reflect.config.ServiceConfig;

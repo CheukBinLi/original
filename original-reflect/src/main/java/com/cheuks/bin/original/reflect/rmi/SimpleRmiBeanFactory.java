@@ -17,7 +17,6 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.annotation.AnnotationAttributes;
 
 import com.cheuks.bin.original.annotation.RmiClient;
 import com.cheuks.bin.original.annotation.RmiServer;

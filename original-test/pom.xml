@@ -126,6 +126,11 @@
 			<artifactId>original-cache</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.cheuks.bin</groupId>
+			<artifactId>original-reflect</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
 		<!-- zookeeper客户端 -->
 		<dependency>
