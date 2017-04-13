@@ -96,12 +96,11 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 			}
 			rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", scanPath, "isServer", false));
 			if (null == registrationFactory)
-				registrationFactory = new ZookeeperRegistrationFactory(zookeeperServerList, baseSleepTimeMs,
-						maxRetries);
+				registrationFactory = new ZookeeperRegistrationFactory(zookeeperServerList, baseSleepTimeMs, maxRetries);
 			registrationFactory.init();
 			if (null == registerClientHandler)
 				registerClientHandler = new RegisterServiceClientHandler(applicationName, registrationFactory);
-			address = registerClientHandler.register();
+			//			address = registerClientHandler.register();
 
 			client = new Bootstrap();
 			worker = new NioEventLoopGroup(maxActiveCount);
@@ -121,8 +120,7 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 		}
 	}
 
-	public void start() throws NumberFormatException, IllegalStateException, UnsupportedOperationException,
-			InterruptedException, Exception {
+	public void start() throws NumberFormatException, IllegalStateException, UnsupportedOperationException, InterruptedException, Exception {
 		if (null == work || work.interrupted()) {
 			work = new Thread(new Runnable() {
 				public void run() {
@@ -136,18 +134,34 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 					int port;
 					InetSocketAddress socketAddress;
 					int count = maxActiveCount / ipList.countTokens();
-					while (ipList.hasMoreTokens()) {
-						temp = ipList.nextToken();
-						ip = new StringTokenizer(temp, ":");
-						host = ip.nextToken();
-						port = Integer.valueOf(ip.nextToken());
-						inetSocketAddress.add(socketAddress = new InetSocketAddress(host, port));
-						for (int i = 0; i < count; i++) {
-							try {
-								addObject(socketAddress);
-							} catch (Exception e) {
-								LOG.error(null, e);
-							}
+					//返回list列表的情况:改为每次请求负载
+					//					while (ipList.hasMoreTokens()) {
+					//						temp = ipList.nextToken();
+					//						ip = new StringTokenizer(temp, ":");
+					//						host = ip.nextToken();
+					//						port = Integer.valueOf(ip.nextToken());
+					//						inetSocketAddress.add(socketAddress = new InetSocketAddress(host, port));
+					//						for (int i = 0; i < count; i++) {
+					//							try {
+					//								addObject(socketAddress);
+					//							} catch (Exception e) {
+					//								LOG.error(null, e);
+					//							}
+					//						}
+					//					}
+					String[] address = null;
+					//测试改单个IP，不负载
+					//					try {
+					//						address = registerClientHandler.register().split(":");
+					//					} catch (Throwable e1) {
+					//						e1.printStackTrace();
+					//					}
+					for (int i = 0; i < count; i++) {
+						try {
+							address = registerClientHandler.register().split(":");
+							addObject(new InetSocketAddress(address[0], Integer.valueOf(address[1])));
+						} catch (Throwable e) {
+							LOG.error(null, e);
 						}
 					}
 				}
@@ -156,26 +170,29 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 		}
 	}
 
-	public void addObject(final InetSocketAddress socketAddress)
-			throws IllegalStateException, UnsupportedOperationException, Exception {
-		// Channel channel = client.connect(socketAddress).sync().channel();
-		// super.addObject(channel);
-		// client.connect(socketAddress).sync().channel();
-		// TODO Auto-generated method stub
+	public void addObject(final InetSocketAddress socketAddress) throws IllegalStateException, UnsupportedOperationException, Exception {
 		try {
-			client.connect(socketAddress).sync().addListener(new GenericFutureListener<Future<? super Void>>() {
-
+			client.connect(socketAddress).addListener(new GenericFutureListener<Future<? super Void>>() {
 				public void operationComplete(Future<? super Void> future) throws Exception {
-					System.out.println("是否成功:"+future.isSuccess());
+					System.out.println("是否成功:" + future.isSuccess());
 					if (!future.isSuccess()) {
 						System.out.println("掉线更换服务器");
 					}
 				}
-			}).channel();
+			}).sync().channel();
 		} catch (InterruptedException e) {
 			LOG.error(null, e);
 		}
+	}
 
+	public void reConnection() throws Throwable {
+		try {
+			String[] address = registerClientHandler.register().split(":");
+			InetSocketAddress inetSocketAddress = new InetSocketAddress(address[0], Integer.valueOf(address[1]));
+			client.connect(inetSocketAddress).sync().channel();
+		} catch (InterruptedException e) {
+			LOG.error(null, e);
+		}
 	}
 
 	@Override

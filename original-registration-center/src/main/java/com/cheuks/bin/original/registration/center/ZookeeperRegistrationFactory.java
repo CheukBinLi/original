@@ -83,13 +83,16 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 	}
 
 	public String register(String serviceDirectory, String value, final RegistrationEventListener<NodeCache> eventListener) throws Throwable {
+		byte[] valueByte = (null == value ? new byte[0] : value.getBytes());
 		if (null == serviceDirectory || !serviceDirectory.startsWith("/"))
 			throw new Throwable("the serviceDirectory must be start with /  ,serviceDirectory:" + serviceDirectory);
 		// if (null == curatorFramework.checkExists().forPath(serviceDirectory))
 		// throw new Throwable("can't found " + serviceDirectory + " service.");
 
 		if (null == curatorFramework.checkExists().forPath(serviceDirectory)) {
-			curatorFramework.create().withMode(CreateMode.EPHEMERAL).forPath(serviceDirectory, value.getBytes());
+			curatorFramework.create().withMode(CreateMode.EPHEMERAL).forPath(serviceDirectory, valueByte);
+		} else {
+			curatorFramework.setData().forPath(serviceDirectory, valueByte);
 		}
 
 		if (null != eventListener) {
@@ -145,8 +148,16 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 		curatorFramework.delete().forPath(serviceDirectory);
 	}
 
-	public boolean isRegister(String directory, String value) throws Throwable {
-		return false;
+	//	public boolean isRegister(String directory, String value) throws Throwable {
+	//		boolean result;
+	//		if (result = isRegister(directory)) {
+	//			curatorFramework.setData().forPath(directory, null == value ? new byte[0] : value.getBytes());
+	//		}
+	//		return result;
+	//	}
+
+	public boolean isRegister(String directory) throws Throwable {
+		return null != curatorFramework.checkExists().forPath(directory);
 	}
 
 	public void election(String ledderDirectory, final ElectionCallBack electionCallBack) throws Throwable {
@@ -302,7 +313,7 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 
 	public static void main(String[] args) {
 		ZookeeperRegistrationFactory zrf = new ZookeeperRegistrationFactory();
-		zrf.serverList="192.168.3.12:2181";
+		zrf.serverList = "192.168.3.12:2181";
 		try {
 			zrf.init();
 			String directory = zrf.createService("/service", new RegistrationEventListener<PathChildrenCacheEvent>() {

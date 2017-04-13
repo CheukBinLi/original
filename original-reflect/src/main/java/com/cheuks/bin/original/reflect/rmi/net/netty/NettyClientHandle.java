@@ -53,10 +53,17 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		super.channelInactive(ctx);
+		System.out.println(ctx.channel().remoteAddress());
 		ctx.close();
 		ctx.channel().close();
-		LOG.warn("disconnect");
+		super.channelInactive(ctx);
+		LOG.warn("disconnect: reconnection");
+		NettyClient nettyClientObjectPool = ctx.channel().attr(NettyClient.NETTY_CLIENT_OBJECT_POOL).get();
+		try {
+			nettyClientObjectPool.reConnection();
+		} catch (Throwable e) {
+			LOG.error(null, e);
+		}
 	}
 
 	@Override

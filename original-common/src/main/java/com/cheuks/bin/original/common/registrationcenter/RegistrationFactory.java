@@ -59,12 +59,10 @@ public interface RegistrationFactory<Client, SubNodeEvent, NodeEvent> {
 	 * 
 	 * @param serviceDirectory
 	 *            目录
-	 * @param value
-	 *            注册内容
 	 * @return
 	 * @throws Throwable
 	 */
-	boolean isRegister(String serviceDirectory, String value) throws Throwable;
+	boolean isRegister(String serviceDirectory) throws Throwable;
 
 	/***
 	 * 服务选举
