@@ -1,5 +1,8 @@
 package com.cheuks.bin.original.reflect.rmi;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -35,7 +38,7 @@ public class NettyClientAdapter extends NettyClient {
 		return newInstance(-1);
 	}
 
-	public static void main(String[] args) throws Throwable {
+	public static void main2(String[] args) throws Throwable {
 
 		// 通信池
 		NettyClient ncop = NettyClientAdapter.newInstance(15);

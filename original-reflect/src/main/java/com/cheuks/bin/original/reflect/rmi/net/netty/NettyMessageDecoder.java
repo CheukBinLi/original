@@ -26,7 +26,7 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
 			return null;
 		TransmissionModel result = null;
 		int headerCode = b.readInt();
-		if (headerCode != HandleType.HEAR_BEAT) {
+		if (headerCode != HandleType.HEAR_TAG) {
 			LOG.error("校验失败,HEADER_CODE:" + headerCode);
 			return null;
 		}

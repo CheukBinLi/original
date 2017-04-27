@@ -32,8 +32,7 @@ public abstract class AbstractObjectPool<T, V> implements ObjectPool<T> {
 	/***
 	 * 回调过期对象个数，重建对像
 	 * 
-	 * @param count
-	 *            过期对象个数
+	 * @param count 过期对象个数
 	 * @throws Exception
 	 */
 	public abstract void invalidateReBuildObject(int count) throws Exception;
@@ -87,6 +86,13 @@ public abstract class AbstractObjectPool<T, V> implements ObjectPool<T> {
 		if (null != t) {
 			BORROW_QUEUE.remove(t);
 			QUEUE.addLast(t);
+		}
+	}
+
+	public synchronized void removeObject(T t) throws Exception {
+		if (null != t) {
+			QUEUE.remove(t);
+			BORROW_QUEUE.remove(t);
 		}
 	}
 

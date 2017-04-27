@@ -87,7 +87,7 @@
 	<import resource="HibernateDB.xml" />
 	<import resource="resource.xml" />
 	<import resource="beans.xml" />
-	<import resource="security.xml" />
+	<!-- <import resource="security.xml" /> -->
 	<import resource="rmi.xml" />
-<!-- 	<import resource="original.xml" /> -->
+	<!-- <import resource="original.xml" /> -->
 </beans>

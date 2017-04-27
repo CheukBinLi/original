@@ -49,26 +49,19 @@ public class RegisterServiceServerHandler implements RegisterService {
 	}
 
 	private void dstributionService(String path) {
-		try {
-			String serverName = registrationFactory.getValue(path);
-			int count = Integer.valueOf(registrationFactory.getValue(serverName));
-			registrationFactory.setValue(serverName, Integer.toString(++count));
-		} catch (Throwable e) {
-			LOG.error(null, e);
+		if (serverList.size() > 0) {
+			Collections.reverse(serverLoadList);
+			ServerLoad tempServerLoad = serverLoadList.removeLast();
+			try {
+				// 负载加1
+				registrationFactory.setValue(path, tempServerLoad.getServerName() + SEPARATOR + tempServerLoad.getServerUrl());
+				tempServerLoad.addLoadCount(1);
+//				registrationFactory.setValue(SERVICE_ROOT + SERVICE_LOAD + "/" + tempServerLoad.getServerName(), Integer.toString(tempServerLoad.getLoadCount().get()));
+				serverLoadList.addFirst(tempServerLoad);
+			} catch (Throwable e) {
+				LOG.error(null, e);
+			}
 		}
-		//		if (serverList.size() > 0) {
-		//			Collections.reverse(serverLoadList);
-		//			ServerLoad tempServerLoad = serverLoadList.removeLast();
-		//			try {
-		//				// 负载加1
-		//				registrationFactory.setValue(path, tempServerLoad.getServerName() + SEPARATOR + tempServerLoad.getServerUrl());
-		//				tempServerLoad.addLoadCount(1);
-		//				//				registrationFactory.setValue(SERVICE_ROOT + SERVICE_LOAD + "/" + tempServerLoad.getServerName(), Integer.toString(tempServerLoad.getLoadCount().get()));
-		//				serverLoadList.addFirst(tempServerLoad);
-		//			} catch (Throwable e) {
-		//				LOG.error(null, e);
-		//			}
-		//		}
 	}
 
 	private final RegistrationEventListener<PathChildrenCacheEvent> customerEventListener = new RegistrationEventListener<PathChildrenCacheEvent>() {
@@ -80,18 +73,16 @@ public class RegisterServiceServerHandler implements RegisterService {
 				// String serverName = path.substring(path.lastIndexOf("/") + 1);
 				// 领导
 				if (isLedder) {
-					//					Thread.sleep(getEventHandleDelay());
-					//负载计算
+					Thread.sleep(getEventHandleDelay());
 					dstributionService(path);
 				}
 
 			} else if (PathChildrenCacheEvent.Type.CHILD_UPDATED == params.getType()) {
-				//				byte[] data = params.getData().getData();
-				//				String path = params.getData().getPath();
-				//				if (isLedder && data.length < 5) {
-				//					dstributionService(path);
-				//				}
-				System.out.println("节点修改:" + params.getData().getPath());
+				byte[] data = params.getData().getData();
+				String path = params.getData().getPath();
+				if (isLedder && data.length < 5) {
+					dstributionService(path);
+				}
 
 			} else if (PathChildrenCacheEvent.Type.CHILD_REMOVED == params.getType()) {
 				if (serverList.size() > 0) {
@@ -169,20 +160,8 @@ public class RegisterServiceServerHandler implements RegisterService {
 			}
 		}
 	}
-	
-	
 
-	public String getRegisterDirectory() throws Throwable {
-		LOG.warn("not support");
-		return null;
-	}
-
-
-	public void unRegister(String directory) throws Throwable {
-		LOG.warn("not support");
-	}
-
-	public String register(String directory, String value) throws Throwable {
+	public String register() throws Throwable {
 		if (isRegister)
 			return null;
 		registrationFactory.init();
@@ -252,6 +231,50 @@ public class RegisterServiceServerHandler implements RegisterService {
 		Collections.sort(al);
 		System.err.println(al);
 
+	}
+
+	protected class ServerLoad {
+		private String serverName;
+		private String serverUrl;
+		private final AtomicInteger loadCount = new AtomicInteger();
+
+		public String getServerName() {
+			return serverName;
+		}
+
+		public ServerLoad setServerName(String serverName) {
+			this.serverName = serverName;
+			return this;
+		}
+
+		public String getServerUrl() {
+			return serverUrl;
+		}
+
+		public ServerLoad setServerUrl(String serverUrl) {
+			this.serverUrl = serverUrl;
+			return this;
+		}
+
+		public AtomicInteger getLoadCount() {
+			return loadCount;
+		}
+
+		public ServerLoad setLoadCount(int loadCount) {
+			this.loadCount.set(loadCount);
+			return this;
+		}
+
+		public synchronized int addLoadCount(int count) {
+			return this.loadCount.addAndGet(count);
+		}
+
+		public ServerLoad(String serverName, String serverUrl, int loadCount) {
+			super();
+			this.serverName = serverName;
+			this.serverUrl = serverUrl;
+			this.loadCount.set(loadCount);
+		}
 	}
 
 	public int getEventHandleDelay() {

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cheuks.bin.original.reflect.rmi.NettyClient;
+import com.cheuks.bin.original.reflect.rmi.RegisterService;
 import com.cheuks.bin.original.reflect.rmi.model.TransmissionModel;
 import com.cheuks.bin.original.reflect.rmi.net.MessageHandle;
 
@@ -17,6 +18,10 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 	private static final Logger LOG = LoggerFactory.getLogger(NettyClientHandle.class);
 
 	private ChannelHandlerContext channelHandlerContext;
+
+	private RegisterService registerClientHandler;
+
+	private volatile String id;
 
 	public NettyClientHandle getObject() {
 		return this;
@@ -40,6 +45,12 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 		channelHandlerContext = ctx;
 		NettyClient nettyClientObjectPool = ctx.channel().attr(NettyClient.NETTY_CLIENT_OBJECT_POOL).get();
 		nettyClientObjectPool.addObject(this);
+		String server = ctx.channel().remoteAddress().toString().replaceAll("/", "");
+		try {
+			id = registerClientHandler.register(server, server);
+		} catch (Throwable e) {
+			LOG.error(null, e);
+		}
 	}
 
 	@Override
@@ -59,8 +70,14 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 		super.channelInactive(ctx);
 		LOG.warn("disconnect: reconnection");
 		NettyClient nettyClientObjectPool = ctx.channel().attr(NettyClient.NETTY_CLIENT_OBJECT_POOL).get();
+		nettyClientObjectPool.removeObject(this);
 		try {
-			nettyClientObjectPool.reConnection();
+			registerClientHandler.unRegister(id);
+		} catch (Throwable e) {
+			LOG.error(null, e);
+		}
+		try {
+			nettyClientObjectPool.addConnection();
 		} catch (Throwable e) {
 			LOG.error(null, e);
 		}
@@ -72,4 +89,14 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 		ctx.close();
 		ctx.channel().close();
 	}
+
+	public NettyClientHandle(RegisterService registerClientHandler) {
+		super();
+		this.registerClientHandler = registerClientHandler;
+	}
+
+	public NettyClientHandle() {
+		super();
+	}
+
 }

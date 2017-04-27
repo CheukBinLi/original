@@ -3,9 +3,8 @@ package com.cheuks.bin.original.reflect.rmi;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,9 +62,9 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 	private RegisterService registerClientHandler;
 	private RmiBeanFactory rmiBeanFactory;
 	private String scanPath;
-	private Thread work = null;
-
-	private volatile long changeServerTime = System.currentTimeMillis();
+	//连接任务
+	private Thread connectionWorker;
+	private final BlockingQueue<Object> connectionQueue = new LinkedBlockingQueue<Object>();
 
 	private volatile boolean isInit;
 
@@ -112,7 +111,7 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 					ch.pipeline().addLast(new NettyMessageDecoder(maxFrameLength, 4, 4, cacheSerialize));
 					ch.pipeline().addLast(new NettyMessageEncoder(cacheSerialize));
 					ch.pipeline().addLast(new IdleStateHandler(0, 0, heartBeatInterval));
-					ch.pipeline().addLast(new NettyClientHandle());
+					ch.pipeline().addLast(new NettyClientHandle(registerClientHandler));
 				}
 			}).attr(NETTY_CLIENT_OBJECT_POOL, this);
 		} catch (Throwable e) {
@@ -121,75 +120,95 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 	}
 
 	public void start() throws NumberFormatException, IllegalStateException, UnsupportedOperationException, InterruptedException, Exception {
-		if (null == work || work.interrupted()) {
-			work = new Thread(new Runnable() {
+		if (null == connectionWorker || connectionWorker.interrupted()) {
+			init();
+			//			if (null == work || work.interrupted()) {
+			//			work = new Thread(new Runnable() {
+			//				public void run() {
+			//					init();
+			//					if (LOG.isDebugEnabled())
+			//						LOG.debug(address);
+			//					StringTokenizer ipList = new StringTokenizer(address, ",");
+			//					StringTokenizer ip;
+			//					String temp;
+			//					String host;
+			//					int port;
+			//					InetSocketAddress socketAddress;
+			//					int count = maxActiveCount / ipList.countTokens();
+			//					//返回list列表的情况:改为每次请求负载
+			//					//					while (ipList.hasMoreTokens()) {
+			//					//						temp = ipList.nextToken();
+			//					//						ip = new StringTokenizer(temp, ":");
+			//					//						host = ip.nextToken();
+			//					//						port = Integer.valueOf(ip.nextToken());
+			//					//						inetSocketAddress.add(socketAddress = new InetSocketAddress(host, port));
+			//					//						for (int i = 0; i < count; i++) {
+			//					//							try {
+			//					//								addObject(socketAddress);
+			//					//							} catch (Exception e) {
+			//					//								LOG.error(null, e);
+			//					//							}
+			//					//						}
+			//					//					}
+			//					String[] address = null;
+			//					//测试改单个IP，不负载
+			//					//					try {
+			//					//						address = registerClientHandler.register().split(":");
+			//					//					} catch (Throwable e1) {
+			//					//						e1.printStackTrace();
+			//					//					}
+			//					for (int i = 0; i < count; i++) {
+			//						try {
+			//							address = registerClientHandler.register().split(":");
+			//							addObject(new InetSocketAddress(address[0], Integer.valueOf(address[1])));
+			//						} catch (Throwable e) {
+			//							LOG.error(null, e);
+			//						}
+			//					}
+			//				}
+			//			});
+			//			work.start();
+			connectionWorker = new Thread(new Runnable() {
 				public void run() {
-					init();
-					if (LOG.isDebugEnabled())
-						LOG.debug(address);
-					StringTokenizer ipList = new StringTokenizer(address, ",");
-					StringTokenizer ip;
-					String temp;
-					String host;
-					int port;
-					InetSocketAddress socketAddress;
-					int count = maxActiveCount / ipList.countTokens();
-					//返回list列表的情况:改为每次请求负载
-					//					while (ipList.hasMoreTokens()) {
-					//						temp = ipList.nextToken();
-					//						ip = new StringTokenizer(temp, ":");
-					//						host = ip.nextToken();
-					//						port = Integer.valueOf(ip.nextToken());
-					//						inetSocketAddress.add(socketAddress = new InetSocketAddress(host, port));
-					//						for (int i = 0; i < count; i++) {
-					//							try {
-					//								addObject(socketAddress);
-					//							} catch (Exception e) {
-					//								LOG.error(null, e);
-					//							}
-					//						}
-					//					}
-					String[] address = null;
-					//测试改单个IP，不负载
-					//					try {
-					//						address = registerClientHandler.register().split(":");
-					//					} catch (Throwable e1) {
-					//						e1.printStackTrace();
-					//					}
-					for (int i = 0; i < count; i++) {
-						try {
-							address = registerClientHandler.register().split(":");
-							addObject(new InetSocketAddress(address[0], Integer.valueOf(address[1])));
-						} catch (Throwable e) {
-							LOG.error(null, e);
+					try {
+						while (true) {
+							connectionQueue.take();
+							connect();
+
 						}
+					} catch (Throwable e) {
+						LOG.error(null, e);
 					}
 				}
 			});
-			work.start();
+			for (int i = 0; i < maxActiveCount; i++) {
+				connectionQueue.add(1);
+			}
+			connectionWorker.start();
 		}
 	}
 
-	public void addObject(final InetSocketAddress socketAddress) throws IllegalStateException, UnsupportedOperationException, Exception {
+	public void addConnection() {
+		connectionQueue.add(1);
+	}
+
+	private void connect() throws Throwable {
 		try {
-			client.connect(socketAddress).addListener(new GenericFutureListener<Future<? super Void>>() {
+			String[] address = registerClientHandler.getRegisterDirectory().split(":");
+			InetSocketAddress inetSocketAddress = new InetSocketAddress(address[0], Integer.valueOf(address[1]));
+			System.out.println(inetSocketAddress.getPort());
+			client.connect(inetSocketAddress).addListener(new GenericFutureListener<Future<? super Void>>() {
 				public void operationComplete(Future<? super Void> future) throws Exception {
-					System.out.println("是否成功:" + future.isSuccess());
 					if (!future.isSuccess()) {
 						System.out.println("掉线更换服务器");
+						try {
+							addConnection();
+						} catch (Throwable e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}).sync().channel();
-		} catch (InterruptedException e) {
-			LOG.error(null, e);
-		}
-	}
-
-	public void reConnection() throws Throwable {
-		try {
-			String[] address = registerClientHandler.register().split(":");
-			InetSocketAddress inetSocketAddress = new InetSocketAddress(address[0], Integer.valueOf(address[1]));
-			client.connect(inetSocketAddress).sync().channel();
 		} catch (InterruptedException e) {
 			LOG.error(null, e);
 		}
@@ -214,6 +233,11 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 	public void shutdown() {
 		super.shutdown();
 		worker.shutdownGracefully();
+	}
+
+	@Override
+	public synchronized void removeObject(NettyClientHandle t) throws Exception {
+		super.removeObject(t);
 	}
 
 	public String getAddress() {

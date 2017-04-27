@@ -35,6 +35,6 @@
 	<bean id="redisHttpSessionConfiguration"
 		class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration">
 		<property name="maxInactiveIntervalInSeconds" value="1800" />
-		<property name="httpSessionStrategy" ref="httpSessionStrategy" />
+		<!-- <property name="httpSessionStrategy" ref="httpSessionStrategy" /> -->
 	</bean>
 </beans>

@@ -133,7 +133,7 @@ public class NettyServer {
 							registerServiceHandler = new RegisterServiceServerHandler(applicationName,
 									applicationUrl + ":" + port, registrationFactory);
 						}
-						registerServiceHandler.register();
+						registerServiceHandler.register(null,null);
 						// registrationFactory.init();
 						// registrationFactory.createService("/aa", null);
 						// registrationFactory.register("/aa", "/" +

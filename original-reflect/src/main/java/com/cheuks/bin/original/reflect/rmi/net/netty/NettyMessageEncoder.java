@@ -23,7 +23,7 @@ public class NettyMessageEncoder extends MessageToByteEncoder<TransmissionModel>
 		// 报头编码
 		// 长度
 		// 内容
-		out.writeInt(HandleType.HEAR_BEAT);// 头
+		out.writeInt(HandleType.HEAR_TAG);// 头
 		byte[] data;
 		try {
 			data = cacheSerialize.encode(msg);

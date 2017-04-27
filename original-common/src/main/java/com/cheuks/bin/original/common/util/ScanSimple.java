@@ -47,6 +47,8 @@ public class ScanSimple extends AbstractScan {
 	}
 
 	public final Map<String, Set<String>> doScan(String path) throws IOException, InterruptedException, ExecutionException {
+		if(LOG.isDebugEnabled())
+			LOG.debug("scan start...");
 		Map<String, Set<String>> result = new HashMap<String, Set<String>>();
 		if (null == path)
 			return result;
@@ -66,7 +68,7 @@ public class ScanSimple extends AbstractScan {
 			result.put(originalPaths[i], classMatchFilter(fullPaths[i], scanResult));
 		}
 		if (LOG.isDebugEnabled()) {
-			LOG.debug(result.toString());
+			LOG.debug("scan finish. \n"+result.toString());
 		}
 		return result;
 	}

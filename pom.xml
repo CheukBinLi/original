@@ -64,16 +64,16 @@
 	</dependencies>
 	<modules>
 		<module>original-common</module>
+		<module>original-annotation</module>
 		<module>original-cache</module>
 		<module>original-db-manager</module>
 		<!-- <module>original-generate</module> <module>original-weixin</module> -->
-		<!-- <module>original-test</module> -->
-		<module>original-web</module>
 		<module>original-search</module>
-		<module>original-annotation</module>
 		<module>original-config</module>
 		<module>original-reflect</module>
 		<module>original-registration-center</module>
 		<module>original-session</module>
+		<module>original-test</module>
+		<module>original-web</module>
 	</modules>
 </project>

@@ -4,11 +4,15 @@
 
 <web-app>
 	<!-- SECUITRY -->
-	<filter>
+<!-- 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
 	</filter>
-
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+ -->
 	<!-- SESSION -->
 	<filter>
 		<filter-name>springSessionRepositoryFilter</filter-name>
@@ -18,14 +22,13 @@
 		<filter-name>springSessionRepositoryFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	<filter-mapping>
-		<filter-name>springSecurityFilterChain</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
 
-	<!-- <listener> <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class> </listener> -->
+
+	<!-- <listener> <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class> 
+		</listener> -->
 	<listener>
-		<listener-class> org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+		<listener-class>
+			org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
 	</listener>
 
 	<!-- MVC -->
@@ -46,7 +49,9 @@
 		<!-- <url-pattern>/*</url-pattern> -->
 	</servlet-mapping>
 
-	<!-- <servlet> <servlet-name>test</servlet-name> <servlet-class> com.cheuks.bin.original.web.customer.CustomerServiceServlet </servlet-class> <load-on-startup>1</load-on-startup> </servlet> <servlet-mapping> <servlet-name>test</servlet-name> <url-pattern>/test</url-pattern> </servlet-mapping> -->
+	<!-- <servlet> <servlet-name>test</servlet-name> <servlet-class> com.cheuks.bin.original.web.customer.CustomerServiceServlet 
+		</servlet-class> <load-on-startup>1</load-on-startup> </servlet> <servlet-mapping> 
+		<servlet-name>test</servlet-name> <url-pattern>/test</url-pattern> </servlet-mapping> -->
 
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
