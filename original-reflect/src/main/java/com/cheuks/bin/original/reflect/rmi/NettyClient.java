@@ -19,7 +19,10 @@ import com.cheuks.bin.original.reflect.rmi.net.netty.NettyMessageDecoder;
 import com.cheuks.bin.original.reflect.rmi.net.netty.NettyMessageEncoder;
 import com.cheuks.bin.original.registration.center.ZookeeperRegistrationFactory;
 
+import io.netty.bootstrap.AbstractBootstrap;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -197,15 +200,19 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 			String[] address = registerClientHandler.getRegisterDirectory().split(":");
 			InetSocketAddress inetSocketAddress = new InetSocketAddress(address[0], Integer.valueOf(address[1]));
 			System.out.println(inetSocketAddress.getPort());
-			client.connect(inetSocketAddress).addListener(new GenericFutureListener<Future<? super Void>>() {
-				public void operationComplete(Future<? super Void> future) throws Exception {
-					if (!future.isSuccess()) {
+			client.connect(inetSocketAddress).addListener(new ChannelFutureListener() {
+
+				public void operationComplete(ChannelFuture future) throws Exception {
+					if (future.isSuccess()) {
+						//发送负载信息
+					} else {
 						System.out.println("掉线更换服务器");
 						try {
 							addConnection();
 						} catch (Throwable e) {
 							e.printStackTrace();
 						}
+
 					}
 				}
 			}).sync().channel();

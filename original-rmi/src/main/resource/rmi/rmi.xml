@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://cheuks.bin.com/schema/rmi
+	http://cheuks.bin.com/schema/rmi.xsd
+	">
+
+	<rmi:config>
+		<rmi:registry address="192.168.1.1" />
+		<rmi:protocol port="119" />
+	</rmi:config>
+
+	<rmi:service-group applicationName="AAAABBBB">
+		<rmi:service interface="A123" id="CCTV-1" />
+	</rmi:service-group>
+
+</beans>

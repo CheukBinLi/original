@@ -5,9 +5,9 @@ package com.cheuks.bin.original.reflect.rmi.net;
  * 
  * @author ben
  *
- * @param <Input>
- * @param <Value>
- * @param <Args>
+ * @param <Input> channel
+ * @param <Value> 私有栈MODEL
+ * @param <Args> 运行参数
  */
 public interface MessageHandle<Input, Value, Args> extends HandleType {
 

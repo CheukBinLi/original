@@ -1,12 +1,13 @@
-package com.cheuks.bin.original.reflect.rmi.net.netty;
+package com.cheuks.bin.original.rmi.net.netty;
+
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cheuks.bin.original.reflect.rmi.NettyClient;
-import com.cheuks.bin.original.reflect.rmi.RegisterService;
-import com.cheuks.bin.original.reflect.rmi.model.TransmissionModel;
-import com.cheuks.bin.original.reflect.rmi.net.MessageHandle;
+import com.cheuks.bin.original.common.rmi.LoadBalanceFactory;
+import com.cheuks.bin.original.common.rmi.model.TransmissionModel;
+import com.cheuks.bin.original.common.rmi.net.MessageHandle;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleState;
@@ -17,9 +18,9 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 
 	private static final Logger LOG = LoggerFactory.getLogger(NettyClientHandle.class);
 
-	private ChannelHandlerContext channelHandlerContext;
+	private volatile ChannelHandlerContext channelHandlerContext;
 
-	private RegisterService registerClientHandler;
+	private LoadBalanceFactory<String, Void> loadBalanceFactory;
 
 	private volatile String id;
 
@@ -34,7 +35,7 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, TransmissionModel msg) throws Exception {
 		// System.out.println("收到消息_交给 invoke handler处理");
-		if (MessageHandle.RMI_RESPONSE == msg.getServiceType()) {
+		if (MessageHandle.RMI_SERVICE_TYPE_RESPONSE == msg.getServiceType()) {
 			setResult(msg);
 		}
 		ReferenceCountUtil.release(msg);
@@ -59,7 +60,7 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 		if (evt instanceof IdleStateEvent && ((IdleStateEvent) evt).state().equals(IdleState.ALL_IDLE)) {
 			if (LOG.isDebugEnabled())
 				LOG.debug("send hearBate package.");
-			ctx.writeAndFlush(new TransmissionModel(HEAR_BEAT));
+			ctx.writeAndFlush(new TransmissionModel(RMI_SERVICE_TYPE_HEAR_BEAT));
 		}
 	}
 
@@ -72,8 +73,10 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 		LOG.warn("disconnect: reconnection");
 		NettyClient nettyClientObjectPool = ctx.channel().attr(NettyClient.NETTY_CLIENT_OBJECT_POOL).get();
 		nettyClientObjectPool.removeObject(this);
+		//断线重连
 		try {
-			registerClientHandler.unRegister(id);
+			//			registerClientHandler.unRegister(id);
+			loadBalanceFactory.cancleRegistration(id);
 		} catch (Throwable e) {
 			LOG.error(null, e);
 		}
@@ -91,9 +94,9 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 		ctx.channel().close();
 	}
 
-	public NettyClientHandle(RegisterService registerClientHandler) {
+	public NettyClientHandle(LoadBalanceFactory<String, Void> loadBalanceFactory) {
 		super();
-		this.registerClientHandler = registerClientHandler;
+		this.loadBalanceFactory = loadBalanceFactory;
 	}
 
 	public NettyClientHandle() {
