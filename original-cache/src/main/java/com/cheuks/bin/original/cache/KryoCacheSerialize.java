@@ -2,6 +2,7 @@ package com.cheuks.bin.original.cache;
 
 import java.io.ByteArrayOutputStream;
 
+import com.cheuks.bin.original.common.cache.CacheException;
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -16,7 +17,7 @@ public class KryoCacheSerialize implements CacheSerialize {
 		// kryo.register(Exception.class, new JavaSerializer());
 	}
 
-	public byte[] encode(Object o) throws Throwable {
+	public byte[] encode(Object o) throws CacheException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Output output = new Output(out);
 		kryo.writeObject(output, o);
@@ -25,11 +26,11 @@ public class KryoCacheSerialize implements CacheSerialize {
 		return out.toByteArray();
 	}
 
-	public Object decode(byte[] o) throws Throwable {
+	public Object decode(byte[] o) throws CacheException {
 		return kryo.readClassAndObject(new Input(o));
 	}
 
-	public <T> T decodeT(byte[] o) throws Throwable {
+	public <T> T decodeT(byte[] o) throws CacheException {
 		Object result = decode(o);
 		return null == result ? null : (T) result;
 	}

@@ -6,9 +6,9 @@
 	">
 
 	<!-- <rmi:protocol port="10033" serviceType="server" host="192.168.3.30"/> -->
-	<rmi:protocol port="10033" serviceType="server" host="10.73.11.83"/>
+	<rmi:protocol port="10033" serviceType="client" host="10.73.11.83" />
 	<!-- <rmi:registry address="192.168.3.27:2181"/> -->
-	<rmi:registry address="10.73.11.97:2181"/>
-
-	<rmi:service interface="com.cheuks.bin.original.reflect.test2I" class="com.cheuks.bin.original.reflect.test2" id="testiiii"/> 
+	
+	<rmi:registry address="10.73.11.97:2181" />
+	<rmi:reference id="test" interface="com.cheuks.bin.original.reflect.test2I" />
 </beans>

@@ -6,33 +6,47 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import com.cheuks.bin.original.common.cache.CacheException;
 import com.cheuks.bin.original.common.cache.CacheSerialize;
-
 
 public class DefaultCacheSerialize implements CacheSerialize {
 
-	public byte[] encode(Object o) throws IOException {
+	public byte[] encode(Object o) throws CacheException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ObjectOutputStream out = new ObjectOutputStream(baos);
-		out.writeObject(o);
+		ObjectOutputStream out = null;
 		try {
+			out = new ObjectOutputStream(baos);
+			out.writeObject(o);
 			return baos.toByteArray();
+		} catch (Throwable e) {
+			throw new CacheException(e);
 		} finally {
-			out.close();
+			try {
+				if (null != out)
+					out.close();
+			} catch (IOException e) {
+			}
 		}
 	}
 
-	public Object decode(byte[] o) throws IOException, ClassNotFoundException {
-		ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(o));
+	public Object decode(byte[] o) throws CacheException {
+		ObjectInputStream in = null;
 		try {
+			in = new ObjectInputStream(new ByteArrayInputStream(o));
 			return in.readObject();
+		} catch (Throwable e) {
+			throw new CacheException(e);
 		} finally {
-			in.close();
+			try {
+				if (null != in)
+					in.close();
+			} catch (IOException e) {
+			}
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T decodeT(byte[] o) throws ClassNotFoundException, IOException {
+	public <T> T decodeT(byte[] o) throws CacheException {
 		return (T) decode(o);
 	}
 

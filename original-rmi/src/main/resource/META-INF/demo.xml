@@ -6,8 +6,8 @@
 	http://cheuks.bin.com/schema/rmi.xsd 
 	">
 
-	<rmi:config>
+<!-- 	<rmi:config>
 		<rmi:registry address="localhost:2181" />
 		<rmi:protocol port="" />
-	</rmi:config>
+	</rmi:config> -->
 </beans>
