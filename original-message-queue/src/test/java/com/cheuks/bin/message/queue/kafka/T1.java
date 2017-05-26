@@ -22,7 +22,30 @@ public class T1 {
 		try {
 			CountDownLatch countDownLatch = new CountDownLatch(1);
 			//			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("10.73.11.117:9091,10.73.11.117:9092", "T1_TOPIC,T2_TOPIC", "CCTV_1").init(null);
-			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("192.168.3.27:9092", "T1_TOPIC,T2_TOPIC", "CCTV_1").init(null);
+			//			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("192.168.3.27:9092", "T1_TOPIC,T2_TOPIC", "CCTV_1").init(null);
+			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("10.17.38.13:9089", "*,afterSale,jdorders", "Y9").init(null);
+			//all
+			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
+
+				public void doProcess(String value, Object originalObject) {
+					System.out.println("topic:jdorders : " + value);
+				}
+
+				public Object getQueueInfo() {
+					return "jdorders";
+				}
+			});
+			//all
+			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
+
+				public void doProcess(String value, Object originalObject) {
+					System.out.println("topic:afterSale : " + value);
+				}
+
+				public Object getQueueInfo() {
+					return "afterSale";
+				}
+			});
 			//topic_1
 			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
 
@@ -38,22 +61,22 @@ public class T1 {
 			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
 
 				public void doProcess(String value, Object originalObject) {
-					System.err.println("topic:T1_TOPIC ," + value);
+					System.err.println("topic:jdorders ," + value);
 				}
 
 				public Object getQueueInfo() {
-					return "T1_TOPIC";
+					return "topic_2";
 				}
 			});
 			//topic_3
 			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
 
 				public void doProcess(String value, Object originalObject) {
-					System.out.println("topic:* ," + value);
+					System.err.println("topic:* ," + value);
 				}
 
 				public Object getQueueInfo() {
-					return "*";
+					return "topic_3";
 				}
 			});
 			countDownLatch.await();
@@ -67,12 +90,14 @@ public class T1 {
 		try {
 			final CountDownLatch countDownLatch = new CountDownLatch(1);
 			//			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("192.168.3.27:9092,10.17.38.12:9089,10.73.11.117:9091,10.73.11.117:9092").init(null);
-			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("192.168.3.27:9092").init(null);
+			//			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("192.168.3.27:9092").init(null);
+			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("10.17.38.13:9089").init(null);
 			ExecutorService executorService = Executors.newCachedThreadPool();
 			executorService.execute(new Runnable() {
 				public void run() {
 					int count = 10;
 					while (--count > 0) {
+						messageQueueProducerFactory.makeMessage("jdorders", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
 						messageQueueProducerFactory.makeMessage("T2_TOPIC", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
 						try {
 							Thread.sleep(1000);
