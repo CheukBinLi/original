@@ -147,10 +147,9 @@ public class ScanSimple extends AbstractScan {
 		try {
 			String filePath;
 			if (file.isFile()) {
-				if (file.getPath().replace(File.separator, "/").matches(pathPattern)) {
-					filePath = file.getPath();
+				if ((filePath=file.getPath().replace(File.separator, "/")).matches(pathPattern)) {
 					// 文件添加返回
-					result.add(filePath.substring(filePath.replace("\\", "/").indexOf(startIndex)));
+					result.add(filePath.substring(filePath.indexOf(startIndex)));
 				}
 				return result;
 			} else if (file.isDirectory()) {
