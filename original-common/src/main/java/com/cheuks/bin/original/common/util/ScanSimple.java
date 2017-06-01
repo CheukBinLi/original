@@ -47,7 +47,7 @@ public class ScanSimple extends AbstractScan {
 	}
 
 	public final Map<String, Set<String>> doScan(String path) throws IOException, InterruptedException, ExecutionException {
-		if(LOG.isDebugEnabled())
+		if (LOG.isDebugEnabled())
 			LOG.debug("scan start...");
 		Map<String, Set<String>> result = new HashMap<String, Set<String>>();
 		if (null == path)
@@ -68,7 +68,7 @@ public class ScanSimple extends AbstractScan {
 			result.put(originalPaths[i], classMatchFilter(fullPaths[i], scanResult));
 		}
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("scan finish. \n"+result.toString());
+			LOG.debug("scan finish. \n" + result.toString());
 		}
 		return result;
 	}
@@ -144,20 +144,24 @@ public class ScanSimple extends AbstractScan {
 	protected final Set<String> fileTypeFilter(File file, String pathPattern, String startIndex) {
 		// Map<String, String> result = new WeakHashMap<String, String>();
 		Set<String> result = new HashSet<String>();
-		String filePath;
-		if (file.isFile()) {
-			if (file.getPath().replace(File.separator, "/").matches(pathPattern)) {
-				filePath = file.getPath();
-				// 文件添加返回
-				result.add(filePath.substring(filePath.indexOf(startIndex)));
+		try {
+			String filePath;
+			if (file.isFile()) {
+				if (file.getPath().replace(File.separator, "/").matches(pathPattern)) {
+					filePath = file.getPath();
+					// 文件添加返回
+					result.add(filePath.substring(filePath.replace("\\", "/").indexOf(startIndex)));
+				}
+				return result;
+			} else if (file.isDirectory()) {
+				File[] files = file.listFiles();
+				for (File f : files) {
+					// 目录递归
+					result.addAll(fileTypeFilter(f, pathPattern, startIndex));
+				}
 			}
-			return result;
-		} else if (file.isDirectory()) {
-			File[] files = file.listFiles();
-			for (File f : files) {
-				// 目录递归
-				result.addAll(fileTypeFilter(f, pathPattern, startIndex));
-			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -205,11 +209,12 @@ public class ScanSimple extends AbstractScan {
 		Set<String> result3 = scan.getResource("org.springframework.orm.*");
 		// Set<String> result = scan.getResource("org.apache.*.spi.*Root*$class");
 		// Set<String> result = scan.getResource("mapper.*query$xml*");
-		// Set<String> result2 = scan.getResource("META-INF.maven.*xml");
+		 Set<String> result6 = scan.getResource("META-INF.maven.*xml");
 		// Map<String, Set<String>> result1 = scan.resource;
 		System.out.println(result);
 		System.out.println(result2);
 		System.out.println(result3);
+		System.out.println(result6);
 		// System.out.println(result1.toString());
 	}
 
