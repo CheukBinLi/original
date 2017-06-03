@@ -14,9 +14,8 @@ import java.util.Map;
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
+import org.beetl.core.resource.ClasspathResourceLoader;
 import org.beetl.core.resource.FileResourceLoader;
-
-import com.cheuks.bin.original.web.entity.User;
 
 //import freemarker.cache.FileTemplateLoader;
 //import freemarker.template.Configuration;
@@ -40,14 +39,19 @@ public class CreateFile {
 		System.err.println(CreateFile.class.getPackage().getName());
 		String gen = System.getProperty("user.dir") + "/gen";
 		FileResourceLoader fileTemplateLoader = new FileResourceLoader(new File(path).getAbsolutePath());
+		ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader("template/beetl/");
+		//		FileResourceLoader fileTemplateLoader = new FileResourceLoader(new File(path).getAbsolutePath());
 
-		GroupTemplate groupTemplate = new GroupTemplate(fileTemplateLoader, config);
+		//		GroupTemplate groupTemplate = new GroupTemplate(fileTemplateLoader, config);
+		GroupTemplate groupTemplate = new GroupTemplate(classpathResourceLoader, config);
 		Template template;
 		// FileTemplateLoader fileTemplateLoader = new FileTemplateLoader(new File(path));
 
 		// config.setTemplateLoader(fileTemplateLoader);
 
-		String[] flvs = { "Dao", "DaoImpl", "Service", "ServiceImpl", "query", "Controller" };
+		String[] flvs = {
+				"Dao", "DaoImpl", "Service", "ServiceImpl", "query", "Controller"
+		};
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("entityFullName", c.getName());
 		map.put("entityParent", c.getPackage().getName().substring(0, c.getPackage().getName().lastIndexOf(".")));
@@ -162,7 +166,7 @@ public class CreateFile {
 		// CreateFile.create(FundraisingLog.class, Integer.class, true, true);
 		// CreateFile.create(WeiXinInfo.class, String.class, true, true);
 		// CreateFile.create(UnifiedOrder.class, String.class, true, true);
-		CreateFile.create(User.class, String.class, true, true);
+		//		CreateFile.create(User.class, String.class, true, true);
 	}
 
 }

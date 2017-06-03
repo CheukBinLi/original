@@ -11,9 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cheuks.bin.original.web.entity.User;
-
-import freemarker.cache.FileTemplateLoader;
+import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 
@@ -32,9 +30,13 @@ public class CreateFile {
 		System.err.println(path);
 		System.err.println(CreateFile.class.getPackage().getName());
 		String gen = System.getProperty("user.dir") + "/gen";
-		FileTemplateLoader fileTemplateLoader = new FileTemplateLoader(new File(path));
-		config.setTemplateLoader(fileTemplateLoader);
-		String[] flvs = { "Dao", "DaoImpl", "Service", "ServiceImpl", "query", "Controller" };
+		ClassTemplateLoader classTemplateLoader = new ClassTemplateLoader(CreateFile.class.getClassLoader(), "template/freemarker/");
+		//		FileTemplateLoader fileTemplateLoader = new FileTemplateLoader(new File(path));
+		//		config.setTemplateLoader(fileTemplateLoader);
+		config.setTemplateLoader(classTemplateLoader);
+		String[] flvs = {
+				"Dao", "DaoImpl", "Service", "ServiceImpl", "query", "Controller"
+		};
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("entityFullName", c.getName());
 		map.put("entityParent", c.getPackage().getName().substring(0, c.getPackage().getName().lastIndexOf(".")));
@@ -145,7 +147,7 @@ public class CreateFile {
 		// CreateFile.create(FundraisingLog.class, Integer.class, true, true);
 		// CreateFile.create(WeiXinInfo.class, String.class, true, true);
 		// CreateFile.create(UnifiedOrder.class, String.class, true, true);
-		CreateFile.create(User.class, String.class, true, true);
+		//		CreateFile.create(User.class, String.class, true, true);
 	}
 
 }
