@@ -5,6 +5,9 @@ import ${entityPackage}.dao.impl.${entitySimpleName}DaoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.cheuks.bin.original.common.dbmanager.DBAdapter;
+import com.cheuks.bin.original.common.dbmanager.dao.AbstractDao;
+
 @Component
 public class ${entitySimpleName}DaoImpl extends AbstractDao<${entitySimpleName}, ${idType}> implements ${entitySimpleName}Dao {
 

@@ -5,6 +5,9 @@ import ${entityPackage}.service.impl.${entitySimpleName}ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.cheuks.bin.original.common.dbmanager.dao.BaseDao;
+import com.cheuks.bin.original.common.dbmanager.service.AbstractService;
+
 @Component
 public class ${entitySimpleName}ServiceImpl extends AbstractService<${entitySimpleName}, ${idType}> implements ${entitySimpleName}Service {
 

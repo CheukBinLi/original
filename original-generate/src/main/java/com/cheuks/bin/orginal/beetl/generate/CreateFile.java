@@ -70,8 +70,10 @@ public class CreateFile {
 		String lastPath;
 		for (String str : flvs) {
 			// gen/user_Dao.java
-			genFile = new File(gen + (isSignleFloder ? "" : "/" + c.getSimpleName()));
-			lastPath = isSignleFloder ? (gen + "/" + c.getSimpleName() + str) : String.format("%s/%s/%s%s.java", gen, c.getSimpleName(), c.getSimpleName(), str);
+//			genFile = new File(gen + (isSignleFloder ? "" : "/" + c.getSimpleName()));
+//			lastPath = isSignleFloder ? (gen + "/" + c.getSimpleName() + str) : String.format("%s/%s/%s%s.java", gen, c.getSimpleName(), c.getSimpleName(), str);
+			genFile = new File(gen + (isSignleFloder ? "" : "/" + str));
+			lastPath = isSignleFloder ? (gen + "/" + c.getSimpleName() + str) : String.format("%s/%s/%s%s", gen, str, c.getSimpleName(), str);
 			if (!genFile.exists())
 				genFile.mkdirs();
 			if (!str.equals("query"))
