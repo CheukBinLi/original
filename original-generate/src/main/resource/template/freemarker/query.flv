@@ -1,8 +1,10 @@
 <!--  
--lt —参数1是否小于参数2 
--le —参数1是否小于等于参数2 
--gt —参数1是否大于参数2 
--ge —参数1是否大于等于参数2 
+${field}_lt —参数1是否小于参数2 <
+${field}_le —参数1是否小于等于参数2 <=
+${field}_gt —参数1是否大于参数2 >
+${field}_ge —参数1是否大于等于参数2 >=
+orderby 是否排序
+sort:asc/desc
   -->
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QueryList SYSTEM "Query.dtd">
@@ -13,16 +15,17 @@
 			<#list params as item> 
 				<${tag}if ${item}??>
 						and A.${item}=:${item} 
-				<${tag}elseif ${item}like??>
+				<${tag}elseif ${item}_like??>
 						and A.${item} like '%'||:${item}like||'%' 
-				<${tag}if ${item}gt??>
-						and A.${item}>:${item}gt 
-				<${tag}elseif ${item}ge??>
-						and A.${item}>=:${item}ge 
-				<${tag}elseif ${item}lt??>
-						and A.${item}<:${item}lt 
-				<${tag}elseif ${item}le??>
-						and A.${item}<=:${item}le 
+				<${tag}if ${item}_gt??>
+						and A.${item}>:${item}_gt 
+				<${tag}elseif ${item}_ge??>
+						and A.${item}>=:${item}_ge
+				</${tag}if>		 
+				<${tag}if ${item}_lt??>
+						and A.${item}<:${item}_lt 
+				<${tag}elseif ${item}_le??>
+						and A.${item}<=:${item}_le 
 				</${tag}if>
 			</#list>
 				<${tag}if orderby??>
