@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
+import org.beetl.core.resource.StringTemplateResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +38,8 @@ public class BeetlQueryFactory extends AbstractQueryFactory {
 
 	@Override
 	public void put(String name, String XQL, Object additional) throws Throwable {
-		if (LOG.isDebugEnabled())
-			LOG.debug("name: " + name + " isFormat: " + additional + " XQL: " + XQL);
-		if (null == name || null == XQL)
-			return;
+		if (LOG.isDebugEnabled()) LOG.debug("name: " + name + " isFormat: " + additional + " XQL: " + XQL);
+		if (null == name || null == XQL) return;
 		if ((Boolean) additional) {
 			resourceLoader.put(name, XQL);
 		} else {
@@ -58,8 +57,7 @@ public class BeetlQueryFactory extends AbstractQueryFactory {
 		} else {
 			result = UNFORMAT_XQL.get(name);
 		}
-		if (LOG.isDebugEnabled())
-			LOG.debug("name:%s: isFormat:%b XQL:%s", name, additional, result);
+		if (LOG.isDebugEnabled()) LOG.debug("name:{}: isFormat:{} XQL:{}", name, additional, result);
 		return result;
 	}
 

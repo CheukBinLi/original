@@ -16,7 +16,7 @@ public class UserServiceImpl extends AbstractService<User, String> implements Us
 	private UserDao userDao;
 
 	@Override
-	public BaseDao<User, String> getService() {
+	public BaseDao<User, String> getDao() {
 		return userDao;
 	}
 

@@ -14,10 +14,8 @@ public interface BaseDao<entity, ID extends Serializable> {
 
 	/***
 	 * 
-	 * @param page
-	 *            -1为所有记录
-	 * @param size
-	 *            -1为所有记录
+	 * @param page -1为所有记录
+	 * @param size -1为所有记录
 	 * @return
 	 * @throws Throwable
 	 */
@@ -26,10 +24,8 @@ public interface BaseDao<entity, ID extends Serializable> {
 	/***
 	 * 
 	 * @param params
-	 * @param page
-	 *            -1为所有记录
-	 * @param size
-	 *            -1为所有记录
+	 * @param page -1为所有记录
+	 * @param size -1为所有记录
 	 * @return
 	 * @throws Throwable
 	 */
@@ -38,12 +34,9 @@ public interface BaseDao<entity, ID extends Serializable> {
 	/***
 	 * 适合做DTO
 	 * 
-	 * @param queryName
-	 *            (名字根据 实体类package+语句名)
-	 * @param params
-	 *            参数
-	 * @param isFormat
-	 *            是否需要格式化(freemarkFormat="true")
+	 * @param queryName (名字根据 实体类package+语句名)
+	 * @param params 参数
+	 * @param isFormat 是否需要格式化(freemarkFormat="true")
 	 * @param page
 	 * @param size
 	 * @return
@@ -56,12 +49,9 @@ public interface BaseDao<entity, ID extends Serializable> {
 	/***
 	 * 适合做DTO
 	 * 
-	 * @param queryName
-	 *            (自定义输入)
-	 * @param params
-	 *            参数
-	 * @param isFormat
-	 *            是否需要格式化(freemarkFormat="true")
+	 * @param queryName (自定义输入)
+	 * @param params 参数
+	 * @param isFormat 是否需要格式化(freemarkFormat="true")
 	 * @param page
 	 * @param size
 	 * @return
@@ -79,6 +69,10 @@ public interface BaseDao<entity, ID extends Serializable> {
 	void update(entity o) throws Throwable;
 
 	void delete(entity o) throws Throwable;
+
+	boolean deleteLogic(Map<String, Object> params) throws Throwable;
+
+	boolean deleteLogicById(Serializable id) throws Throwable;
 
 	int executeUpdate(String queryName, Map<String, Object> params, boolean isHql, boolean isFromat) throws Throwable;
 

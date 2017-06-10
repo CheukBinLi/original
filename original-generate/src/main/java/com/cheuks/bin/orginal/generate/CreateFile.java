@@ -17,7 +17,7 @@ import freemarker.template.TemplateException;
 
 public class CreateFile {
 
-	public static void create(Class<?> c, Class<?> idType, boolean SimpleName, boolean isSignleFloder) throws IOException, TemplateException {
+	public static void create(Class<?> c, Class<?> idType, boolean SimpleName, boolean isSignleFloder, boolean genContrast) throws IOException, TemplateException {
 
 		// dao
 		// daoImpl
@@ -50,6 +50,7 @@ public class CreateFile {
 		map.put("tag", "#");
 		map.put("dollar", "$");
 		map.put("params", getFieldWidthGetSetting(c));
+		map.put("contrast", genContrast);//是否生能比较大小的条件
 		FileWriter writer;
 		File genFile;
 		String lastPath;

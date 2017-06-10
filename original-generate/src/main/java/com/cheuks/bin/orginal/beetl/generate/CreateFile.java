@@ -23,7 +23,7 @@ import org.beetl.core.resource.FileResourceLoader;
 
 public class CreateFile {
 
-	public static void create(Class<?> c, Class<?> idType, boolean SimpleName, boolean isSignleFloder) throws IOException {
+	public static void create(Class<?> c, Class<?> idType, boolean SimpleName, boolean isSignleFloder, boolean genContrast) throws IOException {
 
 		// dao
 		// daoImpl
@@ -49,9 +49,7 @@ public class CreateFile {
 
 		// config.setTemplateLoader(fileTemplateLoader);
 
-		String[] flvs = {
-				"Dao", "DaoImpl", "Service", "ServiceImpl", "query", "Controller"
-		};
+		String[] flvs = { "Dao", "DaoImpl", "Service", "ServiceImpl", "query", "Controller" };
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("entityFullName", c.getName());
 		map.put("entityParent", c.getPackage().getName().substring(0, c.getPackage().getName().lastIndexOf(".")));
@@ -65,19 +63,18 @@ public class CreateFile {
 		map.put("tag", "%");
 		map.put("dollar", "$");
 		map.put("params", getFieldWidthGetSetting(c));
+		map.put("contrast", genContrast);//是否生能比较大小的条件
 		FileWriter writer;
 		File genFile;
 		String lastPath;
 		for (String str : flvs) {
 			// gen/user_Dao.java
-//			genFile = new File(gen + (isSignleFloder ? "" : "/" + c.getSimpleName()));
-//			lastPath = isSignleFloder ? (gen + "/" + c.getSimpleName() + str) : String.format("%s/%s/%s%s.java", gen, c.getSimpleName(), c.getSimpleName(), str);
+			//			genFile = new File(gen + (isSignleFloder ? "" : "/" + c.getSimpleName()));
+			//			lastPath = isSignleFloder ? (gen + "/" + c.getSimpleName() + str) : String.format("%s/%s/%s%s.java", gen, c.getSimpleName(), c.getSimpleName(), str);
 			genFile = new File(gen + (isSignleFloder ? "" : "/" + str));
 			lastPath = isSignleFloder ? (gen + "/" + c.getSimpleName() + str) : String.format("%s/%s/%s%s", gen, str, c.getSimpleName(), str);
-			if (!genFile.exists())
-				genFile.mkdirs();
-			if (!str.equals("query"))
-				writer = new FileWriter(lastPath + ".java");
+			if (!genFile.exists()) genFile.mkdirs();
+			if (!str.equals("query")) writer = new FileWriter(lastPath + ".java");
 			else
 				writer = new FileWriter(lastPath + ".xml");
 			// config.getTemplate(str.toLowerCase() + ".flv").process(map, writer);
@@ -91,20 +88,13 @@ public class CreateFile {
 	}
 
 	private static String converType(Class<?> c) {
-		if (c.equals(Integer.class))
-			return "int";
-		else if (c.equals(String.class))
-			return "String";
-		else if (c.equals(Long.class))
-			return "long";
-		else if (c.equals(Float.class))
-			return "float";
-		else if (c.equals(Double.class))
-			return "double";
-		else if (c.equals(Byte.class))
-			return "byte";
-		else if (c.equals(String.class))
-			return "String";
+		if (c.equals(Integer.class)) return "int";
+		else if (c.equals(String.class)) return "String";
+		else if (c.equals(Long.class)) return "long";
+		else if (c.equals(Float.class)) return "float";
+		else if (c.equals(Double.class)) return "double";
+		else if (c.equals(Byte.class)) return "byte";
+		else if (c.equals(String.class)) return "String";
 		return null;
 	}
 

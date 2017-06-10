@@ -12,7 +12,7 @@ import com.cheuks.bin.original.common.dbmanager.dao.AbstractDao;
 public class ${entitySimpleName}DaoImpl extends AbstractDao<${entitySimpleName}, ${idType}> implements ${entitySimpleName}Dao {
 
 	@Autowired
-	private DBAdapter dBAdapter;
+	private DBAdapter<?> dBAdapter;
 
 	@Override
 	public Class<${entitySimpleName}> getEntityClass() {
@@ -20,7 +20,7 @@ public class ${entitySimpleName}DaoImpl extends AbstractDao<${entitySimpleName},
 	}
 
 	@Override
-	public DBAdapter getDBAdapter() {
+	public DBAdapter<?> getDBAdapter() {
 		return dBAdapter;
 	}
 

@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QueryList SYSTEM "Query.dtd">
 <QueryList package="${entityFullName}">
-	<Alias name="${entityFullName}" Alias="${entitySimpleName}" />
+	<Alias name="${entityFullName}" Alias="@${entitySimpleName}@" />
 	<Join name="defaultWhereList">
 		<![CDATA[ 
 			<%for(item in params) {%>
 				<${tag}if(has(${item})){${tag}>
 					AND ${item}=:${item} 
 				<${tag}}${tag}>
+				<${tag}else if (has(${item}_not)){${tag}>
+						and A.${item} <> :${item}_not 
+				<${tag}}${tag}>
+				<${tag}else if (has(${item}_li)){${tag}>
+						and A.${item} like '%'||:${item}_li||'%' 
+				<${tag}}${tag}>
+				<%if (contrast==true){%>		
+						<${tag}if (has(${item}_gt){${tag}>
+								and A.${item}>:${item}_gt 
+						<${tag}}${tag}>		
+						<${tag}else if (has(${item}_ge)){${tag}>
+								and A.${item}>=:${item}_ge
+						<${tag}}${tag}>		 
+						<${tag}if (has(${item}_lt)){${tag}>
+								and A.${item}<:${item}_lt 
+						<${tag}}${tag}>		
+						<${tag}else if (has(${item}_le)){${tag}>
+								and A.${item}<=:${item}_le 
+						<${tag}}${tag}>
+				<%}%>
 			<%}%>
 			<${tag}if (has(orderby)) {${tag}>
 					ORDER BY A.${dollar}{orderby} 
@@ -21,7 +41,7 @@
 	</Join>
 	<Query name="list" type="HQL" freemarkFormat="true" Alias="true" joinRef="defaultWhereList" joinTag="@WHERE@">
 		<![CDATA[ 
-			FROM ${entitySimpleName} A 
+			FROM @${entitySimpleName}@ A 
 			WHERE 
 			1=1 
 			@WHERE@ 
@@ -29,7 +49,7 @@
 	</Query>
 	<Query name="count" type="HQL" freemarkFormat="true" Alias="true" joinRef="defaultWhereList" joinTag="@WHERE@">
 		<![CDATA[ 
-			SELECT COUNT(1) FROM ${entitySimpleName} A 
+			SELECT COUNT(1) FROM @${entitySimpleName}@ A 
 			WHERE 
 			1=1 
 			@WHERE@ 

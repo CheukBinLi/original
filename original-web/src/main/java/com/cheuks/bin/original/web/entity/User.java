@@ -6,8 +6,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import com.cheuks.bin.original.common.dbmanager.BaseEntity;
+
 @Entity(name = "original_web_user")
-public class User implements Serializable {
+public class User extends BaseEntity implements Serializable {
 
 	/**
 	 * 

@@ -4,9 +4,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import com.cheuks.bin.original.common.dbmanager.BaseEntity;
 import com.cheuks.bin.original.common.dbmanager.DBAdapter;
 
-public abstract class AbstractDao<entity, ID extends Serializable> implements BaseDao<entity, ID> {
+public abstract class AbstractDao<entity extends BaseEntity, ID extends Serializable> implements BaseDao<entity, ID> {
 
 	public abstract Class<entity> getEntityClass();
 
@@ -65,6 +66,22 @@ public abstract class AbstractDao<entity, ID extends Serializable> implements Ba
 
 	public void delete(entity o) throws Throwable {
 		getDBAdapter().delete(o);
+	}
+
+	public boolean deleteLogic(Map<String, Object> params) throws Throwable {
+		List<entity> list = getList(params, -1, -1);
+		if (list.size() < 1 || list.size() > 1)
+			return false;
+		getDBAdapter().update(list.get(0).setLogicStatus(BaseEntity.DELETE));
+		return true;
+	}
+
+	public boolean deleteLogicById(Serializable id) throws Throwable {
+		entity obj = getDBAdapter().get(getEntityClass(), id);
+		if (null == obj)
+			return false;
+		getDBAdapter().update(obj.setLogicStatus(BaseEntity.DELETE));
+		return true;
 	}
 
 	public Object uniqueResult(String queryName, boolean isFormat, Map<String, Object> params) throws Throwable {
