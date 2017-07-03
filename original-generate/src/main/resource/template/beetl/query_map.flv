@@ -15,27 +15,27 @@ sort:asc/desc
 	<Join name="defaultWhereList">
 		<![CDATA[ 
 			<%for(item in params) {%>
-				<${tag}if(has(${item.key})){${tag}>
-					AND ${item.key}=:${item.key} 
+				<${tag}if(has(${item})){${tag}>
+					AND ${item}=:${item} 
 				<${tag}}${tag}>
-				<${tag}else if (has(${item.key}_not)){${tag}>
-						and A.${item.key} <> :${item.key}_not 
+				<${tag}else if (has(${item}_not)){${tag}>
+						and A.${item} <> :${item}_not 
 				<${tag}}${tag}>
-				<${tag}else if (has(${item.key}_li)){${tag}>
-						and A.${item.key} like '%'||:${item.key}_li||'%' 
+				<${tag}else if (has(${item}_li)){${tag}>
+						and A.${item} like '%'||:${item}_li||'%' 
 				<${tag}}${tag}>
-			<%if (contrast==true && @com.cheuks.bin.orginal.beetl.generate.CreateFile.contrast(item.value)){%>		
-				<${tag}if (has(${item.key}_gt)){${tag}>
-						and A.${item.key}>:${item.key}_gt 
+			<%if (contrast==true){%>		
+				<${tag}if (has(${item}_gt)){${tag}>
+						and A.${item}>:${item}_gt 
 				<${tag}}${tag}>		
-				<${tag}else if (has(${item.key}_ge)){${tag}>
-						and A.${item.key}>=:${item.key}_ge
+				<${tag}else if (has(${item}_ge)){${tag}>
+						and A.${item}>=:${item}_ge
 				<${tag}}${tag}>		 
-				<${tag}if (has(${item.key}_lt)){${tag}>
-						and A.${item.key}<:${item.key}_lt 
+				<${tag}if (has(${item}_lt)){${tag}>
+						and A.${item}<:${item}_lt 
 				<${tag}}${tag}>		
-				<${tag}else if (has(${item.key}_le)){${tag}>
-						and A.${item.key}<=:${item.key}_le 
+				<${tag}else if (has(${item}_le)){${tag}>
+						and A.${item}<=:${item}_le 
 				<${tag}}${tag}>
 			<%}%>
 			<%}%>

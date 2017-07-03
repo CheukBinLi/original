@@ -2,7 +2,7 @@ package com.cheuks.bin.original.weixin;
 
 import java.io.IOException;
 
-import com.cheuks.bin.original.weixin.util.HttpClient;
+import com.cheuks.bin.original.common.util.HttpClientUtil;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -25,12 +25,18 @@ public class Auth {
 		// System.out.println("2:" + (System.currentTimeMillis() - now));
 		// String state = request.getParameter("state");
 
-		String path = String.format("https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code", appId, appSecret, code);
-		HttpClient hc = new HttpClient();
-		String json = hc.Get(path, 3000, true, false);
+		String path = String.format("https://api.weixin.qq.com/cgi-bin/token?appid=%s&secret=%s&code=%s&grant_type=client_credential", appId, appSecret, code);
+		HttpClientUtil hc = HttpClientUtil.newInstance();
+		String json = new String(hc.GET(path, 3000, false).toByteArray());
 		JsonObject jsonObject = (JsonObject) jsonParser.parse(json);
 
 		return jsonObject;
+	}
+
+	public static void main(String[] args) throws IOException {
+		//AppSecret=8b915336310cdcc2d6a0faf459c7b509
+		//AppID=wx27d9f31e4396a85f
+		System.out.println(new Auth().auth("wx27d9f31e4396a85f", "8b915336310cdcc2d6a0faf459c7b509", ""));
 	}
 
 }

@@ -6,11 +6,16 @@ import java.util.Map;
 
 import com.cheuks.bin.original.common.dbmanager.BasePage;
 import com.cheuks.bin.original.common.dbmanager.dao.BaseDao;
+import com.cheuks.bin.original.common.util.GeneratedIDService;
 import com.cheuks.bin.original.common.util.ObjectFill;
 
 public abstract class AbstractService<entity, ID extends Serializable> extends ObjectFill implements BaseService<entity, ID> {
 
 	public abstract BaseDao<entity, ID> getDao();
+
+	public Long generateId() {
+		return GeneratedIDService.newInstance().nextID();
+	}
 
 	public entity saveCustom(entity obj) throws Throwable {
 		return getDao().saveCustom(obj);
@@ -30,8 +35,8 @@ public abstract class AbstractService<entity, ID extends Serializable> extends O
 	public BasePage<entity> getpage(Map<String, Object> params, int page, int size) throws Throwable {
 		int count = getCount(params);
 		List<entity> list = getDao().getList(params, page, size);
-		int pages = count / size + (count % size == 0 ? 0 : 1);
-		return new BasePage<entity>(list, page, size, count, pages);
+		int pages = (page < 0 || size < 0) ? 1 : count / size + (count % size == 0 ? 0 : 1);
+		return new BasePage<entity>(list, page < 0 ? 1 : page, size < 0 ? count : size, count, pages);
 	}
 
 	public BasePage<entity> getpage(Map<String, Object> params) throws Throwable {
@@ -65,7 +70,7 @@ public abstract class AbstractService<entity, ID extends Serializable> extends O
 	public void delete(entity obj) throws Throwable {
 		getDao().delete(obj);
 	}
-	
+
 	public boolean deleteLogic(Map<String, Object> params) throws Throwable {
 		return getDao().deleteLogic(params);
 	}

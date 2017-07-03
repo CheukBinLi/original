@@ -6,12 +6,17 @@ import java.util.Map;
 
 import com.cheuks.bin.original.common.dbmanager.BaseEntity;
 import com.cheuks.bin.original.common.dbmanager.DBAdapter;
+import com.cheuks.bin.original.common.util.GeneratedIDService;
 
 public abstract class AbstractDao<entity extends BaseEntity, ID extends Serializable> implements BaseDao<entity, ID> {
 
 	public abstract Class<entity> getEntityClass();
 
 	public abstract DBAdapter<?> getDBAdapter();
+
+	public Long generateId() {
+		return GeneratedIDService.newInstance().nextID();
+	}
 
 	public final String entityName = getEntityClass().getName();
 
@@ -70,16 +75,14 @@ public abstract class AbstractDao<entity extends BaseEntity, ID extends Serializ
 
 	public boolean deleteLogic(Map<String, Object> params) throws Throwable {
 		List<entity> list = getList(params, -1, -1);
-		if (list.size() < 1 || list.size() > 1)
-			return false;
+		if (list.size() < 1 || list.size() > 1) return false;
 		getDBAdapter().update(list.get(0).setLogicStatus(BaseEntity.DELETE));
 		return true;
 	}
 
 	public boolean deleteLogicById(Serializable id) throws Throwable {
 		entity obj = getDBAdapter().get(getEntityClass(), id);
-		if (null == obj)
-			return false;
+		if (null == obj) return false;
 		getDBAdapter().update(obj.setLogicStatus(BaseEntity.DELETE));
 		return true;
 	}

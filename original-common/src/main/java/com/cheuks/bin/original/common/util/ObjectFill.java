@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ObjectFill {
 
-	private final static Map<Class<?>, Map<String, Field>> FIELDS = new ConcurrentHashMap<Class<?>, Map<String, Field>>();
+	protected final static Map<Class<?>, Map<String, Field>> FIELDS = new ConcurrentHashMap<Class<?>, Map<String, Field>>();
 
 	private volatile SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -36,8 +36,7 @@ public class ObjectFill {
 	}
 
 	public final Map<String, Object> objectToMap(Object o) throws IllegalArgumentException, IllegalAccessException {
-		if (!FIELDS.containsKey(o.getClass()))
-			scanClass(o.getClass());
+		if (!FIELDS.containsKey(o.getClass())) scanClass(o.getClass());
 		Map<String, Field> fields = FIELDS.get(o.getClass());
 		Map<String, Object> result = new HashMap<String, Object>();
 		for (Entry<String, Field> en : fields.entrySet()) {
@@ -49,15 +48,13 @@ public class ObjectFill {
 	public final <T> T fillObject(T t, Map<String, ?> data) throws IllegalArgumentException, IllegalAccessException {
 		System.out.println(t.getClass());
 		Class<?> c = t.getClass();
-		if (!FIELDS.containsKey(c))
-			scanClass(c);
+		if (!FIELDS.containsKey(c)) scanClass(c);
 		Map<String, Field> fields = FIELDS.get(c);
 		Object value;
 		Field field;
 		for (Entry<String, ?> en : data.entrySet()) {
 			value = en.getValue();
-			if (null == value || null == (field = fields.get(en.getKey())))
-				continue;
+			if (null == value || null == (field = fields.get(en.getKey()))) continue;
 			try {
 				field.set(t, getValue(field.getType(), value));
 			} catch (Exception e) {
@@ -74,27 +71,16 @@ public class ObjectFill {
 			if (c.isArray()) {
 				System.err.println("数组末实现");
 				return null;
-			} else if (simpleName.equalsIgnoreCase("String"))
-				return getFirstValue(isArray, data);
-			else if (simpleName.equalsIgnoreCase("boolean") || simpleName.equalsIgnoreCase("Boolean"))
-				return Boolean.valueOf(getFirstValue(isArray, data));
-			else if (simpleName.equalsIgnoreCase("int") || simpleName.equalsIgnoreCase("Integer"))
-				return Integer.valueOf(getFirstValue(isArray, data));
-			else if (simpleName.equalsIgnoreCase("byte"))
-				return Byte.valueOf(getFirstValue(isArray, data));
-			else if (simpleName.equalsIgnoreCase("char") || simpleName.equalsIgnoreCase("Character"))
-				return Character.valueOf(getFirstValue(isArray, data).charAt(0));
-			else if (simpleName.equalsIgnoreCase("double"))
-				return Double.valueOf(getFirstValue(isArray, data));
-			else if (simpleName.equalsIgnoreCase("long"))
-				return Long.valueOf(getFirstValue(isArray, data));
-			else if (simpleName.equalsIgnoreCase("short"))
-				return Short.valueOf(getFirstValue(isArray, data));
-			else if (simpleName.equalsIgnoreCase("float"))
-				return Float.valueOf(getFirstValue(isArray, data));
-			else if (simpleName.equalsIgnoreCase("Date")) {
-				return dateFormat.parse(data.toString());
-			}
+			} else if (simpleName.equalsIgnoreCase("String")) return getFirstValue(isArray, data);
+			else if (simpleName.equalsIgnoreCase("boolean") || simpleName.equalsIgnoreCase("Boolean")) return Boolean.valueOf(getFirstValue(isArray, data));
+			else if (simpleName.equalsIgnoreCase("int") || simpleName.equalsIgnoreCase("Integer")) return Integer.valueOf(getFirstValue(isArray, data));
+			else if (simpleName.equalsIgnoreCase("byte")) return Byte.valueOf(getFirstValue(isArray, data));
+			else if (simpleName.equalsIgnoreCase("char") || simpleName.equalsIgnoreCase("Character")) return Character.valueOf(getFirstValue(isArray, data).charAt(0));
+			else if (simpleName.equalsIgnoreCase("double")) return Double.valueOf(getFirstValue(isArray, data));
+			else if (simpleName.equalsIgnoreCase("long")) return Long.valueOf(getFirstValue(isArray, data));
+			else if (simpleName.equalsIgnoreCase("short")) return Short.valueOf(getFirstValue(isArray, data));
+			else if (simpleName.equalsIgnoreCase("float")) return Float.valueOf(getFirstValue(isArray, data));
+			else if (simpleName.equalsIgnoreCase("Date")) { return dateFormat.parse(data.toString()); }
 			return data;
 		} catch (Exception e) {
 			return null;

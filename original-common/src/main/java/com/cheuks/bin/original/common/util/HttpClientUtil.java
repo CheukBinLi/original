@@ -12,6 +12,15 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class HttpClientUtil {
 
+	protected HttpClientUtil() {
+	}
+
+	private static final HttpClientUtil INSTANCE = new HttpClientUtil();
+
+	public static final HttpClientUtil newInstance() {
+		return INSTANCE;
+	}
+
 	/***
 	 * 文件上传到微信服务器
 	 *
@@ -20,15 +29,14 @@ public class HttpClientUtil {
 	 * @param inputStream
 	 * @throws Exception
 	 */
-	public static ByteArrayOutputStream sendFile(String url, String fileName, InputStream inputStream) throws Exception {
+	public ByteArrayOutputStream sendFile(String url, String fileName, InputStream inputStream) throws Exception {
 		ByteArrayOutputStream result = new ByteArrayOutputStream();
 		URL urlObj = new URL(url);
 		boolean isHttps = url.contains("https:");
 		HttpURLConnection con = null;
 		InputStream in;
 		try {
-			if (isHttps)
-				con = (HttpsURLConnection) urlObj.openConnection();
+			if (isHttps) con = (HttpsURLConnection) urlObj.openConnection();
 			else
 				con = (HttpURLConnection) urlObj.openConnection();
 			con.setRequestMethod("POST");
@@ -65,8 +73,7 @@ public class HttpClientUtil {
 			}
 			in.close();
 		} finally {
-			if (null != con)
-				con.disconnect();
+			if (null != con) con.disconnect();
 		}
 		return result;
 	}
@@ -80,7 +87,7 @@ public class HttpClientUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static ByteArrayOutputStream GET(String urlPath, int timeOut, boolean onlyRequest) throws IOException {
+	public ByteArrayOutputStream GET(String urlPath, int timeOut, boolean onlyRequest) throws IOException {
 		HttpURLConnection con = null;
 		URL url = null;
 		InputStream in = null;
@@ -88,8 +95,7 @@ public class HttpClientUtil {
 		boolean isHttps = urlPath.contains("https:");
 		try {
 			url = new URL(urlPath);
-			if (isHttps)
-				con = (HttpsURLConnection) url.openConnection();
+			if (isHttps) con = (HttpsURLConnection) url.openConnection();
 			else
 				con = (HttpURLConnection) url.openConnection();
 			con.setUseCaches(false);
@@ -98,8 +104,7 @@ public class HttpClientUtil {
 			con.setRequestMethod("GET");
 			con.setReadTimeout(timeOut);
 			con.connect();
-			if (onlyRequest)
-				return null;
+			if (onlyRequest) return null;
 			in = con.getInputStream();
 			byte[] buffer = new byte[512];
 			int length;
@@ -108,8 +113,7 @@ public class HttpClientUtil {
 			}
 			in.close();
 		} finally {
-			if (null != con)
-				con.disconnect();
+			if (null != con) con.disconnect();
 		}
 		return out;
 	}
@@ -133,8 +137,7 @@ public class HttpClientUtil {
 		boolean isHttps = urlPath.contains("https:");
 		try {
 			url = new URL(urlPath);
-			if (isHttps)
-				con = (HttpsURLConnection) url.openConnection();
+			if (isHttps) con = (HttpsURLConnection) url.openConnection();
 			else
 				con = (HttpURLConnection) url.openConnection();
 			con.setUseCaches(false);
@@ -146,8 +149,7 @@ public class HttpClientUtil {
 			out = con.getOutputStream();
 			out.write(parameterStr.getBytes("UTF-8"));
 			out.flush();
-			if (onlyRequest)
-				return null;
+			if (onlyRequest) return null;
 			result = new ByteArrayOutputStream();
 			in = con.getInputStream();
 			byte[] buffer = new byte[512];
