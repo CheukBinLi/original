@@ -15,7 +15,7 @@ public class ${entitySimpleName}ServiceImpl extends AbstractService<${entitySimp
 	private ${entitySimpleName}Dao ${@com.cheuks.bin.orginal.beetl.generate.CreateFile.toLowerCaseFirstOne(entitySimpleName)}Dao;
 
 	@Override
-	public BaseDao<${entitySimpleName}, ${idType}> getService() {
+	public BaseDao<${entitySimpleName}, ${idType}> getDao() {
 		return ${@com.cheuks.bin.orginal.beetl.generate.CreateFile.toLowerCaseFirstOne(entitySimpleName)}Dao;
 	}
 
