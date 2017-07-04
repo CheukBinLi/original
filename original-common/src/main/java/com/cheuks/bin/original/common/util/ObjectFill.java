@@ -46,7 +46,7 @@ public class ObjectFill {
 	}
 
 	public final <T> T fillObject(T t, Map<String, ?> data) throws IllegalArgumentException, IllegalAccessException {
-		System.out.println(t.getClass());
+//		System.out.println(t.getClass());
 		Class<?> c = t.getClass();
 		if (!FIELDS.containsKey(c)) scanClass(c);
 		Map<String, Field> fields = FIELDS.get(c);

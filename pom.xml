@@ -67,7 +67,8 @@
 		<module>original-annotation</module>
 		<module>original-cache</module>
 		<module>original-db-manager</module>
-		<!-- <module>original-generate</module> <module>original-weixin</module> -->
+		<module>original-generate</module>
+		<module>original-weixin</module>
 		<module>original-search</module>
 		<module>original-config</module>
 		<module>original-reflect</module>
@@ -75,5 +76,6 @@
 		<module>original-session</module>
 		<module>original-test</module>
 		<module>original-web</module>
+		<module>original-web-common</module>
 	</modules>
 </project>

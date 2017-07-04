@@ -6,10 +6,16 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
@@ -17,13 +23,15 @@ import org.beetl.core.Template;
 import org.beetl.core.resource.ClasspathResourceLoader;
 import org.beetl.core.resource.FileResourceLoader;
 
+import com.cheuks.bin.original.common.util.ReflectionUtil;
+
 //import freemarker.cache.FileTemplateLoader;
 //import freemarker.template.Configuration;
 //import freemarker.template.TemplateException;
 
 public class CreateFile {
 
-	public static void create(Class<?> c, Class<?> idType, boolean SimpleName, boolean isSignleFloder, boolean genContrast) throws IOException {
+	public static void create(Class<?> c, Class<?> idType, boolean SimpleName, boolean isSignleFloder, boolean genContrast) throws IOException, NoSuchFieldException, SecurityException {
 
 		// dao
 		// daoImpl
@@ -62,7 +70,8 @@ public class CreateFile {
 		map.put("idTypeNick", converType(idType));
 		map.put("tag", "%");
 		map.put("dollar", "$");
-		map.put("params", getFieldWidthGetSetting(c));
+		//		map.put("params", getFieldWidthGetSetting(c));
+		map.put("params", ReflectionUtil.instance().scanClassField4Map(c, false, true));
 		map.put("contrast", genContrast);//是否生能比较大小的条件
 		FileWriter writer;
 		File genFile;
@@ -98,12 +107,14 @@ public class CreateFile {
 		return null;
 	}
 
-	private static List<String> getFieldWidthGetSetting(Class<?> c) {
+	private static Map<String, Object> getFieldWidthGetSetting(Class<?> c) {
 		Field[] fields = c.getDeclaredFields();
-		Map<String, Field> map = new HashMap<String, Field>();
-		List<String> list = new ArrayList<String>();
+		Map<String, Field> map = new LinkedHashMap<String, Field>();
+		Map<String, Object> result = new LinkedHashMap<String, Object>();
+		//		List<String> list = new ArrayList<String>();
 		for (Field f : fields) {
-			if (f.getModifiers() == Modifier.PRIVATE && f.getModifiers() != Modifier.STATIC && f.getModifiers() != Modifier.TRANSIENT) {
+			System.out.println(f.getName());
+			if ((f.getModifiers() == Modifier.PRIVATE || f.getModifiers() == Modifier.PROTECTED) && f.getModifiers() != Modifier.STATIC && f.getModifiers() != Modifier.TRANSIENT) {
 				map.put(f.getName(), f);
 			}
 		}
@@ -113,11 +124,33 @@ public class CreateFile {
 			if (m.getModifiers() == Modifier.PUBLIC && m.getModifiers() != Modifier.STATIC && m.getName().startsWith("get")) {
 				get = toLowerCaseFirstOne(m.getName().substring(3));
 				if (map.containsKey(get)) {
-					list.add(get);
+					//					list.add(get);
+					result.put(get, map.get(get).getType());
 				}
 			}
 		}
-		return list;
+		//		return list;
+		return result;
+	}
+
+	public static boolean contrast(Field field) {
+		//		System.out.println(o);
+		if (null == field) return false;
+
+		Class<?> o = field.getType();
+		String simpleName = o.getSimpleName();
+		if (o.isArray()) {
+			System.err.println("数组末实现");
+			return false;
+		} else if (simpleName.equalsIgnoreCase("int") || simpleName.equalsIgnoreCase("Integer")) return true;
+		else if (simpleName.equalsIgnoreCase("double")) return true;
+		else if (simpleName.equalsIgnoreCase("long")) return true;
+		else if (simpleName.equalsIgnoreCase("short")) return true;
+		else if (simpleName.equalsIgnoreCase("float")) return true;
+		else if (simpleName.equalsIgnoreCase("Date")) return true;
+		else if (simpleName.equalsIgnoreCase("BigDecimal")) return true;
+		else if (simpleName.equalsIgnoreCase("BigInteger")) return true;
+		return false;
 	}
 
 	public static String toUpperCaseFirstOne(String name) {
