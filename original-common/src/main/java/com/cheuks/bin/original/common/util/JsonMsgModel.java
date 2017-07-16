@@ -1,5 +1,7 @@
 package com.cheuks.bin.original.common.util;
 
+import java.io.Serializable;
+
 /***
  * *
  * 
@@ -17,79 +19,84 @@ package com.cheuks.bin.original.common.util;
  * @see restful 消息结构
  *
  */
-public class JsonMsgModel {
+public class JsonMsgModel implements Serializable {
 
-	/** 返回码: */
-	private int code;
-	/** 失败/自定义消息 */
-	private String msg;
-	/** 返回数据内容 */
-	private Object data;
-	/** 附加对象 */
-	private Object attachment;
+    private static final long serialVersionUID = -168912744379305885L;
 
-	public JsonMsgModel(int code, String msg, Object data, Object attachment) {
-		super();
-		this.code = code;
-		this.msg = msg;
-		this.data = data;
-		this.attachment = attachment;
-	}
+    /** 返回码: */
+    private int code;
 
-	public JsonMsgModel(int code, String msg, Object data) {
-		this(code, msg, data, null);
-	}
+    /** 失败/自定义消息 */
+    private String msg;
 
-	public JsonMsgModel(Object data, int code) {
-		this(code, null, data, null);
-	}
+    /** 返回数据内容 */
+    private Object data;
 
-	public JsonMsgModel(int code, String msg) {
-		this(code, msg, null, null);
-	}
+    /** 附加对象 */
+    private Object attachment;
 
-	public JsonMsgModel(int code) {
-		this(code, null, null, null);
-	}
+    public JsonMsgModel(int code, String msg, Object data, Object attachment) {
+        super();
+        this.code = code;
+        this.msg = msg;
+        this.data = data;
+        this.attachment = attachment;
+    }
 
-	public JsonMsgModel() {
-		super();
-	}
+    public JsonMsgModel(int code, String msg, Object data) {
+        this(code, msg, data, null);
+    }
 
-	public int getCode() {
-		return code;
-	}
+    public JsonMsgModel(Object data, int code) {
+        this(code, null, data, null);
+    }
 
-	public JsonMsgModel setCode(int code) {
-		this.code = code;
-		return this;
-	}
+    public JsonMsgModel(int code, String msg) {
+        this(code, msg, null, null);
+    }
 
-	public String getMsg() {
-		return msg;
-	}
+    public JsonMsgModel(int code) {
+        this(code, null, null, null);
+    }
 
-	public JsonMsgModel setMsg(String msg) {
-		this.msg = msg;
-		return this;
-	}
+    public JsonMsgModel() {
+        super();
+    }
 
-	public Object getData() {
-		return data;
-	}
+    public int getCode() {
+        return code;
+    }
 
-	public JsonMsgModel setData(Object data) {
-		this.data = data;
-		return this;
-	}
+    public JsonMsgModel setCode(int code) {
+        this.code = code;
+        return this;
+    }
 
-	public Object getAttachment() {
-		return attachment;
-	}
+    public String getMsg() {
+        return msg;
+    }
 
-	public JsonMsgModel setAttachment(Object attachment) {
-		this.attachment = attachment;
-		return this;
-	}
+    public JsonMsgModel setMsg(String msg) {
+        this.msg = msg;
+        return this;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public JsonMsgModel setData(Object data) {
+        this.data = data;
+        return this;
+    }
+
+    public Object getAttachment() {
+        return attachment;
+    }
+
+    public JsonMsgModel setAttachment(Object attachment) {
+        this.attachment = attachment;
+        return this;
+    }
 
 }

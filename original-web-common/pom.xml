@@ -20,8 +20,9 @@
 			<groupId>com.cheuks.bin</groupId>
 			<artifactId>original-common</artifactId>
 			<version>${project.version}</version>
+			<scope>private</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>

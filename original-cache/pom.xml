@@ -27,7 +27,6 @@
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
 			<version>${jedis.version}</version>
-			<scope>private</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.cheuks.bin</groupId>

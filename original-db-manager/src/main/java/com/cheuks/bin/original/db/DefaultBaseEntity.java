@@ -10,43 +10,46 @@ import com.cheuks.bin.original.common.dbmanager.BaseEntity;
 @MappedSuperclass
 public class DefaultBaseEntity extends BaseEntity {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	protected Integer logicStatus = NORMAL;//数据逻辑状态
-	@Column(updatable = false)
-	protected Date createDateTime = new Date();
-	protected Date lastUpdateDateTime = new Date();
+    @Column(insertable = false, columnDefinition = "INT default 0")
+    protected Integer logicStatus;// 数据逻辑状态
 
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
-	}
+    @Column(updatable = false)
+    protected Date createDateTime = new Date();
 
-	public Integer getLogicStatus() {
-		return logicStatus;
-	}
+    protected Date lastUpdateDateTime = new Date();
 
-	public BaseEntity setLogicStatus(Integer logicStatus) {
-		this.logicStatus = logicStatus;
-		return this;
-	}
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
-	public Date getCreateDateTime() {
-		return createDateTime;
-	}
+    public Integer getLogicStatus() {
+        return logicStatus;
+    }
 
-	public BaseEntity setCreateDateTime(Date createDateTime) {
-		this.createDateTime = createDateTime;
-		return this;
-	}
+    public BaseEntity setLogicStatus(Integer logicStatus) {
+        this.logicStatus = logicStatus;
+        return this;
+    }
 
-	public Date getLastUpdateDateTime() {
-		return lastUpdateDateTime;
-	}
+    public Date getCreateDateTime() {
+        return createDateTime;
+    }
 
-	public BaseEntity setLastUpdateDateTime(Date lastUpdateDateTime) {
-		this.lastUpdateDateTime = lastUpdateDateTime;
-		return this;
-	}
+    public BaseEntity setCreateDateTime(Date createDateTime) {
+        this.createDateTime = createDateTime;
+        return this;
+    }
+
+    public Date getLastUpdateDateTime() {
+        return lastUpdateDateTime;
+    }
+
+    public BaseEntity setLastUpdateDateTime(Date lastUpdateDateTime) {
+        this.lastUpdateDateTime = lastUpdateDateTime;
+        return this;
+    }
 
 }

@@ -19,23 +19,23 @@ sort:asc/desc
 					AND ${item.key}=:${item.key} 
 				<${tag}}${tag}>
 				<${tag}else if (has(${item.key}_not)){${tag}>
-						and A.${item.key} <> :${item.key}_not 
+						AND A.${item.key} <> :${item.key}_not 
 				<${tag}}${tag}>
 				<${tag}else if (has(${item.key}_li)){${tag}>
-						and A.${item.key} like '%'||:${item.key}_li||'%' 
+						AND A.${item.key} like '%'||:${item.key}_li||'%' 
 				<${tag}}${tag}>
 			<%if (contrast==true && @com.cheuks.bin.orginal.beetl.generate.CreateFile.contrast(item.value)){%>		
 				<${tag}if (has(${item.key}_gt)){${tag}>
-						and A.${item.key}>:${item.key}_gt 
+						AND A.${item.key}>:${item.key}_gt 
 				<${tag}}${tag}>		
 				<${tag}else if (has(${item.key}_ge)){${tag}>
-						and A.${item.key}>=:${item.key}_ge
+						AND A.${item.key}>=:${item.key}_ge
 				<${tag}}${tag}>		 
 				<${tag}if (has(${item.key}_lt)){${tag}>
-						and A.${item.key}<:${item.key}_lt 
+						AND A.${item.key}<:${item.key}_lt 
 				<${tag}}${tag}>		
 				<${tag}else if (has(${item.key}_le)){${tag}>
-						and A.${item.key}<=:${item.key}_le 
+						AND A.${item.key}<=:${item.key}_le 
 				<${tag}}${tag}>
 			<%}%>
 			<%}%>

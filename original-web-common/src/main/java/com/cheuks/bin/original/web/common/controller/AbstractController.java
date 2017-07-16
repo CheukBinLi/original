@@ -10,67 +10,72 @@ import org.slf4j.LoggerFactory;
 
 import com.cheuks.bin.original.common.util.CollectionUtil;
 import com.cheuks.bin.original.common.util.JsonMsgModel;
+import com.cheuks.bin.original.common.util.ObjectFill;
 import com.cheuks.bin.original.common.web.common.controller.BaseController;
 
-public abstract class AbstractController<ModelAndView> implements BaseController<HttpServletRequest, HttpServletResponse, JsonMsgModel, ModelAndView> {
+public abstract class AbstractController<ModelAndView> extends ObjectFill implements BaseController<HttpServletRequest, HttpServletResponse, JsonMsgModel, ModelAndView> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AbstractController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractController.class);
 
-	protected int errorCode = -1;
-	protected int success = 0;
-	protected String errorPageUrl = "/error";
+    protected int errorCode = -1;
 
-	public JsonMsgModel fail(String msg, Throwable e) {
-		if (null != e) LOG.error(null, e);
-		return new JsonMsgModel(getErrorCode(), msg);
-	}
+    protected int success = 0;
 
-	public JsonMsgModel fail(Throwable e) {
-		if (null != e) LOG.error(null, e);
-		return new JsonMsgModel(getErrorCode(), e.getMessage());
-	}
+    protected String errorPageUrl = "/error";
 
-	public JsonMsgModel fail() {
-		return new JsonMsgModel(getErrorCode(), "fail");
-	}
+    public JsonMsgModel fail(String msg, Throwable e) {
+        if (null != e)
+            LOG.error(null, e);
+        return new JsonMsgModel(getErrorCode(), msg);
+    }
 
-	public JsonMsgModel success(String msg, Object data, Object attachment) {
-		return new JsonMsgModel(0, msg, data, attachment);
-	}
+    public JsonMsgModel fail(Throwable e) {
+        if (null != e)
+            LOG.error(null, e);
+        return new JsonMsgModel(getErrorCode(), e.getMessage());
+    }
 
-	public JsonMsgModel success(Object data) {
-		return success("success", data, null);
-	}
+    public JsonMsgModel fail() {
+        return new JsonMsgModel(getErrorCode(), "fail");
+    }
 
-	public JsonMsgModel success() {
-		return success(null, null, null);
-	}
+    public JsonMsgModel success(String msg, Object data, Object attachment) {
+        return new JsonMsgModel(0, msg, data, attachment);
+    }
 
-	public ModelAndView exceptionPage(Throwable e) {
-		Map<String, Object> error = null;
-		if (null != e) {
-			LOG.error(null, e);
-			error = CollectionUtil.newInstance().toMap(true, new Object[] { "error", e.getMessage() });
-		}
-		return forward(errorPageUrl, error);
-	}
+    public JsonMsgModel success(Object data) {
+        return success("success", data, null);
+    }
 
-	public int getErrorCode() {
-		return errorCode;
-	}
+    public JsonMsgModel success() {
+        return success(null, null, null);
+    }
 
-	public AbstractController<ModelAndView> setErrorCode(int errorCode) {
-		this.errorCode = errorCode;
-		return this;
-	}
+    public ModelAndView exceptionPage(Throwable e) {
+        Map<String, Object> error = null;
+        if (null != e) {
+            LOG.error(null, e);
+            error = CollectionUtil.newInstance().toMap(true, new Object[] { "error", e.getMessage() });
+        }
+        return forward(errorPageUrl, error);
+    }
 
-	public int getSuccess() {
-		return success;
-	}
+    public int getErrorCode() {
+        return errorCode;
+    }
 
-	public AbstractController<ModelAndView> setSuccess(int success) {
-		this.success = success;
-		return this;
-	}
+    public AbstractController<ModelAndView> setErrorCode(int errorCode) {
+        this.errorCode = errorCode;
+        return this;
+    }
+
+    public int getSuccess() {
+        return success;
+    }
+
+    public AbstractController<ModelAndView> setSuccess(int success) {
+        this.success = success;
+        return this;
+    }
 
 }
