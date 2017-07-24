@@ -38,11 +38,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.cheuks.bin</groupId>
-			<artifactId>original-annotation</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.cheuks.bin</groupId>
 			<artifactId>original-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>

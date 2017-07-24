@@ -5,10 +5,11 @@
 	http://cheuks.bin.com/schema/rmi.xsd
 	">
 
-	<rmi:protocol port="10086" serviceType="client" host="10.73.11.77"/>
+	<rmi:protocol port="10086" serviceType="client" host="10.73.11.83"/>
 <!-- 	<rmi:protocol port="10086" serviceType="client" host="10.73.11.88"/> -->
 <!-- 	<rmi:protocol port="10086" serviceType="both" host="192.168.56.101"/> -->
-	<rmi:registry address="10.73.11.77:2181"/>
+	<rmi:registry address="192.168.3.56:2181"/>
+<!-- 	<rmi:registry address="10.73.11.109:2181"/> -->
 <!-- 	<rmi:registry address="10.73.11.89:2181"/> -->
 <!-- 	<rmi:service interface="com.a.b.c" id="110" />
 	<rmi:service interface="com.a.b.c.a" id="111" />

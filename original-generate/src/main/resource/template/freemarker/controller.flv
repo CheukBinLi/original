@@ -33,10 +33,10 @@ public class ${entitySimpleName}Controller extends AbstractController {
 
 	@RequestMapping(value = "get/{id}/to/{next}", method = { RequestMethod.GET, RequestMethod.POST })
 	public ModelAndView getToNext(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") ${idTypeNick} id, @PathVariable("next") String next) {
-		${entitySimpleName} fundraising;
+		${entitySimpleName} ${entitySimpleName?uncap_first};
 		try {
-			fundraising = ${entitySimpleName?uncap_first}Service.getByPk(id);
-			return new ModelAndView(next).addObject("fundraising", fundraising);
+			${entitySimpleName?uncap_first} = ${entitySimpleName?uncap_first}Service.getByPk(id);
+			return new ModelAndView(next).addObject("${entitySimpleName?uncap_first}", ${entitySimpleName?uncap_first});
 		} catch (Throwable e) {
 			return exceptionPage(e);
 		}

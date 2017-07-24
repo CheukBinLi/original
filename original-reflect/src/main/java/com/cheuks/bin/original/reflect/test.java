@@ -1,6 +1,6 @@
 package com.cheuks.bin.original.reflect;
 
-import com.cheuks.bin.original.annotation.RmiClient;
+import com.cheuks.bin.original.common.annotation.rmi.RmiClient;
 
 @RmiClient(serviceImplementation = "ABCDEFG")
 public class test {

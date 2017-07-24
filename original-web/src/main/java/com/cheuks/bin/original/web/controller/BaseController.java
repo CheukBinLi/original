@@ -29,99 +29,107 @@ import com.cheuks.bin.original.web.customer.MessagePackage;
 @Scope("prototype")
 public class BaseController {
 
-	@Autowired
-	private ApplicationContext applicationContext;
-	@Autowired
-	private test2I test;
+    @Autowired
+    private ApplicationContext applicationContext;
 
-	/***
-	 * 
-	 * @param request
-	 * @param response
-	 * @param business
-	 *            业务名
-	 * @param process
-	 *            流程序号
-	 * @return
-	 */
-	// @RequestMapping("**/{business}_{process}")
-	// public ModelAndView businessStream(HttpServletRequest request, HttpServletResponse response, @PathVariable("business") String business, @PathVariable("process") String process) {
-	// return new ModelAndView(request.getPathInfo());
-	// }
+    @Autowired
+    private test2I test;
 
-	/***
-	 * 
-	 * @param request
-	 * @param response
-	 * @param path
-	 *            所有路径
-	 * @return
-	 */
-	@RequestMapping("**")
-	public ModelAndView anythingPath(HttpServletRequest request, HttpServletResponse response) {
-		// System.out.println(request.getScheme());
-		// System.out.println(request.getPathInfo());
-		return new ModelAndView(request.getPathInfo());
-	}
+    /***
+     * 
+     * @param request
+     * @param response
+     * @param business
+     *            业务名
+     * @param process
+     *            流程序号
+     * @return
+     */
+    // @RequestMapping("**/{business}_{process}")
+    // public ModelAndView businessStream(HttpServletRequest request,
+    // HttpServletResponse response, @PathVariable("business") String business,
+    // @PathVariable("process") String process) {
+    // return new ModelAndView(request.getPathInfo());
+    // }
 
-	@RequestMapping("callBackTest")
-	public void callBackTest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		System.out.println(request.getParameterMap());
-		Map<String, String[]> parameter = request.getParameterMap();
-		System.out.println("DataSign" + parameter.get("DataSign")[0]);
-		System.out.println("RequestData" + new String(parameter.get("RequestData")[0].getBytes(), "utf-8"));
-		response.getOutputStream().write(request.getParameterMap().toString().getBytes());
-	}
+    /***
+     * 
+     * @param request
+     * @param response
+     * @param path
+     *            所有路径
+     * @return
+     */
+    @RequestMapping("**")
+    public ModelAndView anythingPath(HttpServletRequest request, HttpServletResponse response) {
+        // System.out.println(request.getScheme());
+        // System.out.println(request.getPathInfo());
+        request.setAttribute("oh_shit", "叼拿升");
+        request.getParameterMap().put("oh_shit", new String[] { "叼拿升" });
+        System.err.println(request.getParameter("oh_shit"));
+        return new ModelAndView(request.getPathInfo());
+    }
 
-	@RequestMapping("hh")
-	public ModelAndView hh(HttpServletRequest request, HttpServletResponse response) {
-		// System.out.println(request.getScheme());
-		// System.out.println(request.getPathInfo());
-		// Object o = applicationContext.getBean("INTERFACE_3");
-		Object o = applicationContext.getBeanDefinitionNames();
-		Object x = ServiceConfig.getBeans();
-		Object z = applicationContext.getBean(ProtocolConfig.class);
-		System.out.println(test.a5());
-		return new ModelAndView("hh");
-	}
+    @RequestMapping("callBackTest")
+    public void callBackTest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        System.out.println(request.getParameterMap());
+        Map<String, String[]> parameter = request.getParameterMap();
+        System.out.println("DataSign" + parameter.get("DataSign")[0]);
+        System.out.println("RequestData" + new String(parameter.get("RequestData")[0].getBytes(), "utf-8"));
+        response.getOutputStream().write(request.getParameterMap().toString().getBytes());
+    }
 
-	@RequestMapping("systemSend")
-	public void systemSend(HttpServletRequest request, HttpServletResponse response) {
-		f1();
-	}
+    @RequestMapping("hh")
+    public ModelAndView hh(HttpServletRequest request, HttpServletResponse response) {
+        // System.out.println(request.getScheme());
+        // System.out.println(request.getPathInfo());
+        // Object o = applicationContext.getBean("INTERFACE_3");
+        Object o = applicationContext.getBeanDefinitionNames();
+        Object x = ServiceConfig.getBeans();
+        Object z = applicationContext.getBean(ProtocolConfig.class);
+        System.out.println(test.a5());
+        return new ModelAndView("hh");
+    }
 
-	@RequestMapping("systemSend2")
-	public void systemSend2(HttpServletRequest request, HttpServletResponse response) {
-		f2();
-	}
+    @RequestMapping("systemSend")
+    public void systemSend(HttpServletRequest request, HttpServletResponse response) {
+        f1();
+    }
 
-	ObjectMapper mapper = new ObjectMapper();
+    @RequestMapping("systemSend2")
+    public void systemSend2(HttpServletRequest request, HttpServletResponse response) {
+        f2();
+    }
 
-	public void f1() {
-		try {
-			WebSocketContainer container = ContainerProvider.getWebSocketContainer(); // 获取WebSocket连接器，其中具体实现可以参照websocket-api.jar的源码,Class.forName("org.apache.tomcat.websocket.WsWebSocketContainer");
-			String uri = "ws://localhost:8889/original-web/test?partyId=f41234567890f4&psid=110&senderType=system";
-			Session session = container.connectToServer(Client.class, new URI(uri)); // 连接会话
-			MessagePackage messagePackage = new MessagePackage("110", SenderType.SYSTEM, "system_110", "web_cs_110");
-			messagePackage.setMsg("f1发送的东西");
-			session.getBasicRemote().sendText(mapper.writeValueAsString(messagePackage)); // 发送文本消息
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    ObjectMapper mapper = new ObjectMapper();
 
-	public void f2() {
-		try {
-			WebSocketContainer container = ContainerProvider.getWebSocketContainer(); // 获取WebSocket连接器，其中具体实现可以参照websocket-api.jar的源码,Class.forName("org.apache.tomcat.websocket.WsWebSocketContainer");
-			String uri = "ws://localhost:8889/original-web/test?psid=1&partyId=1&senderType=CLUSTER";
-			Session session = container.connectToServer(Client.class, new URI(uri)); // 连接会话
-			// MessagePackage messagePackage = new MessagePackage("110", SenderType.SYSTEM, "system_110", "web_cs_110");
-			// messagePackage.setMsg("f1发送的东西");
-			// session.getBasicRemote().sendText(mapper.writeValueAsString(messagePackage)); // 发送文本消息
-			System.out.println(null == session);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public void f1() {
+        try {
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer(); // 获取WebSocket连接器，其中具体实现可以参照websocket-api.jar的源码,Class.forName("org.apache.tomcat.websocket.WsWebSocketContainer");
+            String uri = "ws://localhost:8889/original-web/test?partyId=f41234567890f4&psid=110&senderType=system";
+            Session session = container.connectToServer(Client.class, new URI(uri)); // 连接会话
+            MessagePackage messagePackage = new MessagePackage("110", SenderType.SYSTEM, "system_110", "web_cs_110");
+            messagePackage.setMsg("f1发送的东西");
+            session.getBasicRemote().sendText(mapper.writeValueAsString(messagePackage)); // 发送文本消息
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void f2() {
+        try {
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer(); // 获取WebSocket连接器，其中具体实现可以参照websocket-api.jar的源码,Class.forName("org.apache.tomcat.websocket.WsWebSocketContainer");
+            String uri = "ws://localhost:8889/original-web/test?psid=1&partyId=1&senderType=CLUSTER";
+            Session session = container.connectToServer(Client.class, new URI(uri)); // 连接会话
+            // MessagePackage messagePackage = new MessagePackage("110",
+            // SenderType.SYSTEM, "system_110", "web_cs_110");
+            // messagePackage.setMsg("f1发送的东西");
+            // session.getBasicRemote().sendText(mapper.writeValueAsString(messagePackage));
+            // // 发送文本消息
+            System.out.println(null == session);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

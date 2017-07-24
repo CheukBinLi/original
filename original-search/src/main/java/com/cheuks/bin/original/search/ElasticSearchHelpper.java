@@ -17,7 +17,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
-import com.cheuks.bin.original.annotation.IndexField;
+import com.cheuks.bin.original.common.annotation.search.IndexField;
 import com.cheuks.bin.original.reflect.Reflection;
 import com.cheuks.bin.original.reflect.Reflection.FieldList;
 

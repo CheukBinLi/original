@@ -30,7 +30,6 @@
 			<groupId>com.cheuks.bin</groupId>
 			<artifactId>original-common</artifactId>
 			<version>${project.version}</version>
-			<scope>private</scope>
 		</dependency>
 		<!-- <dependency> <groupId>com.cheuks.bin</groupId> <artifactId>original-web</artifactId> <version>${project.version}</version> <scope>compile</scope> </dependency> -->
 		<!-- <dependency> <groupId>com</groupId> <artifactId>express-code</artifactId> <version>${project.version}</version> </dependency> -->

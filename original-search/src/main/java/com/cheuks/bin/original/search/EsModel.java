@@ -2,7 +2,7 @@ package com.cheuks.bin.original.search;
 
 import java.util.List;
 
-import com.cheuks.bin.original.annotation.IndexField;
+import com.cheuks.bin.original.common.annotation.search.IndexField;
 
 public class EsModel {
 
