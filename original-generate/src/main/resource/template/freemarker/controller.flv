@@ -1,0 +1,81 @@
+package ${entityPackage}.controller;
+
+import java.util.HashMap;
+import java.io.IOException;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import ${entityFullName};
+import ${entityParent}.service.${entitySimpleName}Service;
+import com.cheuks.bin.original.common.annotation.web.InterfaceDescription;
+
+@Controller
+@RequestMapping("/${entitySimpleName?uncap_first}/")
+@InterfaceDescription(value = "", type = InterfaceDescription.TYPE_CLASS)
+public class ${entitySimpleName}Controller extends AbstractController {
+
+    @Autowired
+    private ${entitySimpleName}Service  ${entitySimpleName?uncap_first}Service;
+
+    @ResponseBody
+    @RequestMapping(value = "get/{id}", method = { RequestMethod.GET, RequestMethod.POST })
+    @InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
+	public Object get(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") long id) {
+        try {
+            ${entitySimpleName} ${entitySimpleName?uncap_first} = ${entitySimpleName?uncap_first}Service.getByPk(id);
+            return success(${entitySimpleName?uncap_first});
+        } catch (Throwable e) {
+            return fail(e);
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "getlist", method = { RequestMethod.POST })
+    @InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
+	public Object getList(@RequestBody Map<String, Object> params, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            return success(${entitySimpleName?uncap_first}Service.getpage(checkPageAndSize(params)));
+        } catch (Throwable e) {
+            return fail(e);
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "put", method = { RequestMethod.PUT })
+    @InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
+	public Object put(@RequestBody(required = false) Map<String, Object> params, HttpServletRequest request, HttpServletResponse response) {
+        params = null == params ? new HashMap<String, Object>() : params;
+        LoginInfoModel loginInfoModel = getLoginInfo(request);
+        try {
+            ${entitySimpleName?uncap_first}Service.saveOrUpdate(loginInfoModel,params);
+            return success();
+        } catch (Throwable e) {
+            return fail(e);
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "delete", method = { RequestMethod.DELETE })
+    @InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
+	public Object delete(@RequestBody(required = false) Map<String, Object> params, HttpServletRequest request, HttpServletResponse response) {
+        params = null == params ? new HashMap<String, Object>() : params;
+        try {
+        	LoginInfoModel loginInfoModel = getLoginInfo(request);
+            ${entitySimpleName?uncap_first}Service.delete(loginInfoModel,params);
+            return success();
+        } catch (Throwable e) {
+            return fail(e);
+        }
+    }
+
+}

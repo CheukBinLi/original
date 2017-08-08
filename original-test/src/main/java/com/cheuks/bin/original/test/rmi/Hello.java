@@ -1,7 +1,9 @@
 package com.cheuks.bin.original.test.rmi;
 
-public interface Hello {
+import com.cheuks.bin.original.common.annotation.web.InterfaceDescription;
 
-	public String sayHi(String name);
+public interface Hello {
+    @InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
+    public String sayHi(String name);
 
 }

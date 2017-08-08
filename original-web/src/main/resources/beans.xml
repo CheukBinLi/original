@@ -20,7 +20,7 @@
 		<property name="host" value="${redis.host}" />
 		<property name="port" value="${redis.port}" />
 		<property name="password" value="${redis.pass}" />
-		<property name="timeOut" value="${redis.timeout}" />
+		<property name="soTimeOut" value="${redis.timeout}" />
 		<property name="testOnBorrow" value="true" />
 	</bean>
 
