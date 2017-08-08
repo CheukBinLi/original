@@ -16,6 +16,7 @@
 
 	<bean id="dynamicRoutingDataSource" class="com.cheuks.bin.original.db.manager.DynamicRoutingDataSource"></bean>
 	<bean id="dynamicRoutingDataSourceHandler" class="com.cheuks.bin.original.db.manager.DynamicRoutingDataSourceHandler">
+		<property name="activate" value="false"/>
 		<property name="dataSourceRegex">
 			<map>
 				<entry key="get*" value="reading" />

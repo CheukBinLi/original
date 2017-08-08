@@ -15,7 +15,6 @@ public class UploadFileModel implements Serializable {
 
 	public UploadFileModel() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public UploadFileModel(String name, Long size, String path) {

@@ -77,7 +77,7 @@ public class ScanSimple extends AbstractScan {
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
 		final String pathPattern = "^(/.*/|.*/)?" + path.replace("*", "(.*)?").replace("(.*)?(.*)?", "(.*)?").replace("(.*)?/(.*)?", "(/.*|.*/)?").replace("/.*/.*", "/.*") + "(/.*)?$";
 		// packageName
-		final int startIndex = (new File(Thread.currentThread().getContextClassLoader().getResource("").getPath())).getPath().replace(File.separator, "/").length() + 1;
+//		final int startIndex = (new File(Thread.currentThread().getContextClassLoader().getResource("").getPath())).getPath().replace(File.separator, "/").length() + 1;
 		Set<URL> jarClassPaths = new HashSet<URL>();
 		Set<URL> fileClassPaths = new HashSet<URL>();
 		Set<String> result = new HashSet<String>();

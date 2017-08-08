@@ -19,6 +19,15 @@ public class ReflectionUtil {
 		return INSTANCE;
 	}
 
+	/***
+	 * 
+	 * @param clazz
+	 * @param isAccessible
+	 * @param hasSetting 校验是否存在 etting方法 
+	 * @return
+	 * @throws NoSuchFieldException
+	 * @throws SecurityException
+	 */
 	public Map<String, Field> scanClassField4Map(Class<?> clazz, boolean isAccessible, boolean hasSetting) throws NoSuchFieldException, SecurityException {
 		if (null == clazz) return null;
 

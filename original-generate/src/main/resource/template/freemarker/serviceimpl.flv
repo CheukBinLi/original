@@ -1,7 +1,10 @@
 package ${entityPackage}.service.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import ${entityFullName};
-import ${entityPackage}.service.impl.${entitySimpleName}ServiceImpl;
+import ${entityPackage}.service.impl.${entitySimpleName}Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +18,40 @@ public class ${entitySimpleName}ServiceImpl extends AbstractService<${entitySimp
 	private ${entitySimpleName}Dao ${entitySimpleName?uncap_first}Dao;
 
 	@Override
-	public BaseDao<${entitySimpleName}, ${idType}> getService() {
+	public BaseDao<${entitySimpleName}, ${idType}> getDao() {
 		return ${entitySimpleName?uncap_first}Dao;
 	}
+	
+	public void saveOrUpdate(LoginInfoModel loginInfoModel,Map<String, Object> params) throws Throwable {
+		params.put("creator", loginInfoModel.getUser().getId());
+		${entitySimpleName} ${entitySimpleName?uncap_first};
+		if (params.containsKey("id")) {
+			Map<String, Object> tempParams = CollectionUtil.newInstance().toMap(true, new Object[] { "id", Long.valueOf(params.remove("id").toString()), "tenantId", loginInfoModel.getUser().getTenantId() });
+			List<${entitySimpleName}> list = getList(tempParams);
+			if (null != list && list.size() == 1) {
+				${entitySimpleName?uncap_first} = list.get(0);
+				${entitySimpleName?uncap_first} = fillObject(${entitySimpleName?uncap_first}, params);
+				${entitySimpleName?uncap_first}Dao.update(${entitySimpleName?uncap_first});
+				return;
+			}
+			throw new RuntimeException("can't found data for id is " + tempParams.get("id") + " and creator is " + loginInfoModel.getUser().getId());
+        }
+		${entitySimpleName?uncap_first}Dao.save(fillObject(new ${entitySimpleName}().setId(generateId()), params));
+	}
 
+	public void update(LoginInfoModel loginInfoModel,Map<String, Object> params) throws Throwable {
+		${entitySimpleName} ${entitySimpleName?uncap_first} = ${entitySimpleName?uncap_first}Dao.get(Long.valueOf( params.get("id").toString()));
+		if (null != ${entitySimpleName?uncap_first} && ${entitySimpleName?uncap_first}.getCreator() == loginInfoModel.getUser().getCreator()) {
+			${entitySimpleName?uncap_first}Dao.update(fillObject(${entitySimpleName?uncap_first}, params));
+		}
+		throw new Throwable("更新失败：没找到信息");
+	}
+
+	public void logicDelete(LoginInfoModel loginInfoModel,Map<String, Object> params) throws Throwable {
+		if (null != params.get("id") && !deleteLogic(params)) { throw new Throwable("操作失败"); }
+	}
+	
+	public void delete(LoginInfoModel loginInfoModel,Map<String, Object> params) throws Throwable {
+		if (null != params.get("id") && !delete(params)) { throw new Throwable("操作失败"); }
+	}
 }

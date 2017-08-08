@@ -1,6 +1,9 @@
 package com.cheuks.bin.original.web.common.controller;
 
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -8,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.cheuks.bin.original.common.dbmanager.LogicStatus;
 import com.cheuks.bin.original.common.util.CollectionUtil;
 import com.cheuks.bin.original.common.util.JsonMsgModel;
 import com.cheuks.bin.original.common.util.ObjectFill;
@@ -22,6 +26,65 @@ public abstract class AbstractController<ModelAndView> extends ObjectFill implem
     protected int success = 0;
 
     protected String errorPageUrl = "/error";
+
+    private static volatile String pageNumber = "pageNumber";
+
+    protected Map<String, Object> checkPageAndSize(HttpServletRequest request) {
+        return checkPageAndSize(getParams(request));
+    }
+
+    protected Map<String, Object> checkPageAndSize(final Map<String, Object> params) {
+        if (!params.containsKey(pageNumber)) {
+            params.put(pageNumber, -1);
+            params.put(pageSize, -1);
+        }
+        if (!params.containsKey("logicStatus")) {
+            params.put("logicStatus", LogicStatus.NORMAL);
+        }
+        return params;
+    }
+
+    private static volatile String pageSize = "pageSize";
+
+    protected String paramsToUrl(Map<String, Object> params) {
+        StringBuilder sb = new StringBuilder("?");
+        for (Entry<String, Object> en : params.entrySet()) {
+            sb.append(en.getKey()).append("=").append(en.getValue()).append("&");
+        }
+        sb.setLength(sb.length() - 1);
+        return sb.toString();
+    }
+
+    protected final Map<String, Object> getParams(HttpServletRequest request) {
+        Enumeration<String> en = request.getParameterNames();
+        Map<String, Object> map = new HashMap<String, Object>();
+        String name;
+        while (en.hasMoreElements()) {
+            name = en.nextElement();
+            map.put(name, request.getParameter(name));
+        }
+        return map;
+    }
+
+    protected final Map<String, Object> getParams(HttpServletRequest request, boolean cleanEmpty, boolean cleanNull) {
+        Enumeration<String> en = request.getParameterNames();
+        Map<String, Object> map = new HashMap<String, Object>();
+        String name;
+        Object tempValue;
+        while (en.hasMoreElements()) {
+            name = en.nextElement();
+            tempValue = request.getParameter(name);
+            if (cleanNull && (null == tempValue || ("null".equals(tempValue))) || cleanEmpty && null != tempValue && tempValue.toString().isEmpty()) {
+                continue;
+            }
+            map.put(name, tempValue);
+        }
+        return map;
+    }
+
+    public String getRealPath(HttpServletRequest request) {
+        return request.getServletContext().getRealPath("/");
+    }
 
     public JsonMsgModel fail(String msg, Throwable e) {
         if (null != e)

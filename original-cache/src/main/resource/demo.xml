@@ -13,7 +13,9 @@
 	http://www.springframework.org/schema/task
 	http://www.springframework.org/schema/task/spring-task-4.1.xsd
 	">
-
-	<bean id="redisLua" class="com.cheuks.bin.original.cache.redis.RedisLuaSimple"></bean>
+	<bean id="redisLua" class="com.cheuks.bin.original.cache.redis.RedisLuaSimple">
+		<property name="redisFactory" ref="redisFactory"/>
+		<property name="scan" ref="scan"/>
+	</bean>
 
 </beans>

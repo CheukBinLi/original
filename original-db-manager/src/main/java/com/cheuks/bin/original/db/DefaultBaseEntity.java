@@ -16,6 +16,9 @@ public class DefaultBaseEntity extends BaseEntity {
     protected Integer logicStatus;// 数据逻辑状态
 
     @Column(updatable = false)
+    protected Long creator;// 创建人
+
+    @Column(updatable = false)
     protected Date createDateTime = new Date();
 
     protected Date lastUpdateDateTime = new Date();
@@ -31,6 +34,15 @@ public class DefaultBaseEntity extends BaseEntity {
 
     public BaseEntity setLogicStatus(Integer logicStatus) {
         this.logicStatus = logicStatus;
+        return this;
+    }
+
+    public Long getCreator() {
+        return creator;
+    }
+
+    public BaseEntity setCreator(Long creator) {
+        this.creator = creator;
         return this;
     }
 

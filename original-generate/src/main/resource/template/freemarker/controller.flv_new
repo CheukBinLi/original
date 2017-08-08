@@ -17,21 +17,25 @@ import org.springframework.web.servlet.ModelAndView;
 
 import ${entityFullName};
 import ${entityParent}.service.${entitySimpleName}Service;
+import com.cheuks.bin.original.common.annotation.web.InterfaceDescription;
 
 @Controller
 @Scope("prototype")
 @RequestMapping("/${entitySimpleName?uncap_first}/")
+@InterfaceDescription(value = "", type = InterfaceDescription.TYPE_CLASS)
 public class ${entitySimpleName}Controller extends AbstractController {
 
 	@Autowired
 	private ${entitySimpleName}Service ${entitySimpleName?uncap_first}Service;
 
 	@RequestMapping(value = { "{path}" }, method = { RequestMethod.GET })
-		public ModelAndView basePath(HttpServletRequest request, HttpServletResponse response, @PathVariable("path") String path) throws IOException {
-			return new ModelAndView(path);
-		}
+	@InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
+	public ModelAndView basePath(HttpServletRequest request, HttpServletResponse response, @PathVariable("path") String path) throws IOException {
+		return new ModelAndView(path);
+	}
 
 	@RequestMapping(value = "get/{id}/to/{next}", method = { RequestMethod.GET, RequestMethod.POST })
+	@InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
 	public ModelAndView getToNext(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") ${idTypeNick} id, @PathVariable("next") String next) {
 		${entitySimpleName} ${entitySimpleName?uncap_first};
 		try {
@@ -43,6 +47,7 @@ public class ${entitySimpleName}Controller extends AbstractController {
 	}
 
 	@RequestMapping(value = "get/{id}", method = { RequestMethod.GET, RequestMethod.POST })
+	@InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
 	public ModelAndView get(HttpServletRequest request, HttpServletResponse response, @PathVariable("id") ${idTypeNick} id) {
 		${entitySimpleName} ${entitySimpleName?uncap_first};
 		try {
@@ -55,6 +60,7 @@ public class ${entitySimpleName}Controller extends AbstractController {
 
 	@ResponseBody
 	@RequestMapping(value = "get", method = { RequestMethod.GET })
+	@InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
 	public Object get(HttpServletRequest request, HttpServletResponse response) {
 		${entitySimpleName} ${entitySimpleName?uncap_first};
 		try {
@@ -67,6 +73,7 @@ public class ${entitySimpleName}Controller extends AbstractController {
 	}
 
 	@RequestMapping(value = "put/{next}", method = { RequestMethod.POST })
+	@InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
 	public ModelAndView put(HttpServletRequest request, HttpServletResponse response, @PathVariable("next") String next) {
 		Map<String, Object> params = getParams(request);
 		${entitySimpleName} ${entitySimpleName?uncap_first} = new ${entitySimpleName}();
@@ -81,6 +88,7 @@ public class ${entitySimpleName}Controller extends AbstractController {
 
 	@ResponseBody
 	@RequestMapping(value = "put", method = { RequestMethod.PUT })
+	@InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
 	public Object put(HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> params = getParams(request);
 		${entitySimpleName} ${entitySimpleName?uncap_first} = new ${entitySimpleName}();
@@ -94,6 +102,7 @@ public class ${entitySimpleName}Controller extends AbstractController {
 	}
 
 	@RequestMapping(value = "delete/{next}", method = { RequestMethod.POST })
+	@InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
 	public ModelAndView delete(HttpServletRequest request, HttpServletResponse response, @PathVariable("next") String next) {
 		try {
 			${entitySimpleName} ${entitySimpleName?uncap_first} = new ${entitySimpleName}(Integer.valueOf(request.getParameter("id")));
@@ -106,6 +115,7 @@ public class ${entitySimpleName}Controller extends AbstractController {
 
 	@ResponseBody
 	@RequestMapping(value = "delete", method = { RequestMethod.DELETE })
+	@InterfaceDescription(value = "", type = InterfaceDescription.TYPE_METHOD, enable = true)
 	public Object delete(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			${entitySimpleName} ${entitySimpleName?uncap_first} = new ${entitySimpleName}(Integer.valueOf(request.getParameter("id")));
