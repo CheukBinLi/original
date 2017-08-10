@@ -23,7 +23,7 @@ public class ObjectFill {
     public void scanClass(Class<?> c) {
         // FIELDS.put(c, fieldsConvertMap(c.getDeclaredFields()));
         try {
-            FIELDS.put(c, ReflectionUtil.instance().scanClassField4Map(c, true, false));
+            FIELDS.put(c, ReflectionUtil.instance().scanClassField4Map(c, true, false, false));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -81,11 +81,12 @@ public class ObjectFill {
                 if (null != alias) {
                     name = alias.value();
                     name = name.length() > 0 ? name : en.getKey();
+                    result.append("&").append(name).append("=").append(en.getValue().get(o));
                 }
+                continue;
             } else {
-                name = en.getKey();
+                result.append("&").append(en.getKey()).append("=").append(en.getValue().get(o));
             }
-            result.append("&").append(name).append("=").append(en.getValue().get(o));
         }
         return result.length() > 0 ? result.substring(1) : "";
     }
@@ -111,7 +112,7 @@ public class ObjectFill {
         return t;
     }
 
-    private Object getValue(Class<?> c, Object data) {
+    protected Object getValue(Class<?> c, Object data) {
         String simpleName = c.getSimpleName();
         boolean isArray = data.getClass().isArray();
         try {

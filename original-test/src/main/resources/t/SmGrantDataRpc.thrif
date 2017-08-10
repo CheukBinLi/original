@@ -1,0 +1,28 @@
+namespace java com.midea.smart.buy.account.service
+
+/***
+ * 
+ * @Title: smart-buy-account-common
+ * @Description:权限服务接口
+ * @Company: 
+ * @Email: chaobin.li@meicloud.com
+ * @author cheuk.bin.li
+ * @date 2017年8月2日  下午5:12:17
+ *
+ */
+service SmGrantDataRpcService {
+	
+	/***
+	 * @see 根据权限类型查询对应权限数据列表接口
+	 * 
+	 * @param tenantId 租户ID
+	 * @param userId 用户ID
+	 * @param conditions 附加搜索条件
+	 * @param grantType 权限类型
+	 * @param pageNumber 分页页码
+	 * @param pageSize 分页大小
+	 * @returnstring json数据
+	 */
+	string queryListByGrantType(1:i64 tenantId,2:i64 userId,3:map<string,string> conditions,4:string grantType,5:i32 pageNumber,6:i32 pageSize)
+
+}

@@ -8,6 +8,7 @@
 	<name>original</name>
 	<url>http://maven.apache.org</url>
 	<properties>
+		<servlet-api.version>3.1.0</servlet-api.version>
 		<github.global.server>github</github.global.server>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.7.12</slf4j.version>
@@ -29,6 +30,7 @@
 		<javassist.version>3.20.0-GA</javassist.version>
 		<curator.version>2.10.0</curator.version>
 		<git.jar.path>d:/lib/maven</git.jar.path>
+		<jackson.version>2.8.9</jackson.version>
 	</properties>
 	<!-- <distributionManagement> <repository> <id>releases</id> <name>Local Nexus Repository</name> <url>http://nexus.juweitu.com:8081/content/repositories/releases/</url> </repository> <snapshotRepository> <id>Snapshots</id> <name>Local Nexus Repository</name> <url>http://nexus.juweitu.com:8081/content/repositories/snapshots/</url> </snapshotRepository> </distributionManagement> -->
 	<dependencies>
@@ -86,32 +88,8 @@
 					<!-- <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository> -->
 				</configuration>
 			</plugin>
-			<!-- <plugin>
-				<groupId>com.github.github</groupId>
-				<artifactId>site-maven-plugin</artifactId>
-				<version>0.12</version>
-				<configuration>
-					<message>Maven artifacts for ${project.version}</message>
-					<noJekyll>true</noJekyll>
-					<outputDirectory>${git.jar.path}</outputDirectory>
-					<branch>refs/heads/snapshot</branch>
-					<includes>
-						<include>**/*</include>
-					</includes>
-					<repositoryName>original</repositoryName>
-					对应github上创建的仓库名称 name
-					<repositoryOwner>fdisk123</repositoryOwner>
-					github 仓库所有者
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>site</goal>
-						</goals>
-						<phase>deploy</phase>
-					</execution>
-				</executions>
-			</plugin> -->
+			<!-- <plugin> <groupId>com.github.github</groupId> <artifactId>site-maven-plugin</artifactId> <version>0.12</version> <configuration> <message>Maven artifacts for ${project.version}</message> <noJekyll>true</noJekyll> <outputDirectory>${git.jar.path}</outputDirectory> <branch>refs/heads/snapshot</branch> <includes> <include>**/*</include> </includes> <repositoryName>original</repositoryName> 对应github上创建的仓库名称 name <repositoryOwner>fdisk123</repositoryOwner> github 仓库所有者 </configuration> <executions> 
+				<execution> <goals> <goal>site</goal> </goals> <phase>deploy</phase> </execution> </executions> </plugin> -->
 		</plugins>
 	</build>
 </project>

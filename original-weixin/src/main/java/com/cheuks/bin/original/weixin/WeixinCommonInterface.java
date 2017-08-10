@@ -1,12 +1,26 @@
 package com.cheuks.bin.original.weixin;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.cheuks.bin.original.weixin.mp.contant.WeixinUrlContant;
-import com.cheuks.bin.original.weixin.mp.model.AccessToken;
-import com.cheuks.bin.original.weixin.mp.model.Menu;
-import com.cheuks.bin.original.weixin.mp.model.QrCode;
-import com.cheuks.bin.original.weixin.mp.model.WeiXinUserInfo;
+import com.cheuks.bin.original.weixin.mp.model.request.AccessTokenRequest;
+import com.cheuks.bin.original.weixin.mp.model.request.CreateMenuRequest;
+import com.cheuks.bin.original.weixin.mp.model.request.QrCodeRequest;
+import com.cheuks.bin.original.weixin.mp.model.request.WeiXinUserInfoRequest;
+import com.cheuks.bin.original.weixin.mp.model.response.QrCodeResponse;
+import com.cheuks.bin.original.weixin.mp.model.response.WeiXinUserInfoResponse;
 
 public interface WeixinCommonInterface extends WeixinUrlContant {
+
+    /***
+     * 响应微信发送的Token验证
+     * @param request
+     * @param response
+     * @throws Throwable
+     * @param return 是验证返回true/非返回false
+     */
+    boolean weixinTokenVerification(HttpServletRequest request, HttpServletResponse response) throws Throwable;
 
     /***
      * 获取accessToken
@@ -36,7 +50,7 @@ public interface WeixinCommonInterface extends WeixinUrlContant {
      * @return
      * @throws Throwable
      */
-    AccessToken getAccessToken(AccessToken accessToken) throws Throwable;
+    String getAccessToken(AccessTokenRequest accessToken, boolean checkCache) throws Throwable;
 
     /***
      * 获取用户信息
@@ -45,7 +59,7 @@ public interface WeixinCommonInterface extends WeixinUrlContant {
      * @param openId
      * @return
      */
-    WeiXinUserInfo getWeiXinUserInfo(String accessToken, String openId);
+    WeiXinUserInfoResponse getWeiXinUserInfo(WeiXinUserInfoRequest weiXinUserInfoRequest) throws Throwable;
 
     /***
      * 创建自定义菜单
@@ -54,7 +68,9 @@ public interface WeixinCommonInterface extends WeixinUrlContant {
      * @param menu
      * @return
      */
-    Menu createMenu(String accessToken, Menu menu);
+    void createMenu(String accessToken, CreateMenuRequest menu) throws Throwable;
+
+    void createMenu(String accessToken, String menu) throws Throwable;
 
     /***
      * 生成带参二维码
@@ -63,7 +79,7 @@ public interface WeixinCommonInterface extends WeixinUrlContant {
      * @param cQrCode
      * @return
      */
-    QrCode createQrCode(String accessToken, QrCode cQrCode);
+    QrCodeResponse createQrCode(String accessToken, QrCodeRequest cQrCode) throws Throwable;
 
     /***
      * 二维码缓存键名

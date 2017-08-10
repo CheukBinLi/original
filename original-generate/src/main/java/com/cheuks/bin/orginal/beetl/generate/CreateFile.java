@@ -71,7 +71,7 @@ public class CreateFile {
 		map.put("tag", "%");
 		map.put("dollar", "$");
 		//		map.put("params", getFieldWidthGetSetting(c));
-		map.put("params", ReflectionUtil.instance().scanClassField4Map(c, false, true));
+		map.put("params", ReflectionUtil.instance().scanClassField4Map(c, false, true,true));
 		map.put("contrast", genContrast);//是否生能比较大小的条件
 		FileWriter writer;
 		File genFile;

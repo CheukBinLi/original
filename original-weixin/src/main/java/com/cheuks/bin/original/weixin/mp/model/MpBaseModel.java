@@ -1,32 +1,33 @@
 package com.cheuks.bin.original.weixin.mp.model;
 
 import com.cheuks.bin.original.weixin.BaseModel;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MpBaseModel extends BaseModel {
 
     private static final long serialVersionUID = -3010110299114129850L;
 
-    // errcode
-    private String errCode;
+    @JsonProperty("errcode")
+    protected Integer errCode;
 
-    //
-    private String errmsg;
+    @JsonProperty("errmsg")
+    protected String errMsg;
 
-    public String getErrCode() {
+    public Integer getErrCode() {
         return errCode;
     }
 
-    public MpBaseModel setErrCode(String errCode) {
+    public MpBaseModel setErrCode(int errCode) {
         this.errCode = errCode;
         return this;
     }
 
-    public String getErrmsg() {
-        return errmsg;
+    public String getErrMsg() {
+        return errMsg;
     }
 
-    public MpBaseModel setErrmsg(String errmsg) {
-        this.errmsg = errmsg;
+    public MpBaseModel setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
         return this;
     }
 

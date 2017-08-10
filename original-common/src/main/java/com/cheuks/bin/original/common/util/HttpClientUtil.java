@@ -155,7 +155,7 @@ public class HttpClientUtil {
 			byte[] buffer = new byte[512];
 			int length;
 			while ((length = in.read(buffer)) != -1) {
-				out.write(buffer, 0, length);
+			    result.write(buffer, 0, length);
 			}
 			in.close();
 		} finally {
