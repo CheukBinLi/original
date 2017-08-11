@@ -30,7 +30,7 @@ public class MessageEventModel implements Serializable {
     @Alias("MsgType")
     private String msgType;// text
 
-    @Alias("content")
+    @Alias("Content")
     private String content;// 文本消息内容
 
     @Alias("MsgId")

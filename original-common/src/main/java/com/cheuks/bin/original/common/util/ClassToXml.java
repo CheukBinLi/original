@@ -1,9 +1,7 @@
 package com.cheuks.bin.original.common.util;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
 
@@ -19,9 +17,24 @@ import com.cheuks.bin.original.common.annotation.reflect.Alias;
  */
 public class ClassToXml {
 
+    protected ClassToXml() {}
+
+    private static ClassToXml INSTANCE;
+
     private ReflectionCache reflectionCache = ReflectionCache.newInstance();
 
     private ReflectionUtil reflectionUtil = ReflectionUtil.instance();
+
+    public final static ClassToXml newInstance() {
+        if (null == INSTANCE) {
+            synchronized (ClassToXml.class) {
+                if (null == INSTANCE) {
+                    INSTANCE = new ClassToXml();
+                }
+            }
+        }
+        return INSTANCE;
+    }
 
     public String toXml() throws Throwable {
         return recursion(this, null, null);
@@ -33,9 +46,8 @@ public class ClassToXml {
 
     /** 递归 */
     private String recursion(final Object o, Class<?> superClass, final List<Field> fieldData) throws Throwable {
-        List<Field> fields = null == fieldData ? reflectionCache.getFields4List(null == superClass ? o.getClass() : superClass, true, true) : fieldData;
+        List<Field> fields = null == fieldData ? reflectionCache.getFields4List(null == superClass ? o.getClass() : superClass, true) : fieldData;
         StringBuilder result = new StringBuilder();
-        Set<String> repeatingField = new HashSet<String>();
         Alias alias;
         String tagName;
         Object tempValue;
@@ -43,12 +55,6 @@ public class ClassToXml {
         List<Field> subField;
         List<?> tempList;
         for (Field field : fields) {
-            //去重（alias）
-            if (repeatingField.contains(field.getName())) {
-                continue;
-            }
-            repeatingField.add(field.getName());
-
             alias = field.getAnnotation(Alias.class);
             tagName = (null != alias && alias.value().length() > 0) ? alias.value() : field.getName();
             result.append("<").append(tagName).append(">");

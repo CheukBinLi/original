@@ -31,7 +31,7 @@ public class AppTest extends TestCase {
         newsMessageResponse.appendNewsArticlesItem(new NewsArticlesItem("a", "b", "c", "d"));
         newsMessageResponse.appendNewsArticlesItem(new NewsArticlesItem("z", "x", "c", "v"));
 
-        ClassToXml classToXml = new ClassToXml();
+        ClassToXml classToXml = ClassToXml.newInstance();
         System.out.println(classToXml.toXml(newsMessageResponse));
         //            classToXml.toXml(newsMessageResponse);
 //        System.out.println("i:" + i + ":用时:" + (System.currentTimeMillis() - now));

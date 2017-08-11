@@ -30,7 +30,7 @@ public class XmlReaderAll extends DefaultHandler {
 
     private static XmlReaderAll INSTANCE;
 
-    public static XmlReaderAll NewInstance() {
+    public static XmlReaderAll newInstance() {
         if (null == INSTANCE) {
             synchronized (XmlReaderAll.class) {
                 if (null == INSTANCE) {
@@ -128,11 +128,11 @@ public class XmlReaderAll extends DefaultHandler {
         try {
             try {
                 // f = X.getClass().getDeclaredField(qName);
-                f = reflectionCache.getField(X.getClass(), qName);
+                f = reflectionCache.getFieldByMap(X.getClass(), qName);
             } catch (Exception e) {
                 e.printStackTrace();
                 // f = X.getClass().getSuperclass().getDeclaredField(qName);
-                f = reflectionCache.getField(X.getClass().getSuperclass(), qName);
+                f = reflectionCache.getFieldByMap(X.getClass().getSuperclass(), qName);
             }
             if (null == f)
                 return;

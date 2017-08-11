@@ -20,6 +20,8 @@ public class ReflectionCache {
 
     protected static final Map<String, Map<String, Field>> FIELD_CACHE = new ConcurrentSkipListMap<String, Map<String, Field>>();
 
+    protected static final Map<String, List<Field>> FIELD_LIST_CACHE = new ConcurrentSkipListMap<String, List<Field>>();
+
     private static ReflectionCache INSTANCE;
 
     protected ReflectionCache() {}
@@ -39,7 +41,18 @@ public class ReflectionCache {
         return FIELD_CACHE;
     }
 
-    public Map<String, Field> getFields(Class<?> c) throws NoSuchFieldException, SecurityException {
+    /***
+     * 获取字段集<br>
+     * 注意：字段如果有@Alias 注解，会根据注解内容，增加多一个字段别名。
+     * 
+     * @param c
+     * @param hasSetting 是否过滤只存在有 setXX 方法的字段
+     * @param hasAliasAnnotation 是否扫描@Alias注销
+     * @return
+     * @throws NoSuchFieldException
+     * @throws SecurityException
+     */
+    public Map<String, Field> getFields(Class<?> c, boolean hasSetting, boolean hasAliasAnnotation) throws NoSuchFieldException, SecurityException {
         Map<String, Field> fields = FIELD_CACHE.get(c.getName());
         if (null == fields) {
             synchronized (this) {
@@ -52,21 +65,41 @@ public class ReflectionCache {
         return fields;
     }
 
-    public List<Field> getFields4List(Class<?> c, boolean hasSetting, boolean hasAliasAnnotation) throws NoSuchFieldException, SecurityException {
-        Map<String, Field> fields = FIELD_CACHE.get(c.getName());
+    /***
+     * * 获取字段集<br>
+     * 
+     * @param c
+     * @param hasSetting
+     * @return
+     * @throws NoSuchFieldException
+     * @throws SecurityException
+     */
+    public List<Field> getFields4List(Class<?> c, boolean hasSetting) throws NoSuchFieldException, SecurityException {
+        List<Field> fields = FIELD_LIST_CACHE.get(c.getName());
         if (null == fields) {
             synchronized (this) {
                 if (null == fields) {
-                    fields = ReflectionUtil.instance().scanClassField4Map(c, true, hasSetting, hasAliasAnnotation);
-                    FIELD_CACHE.put(c.getName(), fields);
+                    fields = ReflectionUtil.instance().scanClassField4List(c, true, hasSetting);
+                    FIELD_LIST_CACHE.put(c.getName(), fields);
                 }
             }
         }
-        return new ArrayList<Field>(fields.values());
+        return fields;
     }
 
-    public Field getField(Class<?> c, String field) throws NoSuchFieldException, SecurityException {
-        return getFields(c).get(field);
+    /***
+     * 
+     * 获取字段集<br>
+     * 注意：字段如果有@Alias 注解，会根据注解内容，增加多一个字段别名。
+     * 
+     * @param c
+     * @param field
+     * @return
+     * @throws NoSuchFieldException
+     * @throws SecurityException
+     */
+    public Field getFieldByMap(Class<?> c, String field) throws NoSuchFieldException, SecurityException {
+        return getFields(c, true, true).get(field);
     }
 
 }

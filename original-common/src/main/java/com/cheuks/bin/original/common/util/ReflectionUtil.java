@@ -2,6 +2,7 @@ package com.cheuks.bin.original.common.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,13 +21,20 @@ import com.cheuks.bin.original.common.annotation.reflect.Alias;
 @SuppressWarnings("unchecked")
 public class ReflectionUtil {
 
-    private static final ReflectionUtil INSTANCE = new ReflectionUtil();
+    private static ReflectionUtil INSTANCE;
 
     protected final Set<Class<?>> WrapperClass = new HashSet<Class<?>>(Arrays.asList(String.class, Integer.class, Boolean.class, Character.class, Short.class, Long.class, Float.class, Byte.class));
 
     protected final List<?> CollectionType = Arrays.asList(Collection.class, List.class, Set.class, Integer.class, int.class, Long.class, long.class, Float.class, float.class, Byte.class, byte.class, Character.class, char.class, String.class, Boolean.class, boolean.class, Double.class, double.class, Short.class, short.class);
 
     public static final ReflectionUtil instance() {
+        if (null == INSTANCE) {
+            synchronized (ReflectionUtil.class) {
+                if (null == INSTANCE) {
+                    INSTANCE = new ReflectionUtil();
+                }
+            }
+        }
         return INSTANCE;
     }
 
@@ -74,7 +83,7 @@ public class ReflectionUtil {
             }
         }
 
-        Map<String, Field> result = new HashMap<String, Field>();
+        Map<String, Field> result = new LinkedHashMap<String, Field>();
         Set<String> settingMethodName = null;
         settingMethodName = new HashSet<String>();
         for (Method m : methods) {
@@ -83,6 +92,8 @@ public class ReflectionUtil {
             }
         }
         for (Field f : fields) {
+            if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers()))
+                continue;
             if (!hasSetting || settingMethodName.contains(f.getName().toLowerCase())) {
                 if (isAccessible)
                     f.setAccessible(true);
@@ -134,6 +145,8 @@ public class ReflectionUtil {
             }
         }
         for (Field f : fields) {
+            if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers()))
+                continue;
             if (!hasSetting || settingMethodName.contains(f.getName().toLowerCase())) {
                 if (isAccessible)
                     f.setAccessible(true);
@@ -155,18 +168,7 @@ public class ReflectionUtil {
             }
             result = new ArrayList<Field>();
             for (Type t : type.getActualTypeArguments())
-                result.addAll(getSettingFieldList((Class<?>) t, isAccessible));
-        }
-        return result;
-    }
-
-    public List<Field> getSettingFieldList(Class<?> clazz, boolean isAccessible) throws NoSuchFieldException, SecurityException {
-        Field[] fields = clazz.getDeclaredFields();
-        List<Field> result = new ArrayList<Field>();
-        for (Field f : fields) {
-            if (isAccessible)
-                f.setAccessible(true);
-            result.add(f);
+                result.addAll(scanClassField4List((Class<?>) t, isAccessible, true));
         }
         return result;
     }

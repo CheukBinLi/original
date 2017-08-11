@@ -1,17 +1,27 @@
 package com.cheuks.bin.original.weixin;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import com.cheuks.bin.original.common.annotation.weixin.MessageEventHandleAnnotation;
 import com.cheuks.bin.original.common.cache.redis.RedisFactory;
 import com.cheuks.bin.original.common.util.ConfigManager;
 import com.cheuks.bin.original.common.util.HttpClientUtil;
+import com.cheuks.bin.original.common.util.XmlReaderAll;
+import com.cheuks.bin.original.weixin.mp.MessageEventHandle;
+import com.cheuks.bin.original.weixin.mp.model.MessageEventModel;
 import com.cheuks.bin.original.weixin.mp.model.request.AccessTokenRequest;
 import com.cheuks.bin.original.weixin.mp.model.request.CreateMenuRequest;
 import com.cheuks.bin.original.weixin.mp.model.request.QrCodeRequest;
@@ -25,6 +35,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, ApplicationContextAware {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultWeixinCommonInterfaceImpl.class);
+
     private RedisFactory redisFactory;
 
     private ConfigManager configManager;
@@ -33,13 +45,38 @@ public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, 
 
     private HttpClientUtil httpClientUtil = HttpClientUtil.newInstance();
 
-    public boolean weixinTokenVerification(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+    private XmlReaderAll xmlReaderAll = XmlReaderAll.newInstance();
+
+    private Map<String, MessageEventHandle> messageEventHandleManager = new ConcurrentSkipListMap<String, MessageEventHandle>();
+
+    public void weixinTokenVerification(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         String result = request.getParameter("echostr");
         if (null != result) {
             response.getWriter().write(result);
-            return true;
+            return;
         }
-        return false;
+
+        // 读取流
+        InputStream in = request.getInputStream();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        while ((len = in.read(buffer)) != -1) {
+            out.write(buffer, 0, len);
+        }
+        //关闭即成功
+        out.close();
+        in.close();
+        //处理
+        MessageEventModel messageEventModel = xmlReaderAll.padding(out.toByteArray(), new MessageEventModel());
+        if (null != messageEventModel) {
+            MessageEventHandle messageEventHandle = messageEventHandleManager.get(messageEventModel.getMsgType());
+            if (null != messageEventHandle) {
+                messageEventHandle.onMessage(messageEventModel);
+            } else {
+                LOG.info("收到[{}]类型消息，没找到些类默认 MessageEventHandle。", messageEventModel.getMsgType());
+            }
+        }
     }
 
     public String getAccessToken(String appId, String secret, String grantType) throws Throwable {
@@ -123,6 +160,15 @@ public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, 
             objectMapper = new ObjectMapper();
         }
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+
+        MessageEventHandle messageEventHandle;
+        Map<String, Object> beans = applicationContext.getBeansWithAnnotation(MessageEventHandleAnnotation.class);
+        if (null != beans) {
+            for (Entry<String, Object> en : beans.entrySet()) {
+                messageEventHandle = (MessageEventHandle) en.getValue();
+                messageEventHandleManager.put(messageEventHandle.getMessageType(), messageEventHandle);
+            }
+        }
     }
 
     public RedisFactory getRedisFactory() {

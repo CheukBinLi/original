@@ -15,12 +15,12 @@ public interface WeixinCommonInterface extends WeixinUrlContant {
 
     /***
      * 响应微信发送的Token验证
+     * 
      * @param request
      * @param response
      * @throws Throwable
-     * @param return 是验证返回true/非返回false
      */
-    boolean weixinTokenVerification(HttpServletRequest request, HttpServletResponse response) throws Throwable;
+    void weixinTokenVerification(HttpServletRequest request, HttpServletResponse response) throws Throwable;
 
     /***
      * 获取accessToken

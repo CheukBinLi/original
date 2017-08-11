@@ -14,6 +14,9 @@
 	http://www.springframework.org/schema/task/spring-task-4.1.xsd
 	">
 
+	<!-- TEXT 消息-handle -->
+	<bean class="com.cheuks.bin.original.weixin.mp.handle.event.TextMessageHandle" />
+
 	<bean id="weixinCommonInterface" class="com.cheuks.bin.original.weixin.DefaultWeixinCommonInterfaceImpl">
 		<property name="redisFactory" ref="redisFactory" />
 		<property name="configManager" ref="configManager" />
