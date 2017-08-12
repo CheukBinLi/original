@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author ben
  *
- * @param <T>
- * @param <V>
+ * @param <T>对象池对象类型
+ * @param <V>辅助规定
  */
 public abstract class AbstractObjectPool<T, V> implements ObjectPool<T> {
 

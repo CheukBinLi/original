@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.weixin.mp.contant;
+package com.cheuks.bin.original.common.weixin.content;
 
 public interface MessageType {
 

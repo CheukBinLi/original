@@ -3,7 +3,7 @@ package com.cheuks.bin.original.weixin;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.cheuks.bin.original.weixin.mp.contant.WeixinUrlContant;
+import com.cheuks.bin.original.common.weixin.content.WeixinUrlContant;
 import com.cheuks.bin.original.weixin.mp.model.request.AccessTokenRequest;
 import com.cheuks.bin.original.weixin.mp.model.request.CreateMenuRequest;
 import com.cheuks.bin.original.weixin.mp.model.request.QrCodeRequest;

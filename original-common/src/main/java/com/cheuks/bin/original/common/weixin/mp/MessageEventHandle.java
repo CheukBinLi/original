@@ -1,8 +1,7 @@
-package com.cheuks.bin.original.weixin.mp;
+package com.cheuks.bin.original.common.weixin.mp;
 
-import com.cheuks.bin.original.weixin.mp.contant.MessageType;
-import com.cheuks.bin.original.weixin.mp.model.MessageEventModel;
-import com.cheuks.bin.original.weixin.mp.model.message.BaseMessageResponse;
+import com.cheuks.bin.original.common.weixin.content.MessageType;
+import com.cheuks.bin.original.common.weixin.mp.model.MessageEventModel;
 
 /***
  * 

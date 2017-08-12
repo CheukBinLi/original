@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.weixin.mp.model;
+package com.cheuks.bin.original.common.weixin.mp.model;
 
 import java.io.Serializable;
 

@@ -2,9 +2,6 @@ package com.cheuks.bin.original.weixin;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,16 +9,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.cheuks.bin.original.common.annotation.weixin.MessageEventHandleAnnotation;
 import com.cheuks.bin.original.common.cache.redis.RedisFactory;
 import com.cheuks.bin.original.common.util.ConfigManager;
 import com.cheuks.bin.original.common.util.HttpClientUtil;
-import com.cheuks.bin.original.common.util.XmlReaderAll;
-import com.cheuks.bin.original.weixin.mp.MessageEventHandle;
-import com.cheuks.bin.original.weixin.mp.model.MessageEventModel;
+import com.cheuks.bin.original.common.weixin.mp.MessageEventHandleManager;
 import com.cheuks.bin.original.weixin.mp.model.request.AccessTokenRequest;
 import com.cheuks.bin.original.weixin.mp.model.request.CreateMenuRequest;
 import com.cheuks.bin.original.weixin.mp.model.request.QrCodeRequest;
@@ -33,21 +29,32 @@ import com.cheuks.bin.original.weixin.mp.model.response.WeiXinUserInfoResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, ApplicationContextAware {
+@SuppressWarnings("unused")
+public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, ApplicationContextAware, InitializingBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultWeixinCommonInterfaceImpl.class);
 
+    @Autowired
     private RedisFactory redisFactory;
 
+    @Autowired
     private ConfigManager configManager;
 
+    @Autowired(required = false)
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private MessageEventHandleManager messageEventHandleManager;
 
     private HttpClientUtil httpClientUtil = HttpClientUtil.newInstance();
 
-    private XmlReaderAll xmlReaderAll = XmlReaderAll.newInstance();
+    class MessageHandleManager {
 
-    private Map<String, MessageEventHandle> messageEventHandleManager = new ConcurrentSkipListMap<String, MessageEventHandle>();
+    }
+
+    public void afterPropertiesSet() throws Exception {
+        messageEventHandleManager.start();
+    }
 
     public void weixinTokenVerification(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         String result = request.getParameter("echostr");
@@ -68,15 +75,7 @@ public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, 
         out.close();
         in.close();
         //处理
-        MessageEventModel messageEventModel = xmlReaderAll.padding(out.toByteArray(), new MessageEventModel());
-        if (null != messageEventModel) {
-            MessageEventHandle messageEventHandle = messageEventHandleManager.get(messageEventModel.getMsgType());
-            if (null != messageEventHandle) {
-                messageEventHandle.onMessage(messageEventModel);
-            } else {
-                LOG.info("收到[{}]类型消息，没找到些类默认 MessageEventHandle。", messageEventModel.getMsgType());
-            }
-        }
+        messageEventHandleManager.pushMessage(out.toByteArray());
     }
 
     public String getAccessToken(String appId, String secret, String grantType) throws Throwable {
@@ -137,7 +136,12 @@ public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, 
     }
 
     public QrCodeResponse createQrCode(String accessToken, QrCodeRequest cQrCode) throws Throwable {
-        return null;
+        ByteArrayOutputStream out = httpClientUtil.POST((String) configManager.getConfig(MP_POST_CREATE_QR_CODE) + accessToken, objectMapper.writeValueAsString(cQrCode), 5000, false);
+        QrCodeResponse qrCodeResponse = objectMapper.readValue(out.toByteArray(), QrCodeResponse.class);
+        if (0 != qrCodeResponse.getErrCode()) {
+            throw new Throwable(String.format("创建二维码失败,错误码<%d>,错误信息:%s", qrCodeResponse.getErrCode(), qrCodeResponse.getErrMsg()));
+        }
+        return qrCodeResponse;
     }
 
     public String tokenCacheKeyName(String appid, String secret, String grantType) {
@@ -160,15 +164,6 @@ public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, 
             objectMapper = new ObjectMapper();
         }
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-
-        MessageEventHandle messageEventHandle;
-        Map<String, Object> beans = applicationContext.getBeansWithAnnotation(MessageEventHandleAnnotation.class);
-        if (null != beans) {
-            for (Entry<String, Object> en : beans.entrySet()) {
-                messageEventHandle = (MessageEventHandle) en.getValue();
-                messageEventHandleManager.put(messageEventHandle.getMessageType(), messageEventHandle);
-            }
-        }
     }
 
     public RedisFactory getRedisFactory() {
@@ -195,6 +190,15 @@ public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, 
 
     public DefaultWeixinCommonInterfaceImpl setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        return this;
+    }
+
+    public MessageEventHandleManager getMessageEventHandleManager() {
+        return messageEventHandleManager;
+    }
+
+    public DefaultWeixinCommonInterfaceImpl setMessageEventHandleManager(MessageEventHandleManager messageEventHandleManager) {
+        this.messageEventHandleManager = messageEventHandleManager;
         return this;
     }
 
