@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.weixin.mp.model.response;
+package com.cheuks.bin.original.weixin.mp.model.api.response;
 
 import java.util.List;
 

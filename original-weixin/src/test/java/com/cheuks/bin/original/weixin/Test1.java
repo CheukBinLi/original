@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.cheuks.bin.original.weixin.mp.model.Button;
-import com.cheuks.bin.original.weixin.mp.model.request.CreateMenuRequest;
+import com.cheuks.bin.original.weixin.mp.model.api.Button;
+import com.cheuks.bin.original.weixin.mp.model.api.request.CreateMenuRequest;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

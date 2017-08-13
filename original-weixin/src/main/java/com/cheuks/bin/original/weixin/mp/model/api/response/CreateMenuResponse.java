@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.weixin.mp.model.response;
+package com.cheuks.bin.original.weixin.mp.model.api.response;
 
 import com.cheuks.bin.original.weixin.mp.model.MpBaseModel;
 

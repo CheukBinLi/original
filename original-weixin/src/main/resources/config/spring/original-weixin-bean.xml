@@ -16,6 +16,10 @@
 
 	<!-- TEXT 消息-handle -->
 	<bean class="com.cheuks.bin.original.weixin.mp.handle.event.TextMessageHandle" />
+	<!-- 关注 消息-handle -->
+	<bean class="com.cheuks.bin.original.weixin.mp.handle.event.SubscribeMessageHandle" />
+	<!-- 扫描二维码 消息-handle -->
+	<bean class="com.cheuks.bin.original.weixin.mp.handle.event.ScanMessageHandle" />
 	<!-- messageManager -->
 	<bean class="com.cheuks.bin.original.weixin.mp.DefaultMessageEventHandleManager" />
 

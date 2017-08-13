@@ -1,10 +1,10 @@
 package com.cheuks.bin.original.weixin;
 
 import com.cheuks.bin.original.common.util.ClassToXml;
-import com.cheuks.bin.original.weixin.mp.model.Scene;
-import com.cheuks.bin.original.weixin.mp.model.message.NewsMessageResponse;
-import com.cheuks.bin.original.weixin.mp.model.message.NewsMessageResponse.NewsArticlesItem;
-import com.cheuks.bin.original.weixin.mp.model.request.QrCodeRequest;
+import com.cheuks.bin.original.weixin.bak.messageModel.NewsMessageResponse;
+import com.cheuks.bin.original.weixin.bak.messageModel.NewsMessageResponse.NewsArticlesItem;
+import com.cheuks.bin.original.weixin.mp.model.api.Scene;
+import com.cheuks.bin.original.weixin.mp.model.api.request.QrCodeRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import junit.framework.TestCase;

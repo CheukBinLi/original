@@ -1,10 +1,11 @@
-package com.cheuks.bin.original.weixin.mp.model.request;
+package com.cheuks.bin.original.weixin.mp.model.api.request;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.cheuks.bin.original.weixin.mp.model.MpBaseModel;
-import com.cheuks.bin.original.weixin.mp.model.Scene;
+import com.cheuks.bin.original.weixin.mp.model.api.Scene;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /***
@@ -31,7 +32,7 @@ public class QrCodeRequest extends MpBaseModel {
     // QR_LIMIT_SCENE为永久的整型参数值，
     // QR_LIMIT_STR_SCENE为永久的字符串参数值
     @JsonProperty("action_name")
-    private String actionName;
+    private String actionName = "QR_STR_SCENE";
 
     // action_info 二维码详细信息
     @JsonProperty("action_info")
@@ -56,12 +57,17 @@ public class QrCodeRequest extends MpBaseModel {
         return this;
     }
 
-    public Scene getActionInfo() {
-        return this.actionInfo.get("Scene");
+    public Map<String, Scene> getActionInfo() {
+        return this.actionInfo;
+    }
+
+    @JsonIgnore
+    public Scene getActionScene() {
+        return this.actionInfo.get("scene");
     }
 
     public QrCodeRequest setActionInfo(Scene scene) {
-        this.actionInfo.put("Scene", scene);
+        this.actionInfo.put("scene", scene);
         return this;
     }
 

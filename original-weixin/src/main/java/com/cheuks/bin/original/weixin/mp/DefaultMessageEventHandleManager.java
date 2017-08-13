@@ -52,8 +52,13 @@ public class DefaultMessageEventHandleManager implements ApplicationContextAware
     /** 线程池 */
     private ExecutorService executorService;
 
-    public void pushMessage(byte[] data) throws Throwable {
-        pushMessage(xmlReaderAll.padding(data, new MessageEventModel()));
+    public MessageEventModel pushMessage(byte[] data) throws Throwable {
+        MessageEventModel result = xmlReaderAll.padding(data, new MessageEventModel());
+        try {
+            return result;
+        } finally {
+            pushMessage(result);
+        }
     }
 
     public void pushMessage(MessageEventModel message) throws Throwable {
@@ -78,9 +83,11 @@ public class DefaultMessageEventHandleManager implements ApplicationContextAware
         interrupt = false;
         executorService = Executors.newFixedThreadPool(processors + 1);
         MessageEventHandleWorker<?> eventHandleWorker = new AbstractMessageEventHandleWorker() {
+
             public void process(MessageEventModel messageEventModel) {
+                String msgType = EVENT.equals(msgType = messageEventModel.getMsgType()) ? messageEventModel.getEvent() : msgType;
                 //处理
-                MessageEventHandle messageEventHandle = messageEventHandleManager.get(messageEventModel.getMsgType());
+                MessageEventHandle messageEventHandle = messageEventHandleManager.get(msgType);
                 if (null != messageEventHandle) {
                     messageEventHandle.onMessage(messageEventModel);
                 } else {

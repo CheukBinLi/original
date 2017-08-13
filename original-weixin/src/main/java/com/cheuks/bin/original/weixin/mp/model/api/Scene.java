@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.weixin.mp.model;
+package com.cheuks.bin.original.weixin.mp.model.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

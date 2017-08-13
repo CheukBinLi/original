@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.weixin.mp.model.request;
+package com.cheuks.bin.original.weixin.mp.model.api.request;
 
 import java.net.URLEncoder;
 

@@ -4,12 +4,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.cheuks.bin.original.common.weixin.content.WeixinUrlContant;
-import com.cheuks.bin.original.weixin.mp.model.request.AccessTokenRequest;
-import com.cheuks.bin.original.weixin.mp.model.request.CreateMenuRequest;
-import com.cheuks.bin.original.weixin.mp.model.request.QrCodeRequest;
-import com.cheuks.bin.original.weixin.mp.model.request.WeiXinUserInfoRequest;
-import com.cheuks.bin.original.weixin.mp.model.response.QrCodeResponse;
-import com.cheuks.bin.original.weixin.mp.model.response.WeiXinUserInfoResponse;
+import com.cheuks.bin.original.weixin.mp.model.api.request.AccessTokenRequest;
+import com.cheuks.bin.original.weixin.mp.model.api.request.CreateMenuRequest;
+import com.cheuks.bin.original.weixin.mp.model.api.request.QrCodeRequest;
+import com.cheuks.bin.original.weixin.mp.model.api.request.WeiXinUserInfoRequest;
+import com.cheuks.bin.original.weixin.mp.model.api.response.QrCodeResponse;
+import com.cheuks.bin.original.weixin.mp.model.api.response.WeiXinUserInfoResponse;
+import com.cheuks.bin.original.weixin.mp.model.customservice.message.BaseMessage;
 
 public interface WeixinCommonInterface extends WeixinUrlContant {
 
@@ -28,10 +29,11 @@ public interface WeixinCommonInterface extends WeixinUrlContant {
      * @param appid
      * @param secret
      * @param grantType
+     * @param weixinCode 微信号： gh_5e163a12a084
      * @return
      * @throws Throwable
      */
-    String getAccessToken(String appid, String secret, String grantType) throws Throwable;
+    String getAccessToken(String appid, String secret, String grantType, String weixinCode) throws Throwable;
 
     /***
      * accessTokey 缓存键名
@@ -41,7 +43,7 @@ public interface WeixinCommonInterface extends WeixinUrlContant {
      * @param grantType
      * @return
      */
-    String tokenCacheKeyName(String appid, String secret, String grantType);
+    String tokenCacheKeyName(String appid, String secret, String grantType, String weixinCode);
 
     /***
      * 获取accessToken
@@ -50,7 +52,16 @@ public interface WeixinCommonInterface extends WeixinUrlContant {
      * @return
      * @throws Throwable
      */
-    String getAccessToken(AccessTokenRequest accessToken, boolean checkCache) throws Throwable;
+    String getAccessToken(AccessTokenRequest accessToken, String weixinCode, boolean checkCache) throws Throwable;
+
+    /***
+     * 
+     * @param weixinCode weiXinUserName 微信用户名<br>
+     *            前提条件：缓存/数据库里已初始化
+     * @return
+     * @throws Throwable
+     */
+    String getAccessTokenByWeixinCode(String weixinCode) throws Throwable;
 
     /***
      * 获取用户信息
@@ -88,4 +99,11 @@ public interface WeixinCommonInterface extends WeixinUrlContant {
      */
     String qrCacheKeyName();
 
+    /***
+     * 发送消息
+     * 
+     * @param accessToken
+     * @param baseMessage
+     */
+    void sendMessage(String accessToken, BaseMessage baseMessage) throws Throwable;
 }

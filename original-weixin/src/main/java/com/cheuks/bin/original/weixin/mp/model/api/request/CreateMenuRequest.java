@@ -1,9 +1,9 @@
-package com.cheuks.bin.original.weixin.mp.model.request;
+package com.cheuks.bin.original.weixin.mp.model.api.request;
 
 import java.util.List;
 
-import com.cheuks.bin.original.weixin.mp.model.Button;
 import com.cheuks.bin.original.weixin.mp.model.MpBaseModel;
+import com.cheuks.bin.original.weixin.mp.model.api.Button;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /***

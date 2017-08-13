@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.weixin.mp.model.message;
+package com.cheuks.bin.original.weixin.bak.messageModel;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
 

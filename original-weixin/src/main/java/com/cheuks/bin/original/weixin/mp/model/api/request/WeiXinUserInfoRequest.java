@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.weixin.mp.model.request;
+package com.cheuks.bin.original.weixin.mp.model.api.request;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
 import com.cheuks.bin.original.weixin.mp.model.MpBaseModel;

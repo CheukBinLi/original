@@ -18,14 +18,18 @@ import com.cheuks.bin.original.common.cache.redis.RedisFactory;
 import com.cheuks.bin.original.common.util.ConfigManager;
 import com.cheuks.bin.original.common.util.HttpClientUtil;
 import com.cheuks.bin.original.common.weixin.mp.MessageEventHandleManager;
-import com.cheuks.bin.original.weixin.mp.model.request.AccessTokenRequest;
-import com.cheuks.bin.original.weixin.mp.model.request.CreateMenuRequest;
-import com.cheuks.bin.original.weixin.mp.model.request.QrCodeRequest;
-import com.cheuks.bin.original.weixin.mp.model.request.WeiXinUserInfoRequest;
-import com.cheuks.bin.original.weixin.mp.model.response.AccessTokenResponse;
-import com.cheuks.bin.original.weixin.mp.model.response.CreateMenuResponse;
-import com.cheuks.bin.original.weixin.mp.model.response.QrCodeResponse;
-import com.cheuks.bin.original.weixin.mp.model.response.WeiXinUserInfoResponse;
+import com.cheuks.bin.original.common.weixin.mp.model.MessageEventModel;
+import com.cheuks.bin.original.weixin.mp.model.MpBaseModel;
+import com.cheuks.bin.original.weixin.mp.model.api.request.AccessTokenRequest;
+import com.cheuks.bin.original.weixin.mp.model.api.request.CreateMenuRequest;
+import com.cheuks.bin.original.weixin.mp.model.api.request.QrCodeRequest;
+import com.cheuks.bin.original.weixin.mp.model.api.request.WeiXinUserInfoRequest;
+import com.cheuks.bin.original.weixin.mp.model.api.response.AccessTokenResponse;
+import com.cheuks.bin.original.weixin.mp.model.api.response.CreateMenuResponse;
+import com.cheuks.bin.original.weixin.mp.model.api.response.QrCodeResponse;
+import com.cheuks.bin.original.weixin.mp.model.api.response.WeiXinUserInfoResponse;
+import com.cheuks.bin.original.weixin.mp.model.customservice.message.BaseMessage;
+import com.cheuks.bin.original.weixin.mp.model.customservice.message.TextMessage;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -75,24 +79,25 @@ public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, 
         out.close();
         in.close();
         //处理
-        messageEventHandleManager.pushMessage(out.toByteArray());
+        MessageEventModel model = messageEventHandleManager.pushMessage(out.toByteArray());
+        sendMessage(getAccessTokenByWeixinCode(model.getToUserName()), new TextMessage(model.getFromUserName(), "已接收你的消息。"));
     }
 
-    public String getAccessToken(String appId, String secret, String grantType) throws Throwable {
-        String result = redisFactory.get(tokenCacheKeyName(appId, secret, grantType));
+    public String getAccessToken(String appId, String secret, String grantType, String weixinCode) throws Throwable {
+        String result = redisFactory.get(tokenCacheKeyName(appId, secret, grantType, weixinCode));
         if (null == result) {
             AccessTokenRequest request = new AccessTokenRequest(appId, secret);
             if (null != grantType)
                 request.setGrantType(grantType);
-            result = getAccessToken(request, false);
+            result = getAccessToken(request, weixinCode, false);
         }
         return result;
     }
 
-    public String getAccessToken(AccessTokenRequest accessToken, boolean checkCache) throws Throwable {
+    public String getAccessToken(AccessTokenRequest accessToken, String weixinCode, boolean checkCache) throws Throwable {
         String result = null;
         if (checkCache)
-            result = redisFactory.get(tokenCacheKeyName(accessToken.getAppId(), accessToken.getSecret(), accessToken.getGrantType()));
+            result = redisFactory.get(tokenCacheKeyName(accessToken.getAppId(), accessToken.getSecret(), accessToken.getGrantType(), weixinCode));
         if (null == result) {
             String url = (String) configManager.getConfig(MP_GET_GET_ACCESS_TOKEN);
             String params = configManager.objectToUrlParams(accessToken, true);
@@ -102,7 +107,7 @@ public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, 
                 throw new Throwable(String.format("获取TOKEN失败，错误码<%d>,错误信息:%s", accessTokenResponse.getErrCode(), accessTokenResponse.getErrMsg()));
             }
             result = accessTokenResponse.getAccessToken();
-            redisFactory.set(tokenCacheKeyName(accessToken.getAppId(), accessToken.getSecret(), accessToken.getGrantType()), result, 7100);
+            redisFactory.set(tokenCacheKeyName(accessToken.getAppId(), accessToken.getSecret(), accessToken.getGrantType(), weixinCode), result, 7100);
             return result;
         }
         return result;
@@ -138,19 +143,19 @@ public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, 
     public QrCodeResponse createQrCode(String accessToken, QrCodeRequest cQrCode) throws Throwable {
         ByteArrayOutputStream out = httpClientUtil.POST((String) configManager.getConfig(MP_POST_CREATE_QR_CODE) + accessToken, objectMapper.writeValueAsString(cQrCode), 5000, false);
         QrCodeResponse qrCodeResponse = objectMapper.readValue(out.toByteArray(), QrCodeResponse.class);
-        if (0 != qrCodeResponse.getErrCode()) {
+        if (null != qrCodeResponse.getErrCode()) {
             throw new Throwable(String.format("创建二维码失败,错误码<%d>,错误信息:%s", qrCodeResponse.getErrCode(), qrCodeResponse.getErrMsg()));
         }
         return qrCodeResponse;
     }
 
-    public String tokenCacheKeyName(String appid, String secret, String grantType) {
-        return "winxinAK:" + appid + "_" + secret;
+    public String tokenCacheKeyName(String appid, String secret, String grantType, String weixinCode) {
+        //        return "winxinAK:" + appid + "_" + secret;
+        return "winxinCode:" + weixinCode;
     }
 
     public String qrCacheKeyName() {
         try {
-
             return null;
         } finally {
 
@@ -200,6 +205,19 @@ public class DefaultWeixinCommonInterfaceImpl implements WeixinCommonInterface, 
     public DefaultWeixinCommonInterfaceImpl setMessageEventHandleManager(MessageEventHandleManager messageEventHandleManager) {
         this.messageEventHandleManager = messageEventHandleManager;
         return this;
+    }
+
+    public void sendMessage(String accessToken, BaseMessage baseMessage) throws Throwable {
+        ByteArrayOutputStream out = httpClientUtil.POST((String) configManager.getConfig(MP_POST_SEND_MESSAGE_CUSTOM_SERVICE) + accessToken, objectMapper.writeValueAsString(baseMessage), 5000, false);
+        MpBaseModel response = objectMapper.readValue(out.toByteArray(), MpBaseModel.class);
+        if (0 != response.getErrCode()) {
+            throw new Throwable(String.format("消息发送失败,错误码<%d>,错误信息:%s", response.getErrCode(), response.getErrMsg()));
+        }
+
+    }
+
+    public String getAccessTokenByWeixinCode(String weixinCode) throws Throwable {
+        return redisFactory.get(tokenCacheKeyName(null, null, null, weixinCode));
     }
 
 }
