@@ -1,6 +1,6 @@
 package com.cheuks.bin.original.rmi.net;
 
-import com.cheuks.bin.original.common.rmi.RmiContent;
+import com.cheuks.bin.original.common.rmi.RmiContant;
 
 /***
  * 
@@ -12,7 +12,7 @@ import com.cheuks.bin.original.common.rmi.RmiContent;
  * @date 2017年5月1日 上午9:03:25
  *
  */
-public class SimpleLdapFactory implements RmiContent {
+public class SimpleLdapFactory implements RmiContant {
 
 	private final static SimpleLdapFactory INSTANCE = new SimpleLdapFactory();
 

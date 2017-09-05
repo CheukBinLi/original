@@ -9,6 +9,7 @@ public class ReferenceModel implements Serializable {
 	private String id;// 名字
 	private String interfaceName;// 接口
 	private String version;
+	private Boolean multiInstance;
 
 	public String getId() {
 		return id;
@@ -34,6 +35,15 @@ public class ReferenceModel implements Serializable {
 
 	public ReferenceModel setVersion(String version) {
 		this.version = version;
+		return this;
+	}
+
+	public Boolean getMultiInstance() {
+		return multiInstance;
+	}
+
+	public ReferenceModel setMultiInstance(Boolean multiInstance) {
+		this.multiInstance = multiInstance;
 		return this;
 	}
 

@@ -15,5 +15,7 @@ public interface WeixinUrlContant {
     String MP_GET_QR_CODE = "mp.get.QrCode";
 
     String MP_GET_GET_WEI_XIN_USER_INFO = "mp.get.get.WeixinUserInfo";
+    
+    String MP_POST_SEND_MESSAGE_CUSTOM_SERVICE="MP.post.sendMessage.customService";
 
 }

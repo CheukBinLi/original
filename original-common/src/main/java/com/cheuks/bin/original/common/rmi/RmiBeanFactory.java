@@ -1,16 +1,15 @@
 package com.cheuks.bin.original.common.rmi;
 
-import com.cheuks.bin.original.common.rmi.model.ClassBean;
 import com.cheuks.bin.original.common.rmi.model.MethodBean;
 
-public interface RmiBeanFactory<ARG> {
+public interface RmiBeanFactory {
 
-	ClassBean getBean(Class<?> c) throws RmiException;
+    <T> T getBean(Class<?> c) throws RmiException;
 
-	ClassBean getBean(String serviceName) throws RmiException;
+    <T> T getBean(String serviceName) throws RmiException;
 
-	MethodBean getMethod(String code) throws RmiException;
+    MethodBean getMethod(String code) throws RmiException;
 
-	void start(ARG arg);
+    void start(Object arg);
 
 }

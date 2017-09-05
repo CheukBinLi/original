@@ -1,6 +1,6 @@
 package com.cheuks.bin.original.common.rmi.net;
 
-import com.cheuks.bin.original.common.rmi.RmiContent;
+import com.cheuks.bin.original.common.rmi.RmiContant;
 
 /***
  * 
@@ -12,7 +12,7 @@ import com.cheuks.bin.original.common.rmi.RmiContent;
  * @date 2017年4月28日 下午3:36:26
  *
  */
-public interface MessageHandle<Input, Value> extends RmiContent {
+public interface MessageHandle<Input, Value> extends RmiContant {
 
 	/***
 	 * 处理的服务类型

@@ -65,6 +65,7 @@
 		<module>original-common</module>
 		<module>original-cache</module>
 		<module>original-db-manager</module>
+		<module>original-message-queue</module>
 		<module>original-generate</module>
 		<module>original-weixin</module>
 		<module>original-search</module>

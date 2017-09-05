@@ -14,6 +14,7 @@ import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.cheuks.bin.original.common.rmi.LoadBalanceFactory;
 import com.cheuks.bin.original.common.rmi.RmiBeanFactory;
 import com.cheuks.bin.original.common.util.AbstractObjectPool;
+import com.cheuks.bin.original.rmi.net.RmiClient;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,7 +33,8 @@ import io.netty.util.AttributeKey;
  * @author ben
  *
  */
-public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocketAddress> {
+public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocketAddress> implements RmiClient<String, Void> {
+	private static final Logger LOG = LoggerFactory.getLogger(NettyClient.class);
 
 	private static NettyClient instance;
 
@@ -40,28 +42,32 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 		return instance;
 	}
 
-	private static final Logger LOG = LoggerFactory.getLogger(NettyClient.class);
+	// private String address = "127.0.0.1:10086";
 
-	private String address = "127.0.0.1:10086";
-	private Map<String, String> referenceInfo = new ConcurrentSkipListMap<String, String>();//key:应用唯一ID value:连接上的服务器ID
-	private Map<String, String> connectionInfo = new ConcurrentSkipListMap<String, String>();//key:连接上的服务器ID value:应用唯一ID
+	private Map<String, String> connectionInfo = new ConcurrentSkipListMap<String, String>();// key:连接上的服务器ID
+																								// value:应用唯一ID
+
 	public static final AttributeKey<NettyClient> NETTY_CLIENT_OBJECT_POOL = AttributeKey.valueOf("NETTY_CLIENT_OBJECT_POOL");
+
 	private int maxActiveCount = 15;
+
 	private int heartBeatInterval = 60;
+
 	private int maxFrameLength = 5000;
-	private String applicationName;
-	private String zookeeperServerList = "127.0.0.1:2181";
-	private int baseSleepTimeMs = 5000;
-	private int maxRetries = 20;
+
 	private LoadBalanceFactory<String, Void> loadBalanceFactory;
-	private RmiBeanFactory<Object> rmiBeanFactory;
-	//连接任务
-	private Thread connectionWorker;
+
+	private RmiBeanFactory rmiBeanFactory;
+
+	// 连接任务
+	private Thread connectionWorker = null;
+
 	private final BlockingQueue<String> connectionQueue = new LinkedBlockingQueue<String>();
 
 	private volatile boolean isInit;
 
 	private Bootstrap client;
+
 	private EventLoopGroup worker;
 
 	private CacheSerialize cacheSerialize;
@@ -83,12 +89,12 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 			if (null == cacheSerialize)
 				cacheSerialize = new FstCacheSerialize();
 			if (null == rmiBeanFactory) {
-				// rmiBeanFactory = new SimpleRmiBeanFactory();
 				throw new NullPointerException("rmiBeanFactory is null");
 			}
 			rmiBeanFactory.start(null);
-			if (null == loadBalanceFactory)
-				loadBalanceFactory = new ZookeeperRegistrationFactory(zookeeperServerList, baseSleepTimeMs, maxRetries);
+			if (null == loadBalanceFactory) {
+				throw new NullPointerException("can't instance loadBalanceFactory.");
+			}
 			loadBalanceFactory.init();
 
 			client = new Bootstrap();
@@ -171,6 +177,34 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 	@Override
 	public synchronized void removeObject(NettyClientHandle t) throws Exception {
 		super.removeObject(t);
+	}
+
+	public NettyClient setHeartBeatTimeoutSecond(int heartBeatTimeoutSecond) {
+		this.heartBeatInterval = heartBeatTimeoutSecond * 1000;
+		return this;
+	}
+
+	public NettyClient setRmiBeanFactory(RmiBeanFactory rmiBeanFactory) {
+		this.rmiBeanFactory = rmiBeanFactory;
+		return this;
+	}
+
+	public NettyClient setMaxFrameLength(int maxFrameLength) {
+		this.maxFrameLength = maxFrameLength;
+		return this;
+	}
+
+	public NettyClient setHandleThreads(int handleThreads) {
+		return null;
+	}
+
+	public NettyClient setScanPath(String path) {
+		return null;
+	}
+
+	public NettyClient setLoadBalanceFactory(LoadBalanceFactory<String, Void> loadBalanceFactory) {
+		this.loadBalanceFactory = loadBalanceFactory;
+		return this;
 	}
 
 }

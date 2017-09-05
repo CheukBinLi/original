@@ -1,8 +1,6 @@
 package com.cheuks.bin.original.rmi.config;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -13,11 +11,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.cheuks.bin.original.common.rmi.RmiContent;
-import com.cheuks.bin.original.rmi.config.ServiceGroupConfig.ServiceGroup;
+import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.rmi.config.model.ReferenceModel;
 
-public class ReferenceGroupConfig extends AbstractConfig implements RmiContent {
+public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,10 +26,8 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContent {
 
 	private void doParser(String applicationName, Element element, ParserContext parserContext) {
 		NodeList list = element.getChildNodes();
-		List<ReferenceModel> referenceModels = getServiceGroupList(parserContext, applicationName);
+		ReferenceGroupModel referenceGroupModel = getServiceGroupModel(parserContext, applicationName);
 		ReferenceModel referenceModel;
-		if (null == referenceModels)
-			referenceModels = new ArrayList<ReferenceModel>();
 		Node node;
 		Element tempElement;
 		for (int i = 0, len = list.getLength(); i < len; i++) {
@@ -43,49 +38,93 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContent {
 				referenceModel.setId(tempElement.getAttribute("id"));
 				referenceModel.setInterfaceName(tempElement.getAttribute("interface"));
 				referenceModel.setVersion(tempElement.getAttribute("version"));
-				referenceModels.add(referenceModel);
+				referenceModel.setMultiInstance(Boolean.valueOf(element.getAttribute("multiInstance")));
+				// referenceModels.add(referenceModel);
+				referenceGroupModel.getReferenceGroup().put(referenceModel.getId(), referenceModel);
 			}
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	List<ReferenceModel> getServiceGroupList(ParserContext parserContext, String applicationName) {
+	protected ReferenceGroupModel getServiceGroupModel(ParserContext parserContext, String applicationName) {
+
 		BeanDefinition beanDefinition = null;
+		Map<String, ReferenceGroupModel> referenceGroup;
+
 		if (parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP)) {
 			beanDefinition = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP);
+			referenceGroup = (Map<String, ReferenceGroupModel>) beanDefinition.getPropertyValues().get(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP);
 		} else {
 			synchronized (this) {
-				if (parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP))
+				if (parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP)) {
 					beanDefinition = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP);
-				else if (null == beanDefinition) {
-					beanDefinition = new RootBeanDefinition(ServiceGroup.class);
+					referenceGroup = (Map<String, ReferenceGroupModel>) beanDefinition.getPropertyValues().get(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP);
+				} else {
+					beanDefinition = new RootBeanDefinition(ReferenceGroup.class);
 					parserContext.getRegistry().registerBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP, beanDefinition);
+					beanDefinition.getPropertyValues().add(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP, referenceGroup = new ConcurrentSkipListMap<String, ReferenceGroupModel>());
 				}
 			}
 		}
-		Map<String, List<ReferenceModel>> referenceGroup = (Map<String, List<ReferenceModel>>) beanDefinition.getPropertyValues().get(RMI_CONFIG_BEAN_REFERENCE_GROUP);
-		if (null == referenceGroup) {
-			referenceGroup = new ConcurrentSkipListMap<String, List<ReferenceModel>>();
-			beanDefinition.getPropertyValues().add(RMI_CONFIG_BEAN_REFERENCE_GROUP, referenceGroup);
+
+		ReferenceGroupModel referenceGroupModel = referenceGroup.get(applicationName);
+		if (null == referenceGroupModel) {
+			referenceGroup.put(applicationName, referenceGroupModel = new ReferenceGroupModel(applicationName, true));
 		}
-		List<ReferenceModel> result = referenceGroup.get(applicationName);
-		if (null == result) {
-			result = new ArrayList<ReferenceModel>();
-			referenceGroup.put(applicationName, result);
+
+		return referenceGroupModel;
+	}
+
+	public static class ReferenceGroupModel implements Serializable {
+		private static final long serialVersionUID = 1L;
+
+		private Map<String, ReferenceModel> referenceGroup;
+
+		private String applicationName;
+
+		public Map<String, ReferenceModel> getReferenceGroup() {
+			return referenceGroup;
 		}
-		return result;
+
+		public ReferenceGroupModel setReferenceGroup(Map<String, ReferenceModel> referenceGroup) {
+			this.referenceGroup = referenceGroup;
+			return this;
+		}
+
+		public String getApplicationName() {
+			return applicationName;
+		}
+
+		public ReferenceGroupModel setApplicationName(String applicationName) {
+			this.applicationName = applicationName;
+			return this;
+		}
+
+		public ReferenceGroupModel(String applicationName) {
+			super();
+			this.applicationName = applicationName;
+		}
+
+		public ReferenceGroupModel(String applicationName, boolean isInit) {
+			this(applicationName);
+			if (isInit)
+				this.referenceGroup = new ConcurrentSkipListMap<String, ReferenceModel>();
+		}
+
 	}
 
 	public static class ReferenceGroup implements Serializable {
 		private static final long serialVersionUID = 1L;
 
-		private Map<String, List<ReferenceModel>> referenceGroup;
+		private final static String REFERENCE_GROUP_FIELD_REFERENCE_GROUP = "referenceGroup";
 
-		public Map<String, List<ReferenceModel>> getReferenceGroup() {
+		private Map<String, ReferenceGroupModel> referenceGroup;
+
+		public Map<String, ReferenceGroupModel> getReferenceGroup() {
 			return referenceGroup;
 		}
 
-		public ReferenceGroup setReferenceGroup(Map<String, List<ReferenceModel>> referenceGroup) {
+		public ReferenceGroup setReferenceGroup(Map<String, ReferenceGroupModel> referenceGroup) {
 			this.referenceGroup = referenceGroup;
 			return this;
 		}

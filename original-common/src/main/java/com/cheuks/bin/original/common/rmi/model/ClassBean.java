@@ -4,43 +4,52 @@ import java.io.Serializable;
 
 public class ClassBean implements Serializable {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 
-	/***
-	 * 全局ID
-	 */
-	private String id;
-	/***
-	 * 版本信息
-	 */
-	private String version;
-	/***
-	 * 说明
-	 */
-	private String describe;
-	/***
-	 * 单例/多例
-	 */
-	private boolean multiInstance;
-	/***
-	 * 接口类
-	 */
 	private Class<?> interfaceClassFile;
-	/***
-	 * 接口代理实现类
-	 */
+	private Class<?> originalClassFile;
 	private Class<?> proxyClassFile;
-	/***
-	 * 实例
-	 */
+	private String registrationServiceName;
+	private String version;
 	private Object instance;
+	private boolean multiInstance;
 
-	public String getId() {
-		return id;
+	public Class<?> getInterfaceClassFile() {
+		return interfaceClassFile;
 	}
 
-	public ClassBean setId(String id) {
-		this.id = id;
+	public ClassBean setInterfaceClassFile(Class<?> interfaceClassFile) {
+		this.interfaceClassFile = interfaceClassFile;
+		return this;
+	}
+
+	public Class<?> getOriginalClassFile() {
+		return originalClassFile;
+	}
+
+	public ClassBean setOriginalClassFile(Class<?> originalClassFile) {
+		this.originalClassFile = originalClassFile;
+		return this;
+	}
+
+	public Class<?> getProxyClassFile() {
+		return proxyClassFile;
+	}
+
+	public ClassBean setProxyClassFile(Class<?> proxyClassFile) {
+		this.proxyClassFile = proxyClassFile;
+		return this;
+	}
+
+	public String getRegistrationServiceName() {
+		return registrationServiceName;
+	}
+
+	public ClassBean setRegistrationServiceName(String registrationServiceName) {
+		this.registrationServiceName = registrationServiceName;
 		return this;
 	}
 
@@ -53,12 +62,20 @@ public class ClassBean implements Serializable {
 		return this;
 	}
 
-	public String getDescribe() {
-		return describe;
+	public Object getInstance() throws InstantiationException, IllegalAccessException {
+		if (this.isMultiInstance())
+			return this.proxyClassFile.newInstance();
+		else if (null == this.instance) {
+			synchronized (this) {
+				if (null == this.instance)
+					setInstance(this.proxyClassFile.newInstance());
+			}
+		}
+		return instance;
 	}
 
-	public ClassBean setDescribe(String describe) {
-		this.describe = describe;
+	public ClassBean setInstance(Object instance) {
+		this.instance = instance;
 		return this;
 	}
 
@@ -71,31 +88,25 @@ public class ClassBean implements Serializable {
 		return this;
 	}
 
-	public Object getInstance() {
-		return instance;
+	public ClassBean(Class<?> originalClassFile, String registrationServiceName, String version,
+			boolean multiInstance) {
+		super();
+		this.originalClassFile = originalClassFile;
+		this.registrationServiceName = registrationServiceName;
+		this.version = version;
+		this.multiInstance = multiInstance;
 	}
 
-	public ClassBean setInstance(Object instance) {
+	public ClassBean(Class<?> originalClassFile, String registrationServiceName, Object instance, String version) {
+		super();
+		this.originalClassFile = originalClassFile;
+		this.registrationServiceName = registrationServiceName;
+		this.version = version;
 		this.instance = instance;
-		return this;
 	}
 
-	public Class<?> getInterfaceClassFile() {
-		return interfaceClassFile;
-	}
-
-	public ClassBean setInterfaceClassFile(Class<?> interfaceClassFile) {
-		this.interfaceClassFile = interfaceClassFile;
-		return this;
-	}
-
-	public Class<?> getProxyClassFile() {
-		return proxyClassFile;
-	}
-
-	public ClassBean setProxyClassFile(Class<?> proxyClassFile) {
-		this.proxyClassFile = proxyClassFile;
-		return this;
-	}
+	// public ClassBean() {
+	// super();
+	// }
 
 }

@@ -7,12 +7,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.cheuks.bin.original.common.rmi.RmiContent;
+import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.common.util.CollectionUtil;
 import com.cheuks.bin.original.rmi.config.model.ProtocolModel;
 import com.cheuks.bin.original.rmi.config.model.RegistryModel;
 
-public class RmiConfig extends AbstractConfig implements RmiContent {
+public class RmiConfig extends AbstractConfig implements RmiContant {
 
 	private static final long serialVersionUID = 1L;
 

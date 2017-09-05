@@ -1,6 +1,6 @@
 package com.cheuks.bin.original.common.rmi;
 
-public interface RmiContent {
+public interface RmiContant {
 
 	/***
 	 * 私有栈头标签

@@ -1,6 +1,6 @@
 package com.cheuks.bin.original.common.rmi.net;
 
-import com.cheuks.bin.original.common.rmi.RmiContent;
+import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.common.rmi.RmiException;
 
 /***
@@ -13,7 +13,7 @@ import com.cheuks.bin.original.common.rmi.RmiException;
  * @date 2017年4月28日 下午3:35:22
  *
  */
-public interface MessageHandleFactory<Input, Value, Args> extends RmiContent {
+public interface MessageHandleFactory<Input, Value, Args> extends RmiContant {
 
 	/***
 	 * 

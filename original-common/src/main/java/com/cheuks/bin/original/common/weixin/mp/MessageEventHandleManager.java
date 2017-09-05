@@ -4,7 +4,7 @@ import com.cheuks.bin.original.common.weixin.mp.model.MessageEventModel;
 
 public interface MessageEventHandleManager {
 
-    void pushMessage(byte[] data) throws Throwable;
+	MessageEventModel pushMessage(byte[] data) throws Throwable;
 
     void pushMessage(MessageEventModel message) throws Throwable;
 

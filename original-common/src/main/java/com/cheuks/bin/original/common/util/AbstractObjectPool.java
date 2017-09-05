@@ -23,6 +23,7 @@ public abstract class AbstractObjectPool<T, V> implements ObjectPool<T> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractObjectPool.class);
 
+	private String poolName;
 	private final BlockingDeque<T> QUEUE;
 	private final ConcurrentMap<T, Long> BORROW_QUEUE;
 	private volatile boolean interrupt = false;
@@ -32,7 +33,8 @@ public abstract class AbstractObjectPool<T, V> implements ObjectPool<T> {
 	/***
 	 * 回调过期对象个数，重建对像
 	 * 
-	 * @param count 过期对象个数
+	 * @param count
+	 *            过期对象个数
 	 * @throws Exception
 	 */
 	public abstract void invalidateReBuildObject(int count) throws Exception;
@@ -138,6 +140,16 @@ public abstract class AbstractObjectPool<T, V> implements ObjectPool<T> {
 
 	public AbstractObjectPool() {
 		this(-1);
+		this.poolName = "default_" + System.currentTimeMillis();
+	}
+
+	public String getPoolName() {
+		return poolName;
+	}
+
+	public AbstractObjectPool<T, V> setPoolName(String poolName) {
+		this.poolName = poolName;
+		return this;
 	}
 
 	public long getTimeout() {

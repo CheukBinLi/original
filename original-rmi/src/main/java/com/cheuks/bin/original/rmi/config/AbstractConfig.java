@@ -31,6 +31,10 @@ public abstract class AbstractConfig implements Serializable, Cloneable {
 		parserContext.getRegistry().registerBeanDefinition(beanName, beanDefinition);
 	}
 
+	protected BeanDefinition getConfig(ParserContext parserContext, String beanName) {
+		return parserContext.getRegistry().getBeanDefinition(beanName);
+	}
+
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		return super.clone();

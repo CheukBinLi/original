@@ -1,6 +1,6 @@
 package com.cheuks.bin.original.common.rmi.net;
 
-import com.cheuks.bin.original.common.rmi.RmiContent;
+import com.cheuks.bin.original.common.rmi.RmiContant;
 
 /***
  * 消息回调返回结果接口
@@ -10,7 +10,7 @@ import com.cheuks.bin.original.common.rmi.RmiContent;
  * @param <Input> channel|ChannelHandlerContext
  * @param <Value> 私有栈MODEL|TransmissionModel
  */
-public interface MessageCallBack<Input, Value> extends RmiContent {
+public interface MessageCallBack<Input, Value> extends RmiContant {
 
 	/***
 	 * 清空结果

@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cheuks.bin.original.common.cache.CacheSerialize;
-import com.cheuks.bin.original.common.rmi.RmiContent;
+import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.common.rmi.model.TransmissionModel;
 
 import io.netty.buffer.ByteBuf;
@@ -12,7 +12,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.util.ReferenceCountUtil;
 
-public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder implements RmiContent {
+public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder implements RmiContant {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NettyMessageDecoder.class);
 
