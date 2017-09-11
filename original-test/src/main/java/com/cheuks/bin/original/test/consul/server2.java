@@ -2,30 +2,11 @@ package com.cheuks.bin.original.test.consul;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.List;
 
-import org.bouncycastle.util.IPAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.net.HostAndPort;
-import com.orbitz.consul.AgentClient;
-import com.orbitz.consul.Consul;
-import com.orbitz.consul.KeyValueClient;
-import com.orbitz.consul.SessionClient;
-import com.orbitz.consul.async.EventResponseCallback;
-import com.orbitz.consul.model.EventResponse;
-import com.orbitz.consul.model.agent.ImmutableCheck;
-import com.orbitz.consul.model.agent.ImmutableRegCheck;
-import com.orbitz.consul.model.agent.ImmutableRegistration;
-import com.orbitz.consul.model.event.Event;
-import com.orbitz.consul.model.session.ImmutableSession;
-import com.orbitz.consul.model.session.SessionCreatedResponse;
-import com.orbitz.consul.model.session.SessionInfo;
 
 public class server2 {
 
@@ -42,7 +23,6 @@ public class server2 {
 
     public void server_health() {
         Thread thread = new Thread(new Runnable() {
-            @Override
             public void run() {
                 try {
                     int port = 10011;

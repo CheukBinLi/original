@@ -26,15 +26,17 @@ public interface MessageHandleFactory<Input, Value, Args> extends RmiContant {
 
 	/***
 	 * 
-	 * @param serviceType 服务类型:request,response,ping等等
+	 * @param serviceType
+	 *            服务类型:request,response,ping等等
 	 * @param messageHandle
 	 */
-	void registrationMessageHandle(int serviceType, MessageHandle<?, ?> messageHandle);
+	void registrationMessageHandle(int serviceType, MessageHandle<Input, Value> messageHandle);
 
 	/***
 	 * 服务是否存在
 	 * 
-	 * @param serviceType 服务类型:request,response,ping等等
+	 * @param serviceType
+	 *            服务类型:request,response,ping等等
 	 * @return
 	 */
 	boolean serviceTypeContains(int serviceType);

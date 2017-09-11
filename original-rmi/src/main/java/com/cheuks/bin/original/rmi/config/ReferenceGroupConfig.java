@@ -12,6 +12,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.cheuks.bin.original.common.rmi.RmiContant;
+import com.cheuks.bin.original.common.util.CollectionUtil;
 import com.cheuks.bin.original.rmi.config.model.ReferenceModel;
 
 public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
@@ -32,7 +33,8 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 		Element tempElement;
 		for (int i = 0, len = list.getLength(); i < len; i++) {
 			node = list.item(i);
-			if (RMI_CONFIG_ELEMENT_SERVICE.equals(node.getNodeName()) || RMI_CONFIG_ELEMENT_SERVICE.equals(node.getLocalName())) {
+			System.err.println(RMI_CONFIG_ELEMENT_REFERENCE + "==" + node.getNodeName() + "  ||  " + node.getLocalName());
+			if (RMI_CONFIG_ELEMENT_REFERENCE.equals(node.getNodeName()) || RMI_CONFIG_ELEMENT_REFERENCE.equals(node.getLocalName())) {
 				tempElement = (Element) node;
 				referenceModel = new ReferenceModel();
 				referenceModel.setId(tempElement.getAttribute("id"));
@@ -55,16 +57,19 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 			beanDefinition = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP);
 			referenceGroup = (Map<String, ReferenceGroupModel>) beanDefinition.getPropertyValues().get(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP);
 		} else {
-			synchronized (this) {
-				if (parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP)) {
-					beanDefinition = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP);
-					referenceGroup = (Map<String, ReferenceGroupModel>) beanDefinition.getPropertyValues().get(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP);
-				} else {
-					beanDefinition = new RootBeanDefinition(ReferenceGroup.class);
-					parserContext.getRegistry().registerBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP, beanDefinition);
-					beanDefinition.getPropertyValues().add(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP, referenceGroup = new ConcurrentSkipListMap<String, ReferenceGroupModel>());
-				}
-			}
+			// synchronized (this) {
+			// if (parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP)) {
+			// beanDefinition = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP);
+			// referenceGroup = (Map<String, ReferenceGroupModel>) beanDefinition.getPropertyValues().get(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP);
+			// } else {
+			referenceGroup = new ConcurrentSkipListMap<String, ReferenceGroupModel>();
+			// beanDefinition = new RootBeanDefinition(ReferenceGroup.class);
+			// parserContext.getRegistry().registerBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP, beanDefinition);
+			// beanDefinition.getPropertyValues().add(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP, referenceGroup = new ConcurrentSkipListMap<String, ReferenceGroupModel>());
+			// parserContext.getRegistry().registerBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP, beanDefinition);
+			registerBeanDefinition(parserContext, ReferenceGroup.class, RMI_CONFIG_BEAN_REFERENCE_GROUP, CollectionUtil.newInstance().toMap(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP, referenceGroup));
+			// }
+			// }
 		}
 
 		ReferenceGroupModel referenceGroupModel = referenceGroup.get(applicationName);

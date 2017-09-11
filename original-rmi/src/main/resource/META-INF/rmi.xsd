@@ -66,9 +66,9 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="registryType">
-		<xsd:attribute name="address" use="required">
+		<xsd:attribute name="serverAddress" use="required" type="xsd:string">
 			<xsd:annotation>
-				<xsd:documentation><![CDATA[zookeeper register|zookeeper注册中心地址]]></xsd:documentation>
+				<xsd:documentation><![CDATA[zookeeper://192.168.1.1:2181,192,168.1.2:2181|zookeeper注册中心地址,consul://192.168.1.1:8500,182.168.1.2:8500|consul注册中心]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="maxRetries" use="optional" type="xsd:integer" default="20">
@@ -77,10 +77,22 @@
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:complexType>
+	<xsd:complexType name="scanType">
+		<xsd:attribute name="packagePath" use="optional" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[描述注解包路径|后继]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
 
 
 	<xsd:complexType name="protocolType">
-		<xsd:attribute name="address" use="optional" type="xsd:string">
+		<xsd:attribute name="localName" use="optional" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[current server name|本服务器名称]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="localAddress" use="optional" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[local listen network interface|本地网络卡IP]]></xsd:documentation>
 			</xsd:annotation>
@@ -104,6 +116,11 @@
 		<xsd:attribute name="charset" use="optional" type="xsd:string" default="utf-8">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[coding|编码]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="frameLength" use="optional" type="xsd:integer" default="5000">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[network data frame length|数据块大小]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="heartbeat" use="optional" type="xsd:integer" default="600">
@@ -145,9 +162,10 @@
 
 	<xsd:element name="config">
 		<xsd:complexType>
-			<xsd:all minOccurs="1">
+			<xsd:all>
 				<xsd:element maxOccurs="1" name="registry" type="registryType"></xsd:element>
 				<xsd:element maxOccurs="1" name="protocol" type="protocolType"></xsd:element>
+				<xsd:element minOccurs="0" maxOccurs="1" name="scan" type="scanType"></xsd:element>
 			</xsd:all>
 		</xsd:complexType>
 	</xsd:element>

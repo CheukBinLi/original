@@ -38,7 +38,7 @@ public class AppTest extends TestCase {
 	public static void main(String[] args) throws Throwable {
 		ZookeeperRegistrationFactory zrf = new ZookeeperRegistrationFactory();
 		zrf.setServerList("192.168.3.12:2181");
-		zrf.init();
+		zrf.start();
 		String directory = zrf.createService("/service", new RegistrationEventListener<PathChildrenCacheEvent>() {
 
 			public void nodeChanged(PathChildrenCacheEvent params, Object... obj) throws Exception {

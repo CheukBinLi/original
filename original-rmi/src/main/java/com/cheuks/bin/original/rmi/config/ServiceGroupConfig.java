@@ -12,6 +12,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.cheuks.bin.original.common.rmi.RmiContant;
+import com.cheuks.bin.original.common.util.CollectionUtil;
 import com.cheuks.bin.original.rmi.config.model.ServiceModel;
 
 public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
@@ -58,9 +59,10 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 			bean = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_SERVICE_GROUP);
 			serviceGroups = (Map<String, ServiceGroupModel>) bean.getPropertyValues().get(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG);
 		} else {
-			bean = new RootBeanDefinition(ServiceGroup.class);
+//			bean = new RootBeanDefinition(ServiceGroup.class);
 			serviceGroups = new ConcurrentSkipListMap<String, ServiceGroupModel>();
-			bean.getPropertyValues().add(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG, serviceGroups);
+//			bean.getPropertyValues().add(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG, serviceGroups);
+			registerBeanDefinition(parserContext, ServiceGroup.class, RMI_CONFIG_BEAN_SERVICE_GROUP, CollectionUtil.newInstance().toMap(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG, serviceGroups));
 		}
 		if (null == (serviceGroup = serviceGroups.get(applicationName))) {
 			serviceGroups.put(applicationName, serviceGroup = new ServiceGroupModel(applicationName, true));

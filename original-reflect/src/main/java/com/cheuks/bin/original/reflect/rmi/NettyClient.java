@@ -96,7 +96,7 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 			rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", scanPath, "isServer", false));
 			if (null == registrationFactory)
 				registrationFactory = new ZookeeperRegistrationFactory(zookeeperServerList, baseSleepTimeMs, maxRetries);
-			registrationFactory.init();
+			registrationFactory.start();
 			if (null == registerClientHandler)
 				registerClientHandler = new RegisterServiceClientHandler(applicationName, registrationFactory);
 			//			address = registerClientHandler.register();
@@ -351,6 +351,10 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 
 	public void setScanPath(String scanPath) {
 		this.scanPath = scanPath;
+	}
+
+	public boolean isFailure(NettyClientHandle t) throws Exception {
+		return false;
 	}
 
 }

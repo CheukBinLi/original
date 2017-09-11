@@ -3,6 +3,9 @@ package com.cheuks.bin.original.rmi.net.netty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.cheuks.bin.original.rmi.model.ConsumerValueModel;
+import com.cheuks.bin.original.rmi.net.netty.client.NettyClient;
+
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 
@@ -19,26 +22,40 @@ import io.netty.channel.ChannelFutureListener;
 public class SimpleChannelFutureListener implements ChannelFutureListener {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SimpleChannelFutureListener.class);
-	private String applicationCode;
+
+	ConsumerValueModel consumerValueModel;
 
 	private final NettyClient nettyClient;
 
 	public void operationComplete(ChannelFuture future) throws Exception {
-		if (!future.isSuccess()) {
-			if (LOG.isDebugEnabled())
-				LOG.debug("applicationCode:{} ,Reconnect...", applicationCode);
+		System.err.println("################");
+		if (future.isSuccess()) {
 			try {
-				nettyClient.addConnectionByServerName(applicationCode);
+				// nettyClient.operationComplete(future.channel(), consumerValueModel.getServiceName(), consumerValueModel.getConsumerName());
+				// RegisterLoadBalanceModel registerLoadBalanceModel = new RegisterLoadBalanceModel();
+				// registerLoadBalanceModel.setType(ServiceType.client);
+				// registerLoadBalanceModel.setServerName(consumerValueModel.getServerName());
+				// registerLoadBalanceModel.setServiceName(consumerValueModel.getServiceName());
+				// registerLoadBalanceModel.setUrl(consumerValueModel.getServerUrl());
+				// registerLoadBalanceModel.setValue(consumerValueModel.getConsumerName());
+				// registerLoadBalanceModel.setDesc(consumerValueModel.getConsumerUrl());
+				nettyClient.operationComplete(future.channel(), consumerValueModel.getServerName(), consumerValueModel.getServiceName(), consumerValueModel.getServerUrl(), consumerValueModel.getConsumerName(), consumerValueModel.getConsumerUrl());
+			} catch (Throwable e) {
+				throw new Exception(e);
+			}
+		} else {
+			if (LOG.isDebugEnabled())
+				LOG.debug("applicationCode:{} ,Reconnect...", consumerValueModel.getConsumerName());
+			try {
+				nettyClient.changeServerConnection(consumerValueModel);
 			} catch (Throwable e) {
 				LOG.error(null, e);
 			}
-		} else {
 		}
 	}
 
-	public SimpleChannelFutureListener(String applicationCode, final NettyClient nettyClient) {
-		super();
-		this.applicationCode = applicationCode;
+	public SimpleChannelFutureListener(NettyClient nettyClient, ConsumerValueModel consumerValueModel) {
+		this.consumerValueModel = consumerValueModel;
 		this.nettyClient = nettyClient;
 	}
 

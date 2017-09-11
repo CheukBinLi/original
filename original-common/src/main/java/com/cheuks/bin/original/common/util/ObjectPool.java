@@ -35,6 +35,15 @@ public interface ObjectPool<T> {
 	void invalidateObject(T t) throws Exception;
 
 	/***
+	 * 检测失效标记,失效直接移除
+	 * 
+	 * @param t
+	 * @return
+	 * @throws Exception
+	 */
+	boolean isFailure(T t) throws Exception;
+
+	/***
 	 * 添加对象
 	 * 
 	 * @param t

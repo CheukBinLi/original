@@ -42,8 +42,10 @@ public abstract class AbstractObjectPool<T, V> implements ObjectPool<T> {
 	private final Thread invalidateDetection = new Thread(new Runnable() {
 		public void run() {
 			Entry<T, Long> tempResource;
+			T tempQResource;
 			long now;
 			Iterator<Entry<T, Long>> it;
+			Iterator<T> qIt;
 			int invalidateCount;
 			try {
 				while (!interrupt) {
@@ -51,6 +53,7 @@ public abstract class AbstractObjectPool<T, V> implements ObjectPool<T> {
 					invalidateCount = 0;
 					now = System.currentTimeMillis();
 					it = BORROW_QUEUE.entrySet().iterator();
+					// 借出过期检测
 					while (it.hasNext()) {
 						tempResource = it.next();
 						if (now >= tempResource.getValue()) {
@@ -62,6 +65,14 @@ public abstract class AbstractObjectPool<T, V> implements ObjectPool<T> {
 							} finally {
 								BORROW_QUEUE.remove(tempResource.getKey());
 							}
+						}
+					}
+					// 失效检测
+					qIt = QUEUE.iterator();
+					while (qIt.hasNext()) {
+						tempQResource = qIt.next();
+						if (isFailure(tempQResource)) {
+							QUEUE.remove(tempQResource);
 						}
 					}
 					invalidateReBuildObject(invalidateCount);
@@ -121,6 +132,14 @@ public abstract class AbstractObjectPool<T, V> implements ObjectPool<T> {
 		QUEUE.addLast(t);
 	}
 
+	public AbstractObjectPool() {
+		this(-1);
+		this.poolName = "default_" + System.currentTimeMillis();
+	}
+	public AbstractObjectPool(String poolName) {
+		this(-1);
+		this.poolName = poolName;
+	}
 	public AbstractObjectPool(int poolSize) {
 		super();
 		invalidateDetection.start();
@@ -133,14 +152,14 @@ public abstract class AbstractObjectPool<T, V> implements ObjectPool<T> {
 		}
 	}
 
+	public AbstractObjectPool(int poolSize, String poolName) {
+		this(poolSize);
+		this.poolName = poolName;
+	}
+
 	public void shutdown() {
 		interrupt = true;
 		invalidateDetection.interrupt();
-	}
-
-	public AbstractObjectPool() {
-		this(-1);
-		this.poolName = "default_" + System.currentTimeMillis();
 	}
 
 	public String getPoolName() {

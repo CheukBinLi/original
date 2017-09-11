@@ -5,8 +5,17 @@ import java.io.Serializable;
 public class RegistryModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	private String serverAddress;
 	private int maxRetries;
-	private String address;
+
+	public String getServerAddress() {
+		return serverAddress;
+	}
+
+	public RegistryModel setServerAddress(String serverAddress) {
+		this.serverAddress = serverAddress;
+		return this;
+	}
 
 	public int getMaxRetries() {
 		return maxRetries;
@@ -14,15 +23,6 @@ public class RegistryModel implements Serializable {
 
 	public RegistryModel setMaxRetries(int maxRetries) {
 		this.maxRetries = maxRetries;
-		return this;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public RegistryModel setAddress(String address) {
-		this.address = address;
 		return this;
 	}
 

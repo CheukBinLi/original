@@ -72,6 +72,7 @@
 		<module>original-config</module>
 		<module>original-reflect</module>
 		<module>original-registration-center</module>
+		<module>original-message-queue</module>
 		<module>original-session</module>
 		<module>original-test</module>
 		<module>original-web</module>

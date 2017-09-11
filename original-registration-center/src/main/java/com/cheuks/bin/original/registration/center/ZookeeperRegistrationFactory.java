@@ -131,6 +131,7 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 			throw new Throwable("the serviceDirectory must be start with /");
 		byte[] result;
 		result = curatorFramework.getData().forPath(serviceDirectory);
+		System.err.println(new String(result));
 		return null == result ? null : new String(result);
 	}
 
@@ -148,13 +149,13 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 		curatorFramework.delete().forPath(serviceDirectory);
 	}
 
-	//	public boolean isRegister(String directory, String value) throws Throwable {
-	//		boolean result;
-	//		if (result = isRegister(directory)) {
-	//			curatorFramework.setData().forPath(directory, null == value ? new byte[0] : value.getBytes());
-	//		}
-	//		return result;
-	//	}
+	// public boolean isRegister(String directory, String value) throws Throwable {
+	// boolean result;
+	// if (result = isRegister(directory)) {
+	// curatorFramework.setData().forPath(directory, null == value ? new byte[0] : value.getBytes());
+	// }
+	// return result;
+	// }
 
 	public boolean isRegister(String directory) throws Throwable {
 		return null != curatorFramework.checkExists().forPath(directory);
@@ -232,7 +233,7 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 		}
 	}
 
-	public void init() throws Throwable {
+	public void start() throws Throwable {
 		if (isInit)
 			return;
 		isInit = true;
@@ -307,6 +308,11 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 		this.maxRetries = maxRetries;
 	}
 
+	public ZookeeperRegistrationFactory(String serverList) {
+		super();
+		this.serverList = serverList;
+	}
+
 	public ZookeeperRegistrationFactory() {
 		super();
 	}
@@ -315,7 +321,7 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 		ZookeeperRegistrationFactory zrf = new ZookeeperRegistrationFactory();
 		zrf.serverList = "192.168.3.12:2181";
 		try {
-			zrf.init();
+			zrf.start();
 			String directory = zrf.createService("/service", new RegistrationEventListener<PathChildrenCacheEvent>() {
 
 				public void nodeChanged(PathChildrenCacheEvent params, Object... obj) throws Exception {

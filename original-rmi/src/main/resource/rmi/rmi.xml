@@ -6,12 +6,15 @@
 	">
 
 	<rmi:config>
-		<rmi:registry address="192.168.1.1" />
-		<rmi:protocol port="119" />
+		<rmi:registry serverAddress="192.168.3.66:2181" />
+		<rmi:protocol port="119" localAddress="192.168.3.78" localName="ben-pc" />
 	</rmi:config>
 
-	<rmi:service-group applicationName="AAAABBBB">
-		<rmi:service interface="A123" id="CCTV-1" />
+	<rmi:service-group applicationName="NBA">
+		<rmi:service id="CCTV-1" interface="com.cheuks.bin.original.rmi.t.test2I" class="com.cheuks.bin.original.rmi.t.test2" />
 	</rmi:service-group>
+	<rmi:reference-group applicationName="NBA">
+		<rmi:reference interface="com.cheuks.bin.original.rmi.t.test2I" id="CCTV2" />
+	</rmi:reference-group>
 
 </beans>

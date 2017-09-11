@@ -20,24 +20,30 @@ public class SimpleLdapFactory implements RmiContant {
 		return INSTANCE;
 	}
 
-	public String getServersDirectory() {
-		return RMI_LDAP_ROOT + RMI_LDAP_SERVERS;
+	public String getRootDirectory() {
+		return LDAP_ROOT;
+	}
+	public String getRmiRootDirectory() {
+		return LDAP_ROOT + RMI_LDAP_RMI_ROOT;
+	}
+	public String getServiceDirectory() {
+		return LDAP_ROOT + RMI_LDAP_RMI_ROOT + RMI_LDAP_RMI_SERVICE;
 	}
 
 	public String getProviderDirectory(String applicationName) {
-		return RMI_LDAP_ROOT + null == applicationName ? (applicationName + "/") : "" + RMI_LDAP_PROVIDER;
+		return LDAP_ROOT + RMI_LDAP_RMI_ROOT + RMI_LDAP_RMI_PROVIDER + (null == applicationName ? "" : "/" + applicationName);
 	}
 
 	public String getConsumerDirectory(String applicationName) {
-		return RMI_LDAP_ROOT + null == applicationName ? (applicationName + "/") : "" + RMI_LDAP_CONSUMER;
+		return LDAP_ROOT + RMI_LDAP_RMI_ROOT + RMI_LDAP_RMI_CONSUMER + (null == applicationName ? "" : "/" + applicationName);
 	}
 
 	public String getLoadDirectory(String applicationName) {
-		return RMI_LDAP_ROOT + null == applicationName ? (applicationName + "/") : "" + RMI_LDAP_LOAD;
+		return LDAP_ROOT + RMI_LDAP_RMI_ROOT + RMI_LDAP_RMI_LOAD + (null == applicationName ? "" : "/" + applicationName);
 	}
 
 	public String getLedderDirectory(String applicationName) {
-		return RMI_LDAP_ROOT + null == applicationName ? (applicationName + "/") : "" + RMI_LDAP_LEDDER;
+		return LDAP_ROOT + RMI_LDAP_RMI_ROOT + RMI_LDAP_RMI_LEDDER + (null == applicationName ? "" : "/" + applicationName);
 	}
 
 	public String getProviderDirectory() {
@@ -47,13 +53,32 @@ public class SimpleLdapFactory implements RmiContant {
 	public String getConsumerDirectory() {
 		return getConsumerDirectory(null);
 	}
-	//
-	//	public String getLoadDirectory() {
-	//		return getLoadDirectory(null);
-	//	}
-	//
-	//	public String getLedderDirectory() {
-	//		return getLedderDirectory(null);
-	//	}
+
+	public String getLoadDirectory() {
+		return getLoadDirectory(null);
+	}
+
+	public String getLedderDirectory() {
+		return getLedderDirectory(null);
+	}
+
+	/***
+	 * 拼接目录
+	 * 
+	 * @param directory
+	 * @return
+	 */
+	public String joinPath(String... directory) {
+		if (null == directory || directory.length < 1)
+			return "";
+		StringBuilder sb = new StringBuilder();
+		if (!directory[0].startsWith("/")) {
+			sb.append("/");
+		}
+		for (String path : directory) {
+			sb.append(path).append("/");
+		}
+		return sb.substring(0, sb.length() - 1);
+	}
 
 }

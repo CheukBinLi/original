@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.cheuks.bin.original.common.rmi.RmiInvokeClient;
 import com.cheuks.bin.original.common.rmi.model.TransmissionModel;
 import com.cheuks.bin.original.common.util.ObjectPoolManager;
+import com.cheuks.bin.original.rmi.net.netty.client.NettyClientHandle;
 
 /***
  * 远程方法简单实现

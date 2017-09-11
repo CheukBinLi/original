@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.NodeCache;
@@ -185,7 +184,7 @@ public class RegisterServiceServerHandler implements RegisterService {
 	public String register(String directory, String value) throws Throwable {
 		if (isRegister)
 			return null;
-		registrationFactory.init();
+		registrationFactory.start();
 		isRegister = true;
 		registrationFactory.createService(SERVICE_ROOT, null);
 		registrationFactory.createService(SERVICE_ROOT + SERVICE_PRODUCER, producerEventListener);

@@ -4,6 +4,11 @@ import java.util.List;
 
 public interface RegistrationFactory<Client, SubNodeEvent, NodeEvent> {
 
+	/***
+	 * 服务器地址
+	 * 
+	 * @param url
+	 */
 	void setUrl(String url);
 
 	Client getClient();
@@ -90,5 +95,5 @@ public interface RegistrationFactory<Client, SubNodeEvent, NodeEvent> {
 	 * 
 	 * @throws Throwable
 	 */
-	void init() throws Throwable;
+	void start() throws Throwable;
 }

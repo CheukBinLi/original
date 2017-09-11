@@ -24,6 +24,7 @@ public interface RmiContant {
 	int RMI_SERVICE_TYPE_HEAR_BEAT = 0XAAAC;
 
 	String RMI_CONFIG_ELEMENT_REGISTRY = "registry";
+	String RMI_CONFIG_ELEMENT_SCAN = "scan";
 	String RMI_CONFIG_ELEMENT_PROTOCOL = "protocol";
 	String RMI_CONFIG_ELEMENT_SERVICE = "service";
 	String RMI_CONFIG_ELEMENT_REFERENCE = "reference";
@@ -32,12 +33,14 @@ public interface RmiContant {
 	String RMI_CONFIG_BEAN_SERVICE_GROUP = "rmiServiceGroupConfig";
 	String RMI_CONFIG_BEAN_REFERENCE_GROUP = "rmiReferenceGroupConfig";
 	String RMI_CONFIG_BEAN_REGISTRY = "rmiRegistryConfig";
+	String RMI_CONFIG_BEAN_SCAN = "rmiscanConfig";
 	String RMI_CONFIG_BEAN_PROTOCOL = "rmiProtocolConfig";
 
-	String RMI_LDAP_ROOT = "original/rmi/";
-	String RMI_LDAP_SERVERS = "servers/";
-	String RMI_LDAP_PROVIDER = "provider/";
-	String RMI_LDAP_CONSUMER = "consumer/";
-	String RMI_LDAP_LOAD = "load/";
-	String RMI_LDAP_LEDDER = "ledder/";
+	String LDAP_ROOT = "/original";
+	String RMI_LDAP_RMI_ROOT = "/rmi";
+	String RMI_LDAP_RMI_SERVICE = "/service";
+	String RMI_LDAP_RMI_PROVIDER = "/provider";
+	String RMI_LDAP_RMI_CONSUMER = "/consumer";
+	String RMI_LDAP_RMI_LOAD = "/load";
+	String RMI_LDAP_RMI_LEDDER = "/ledder";
 }

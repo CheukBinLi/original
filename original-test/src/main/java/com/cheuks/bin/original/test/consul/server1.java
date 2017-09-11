@@ -23,7 +23,6 @@ public class server1 {
 
     public void server_health() {
         Thread thread = new Thread(new Runnable() {
-            @Override
             public void run() {
                 try {
                     int port = 10010;
