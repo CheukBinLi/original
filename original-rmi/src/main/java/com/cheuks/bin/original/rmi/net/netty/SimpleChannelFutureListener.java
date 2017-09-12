@@ -3,8 +3,8 @@ package com.cheuks.bin.original.rmi.net.netty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cheuks.bin.original.rmi.model.ConsumerValueModel;
-import com.cheuks.bin.original.rmi.net.netty.client.NettyClient;
+import com.cheuks.bin.original.common.rmi.model.ConsumerValueModel;
+import com.cheuks.bin.original.common.rmi.net.NetworkClient;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -25,13 +25,11 @@ public class SimpleChannelFutureListener implements ChannelFutureListener {
 
 	ConsumerValueModel consumerValueModel;
 
-	private final NettyClient nettyClient;
+	private final NetworkClient nettyClient;
 
 	public void operationComplete(ChannelFuture future) throws Exception {
-		System.err.println("################");
 		if (future.isSuccess()) {
 			try {
-				// nettyClient.operationComplete(future.channel(), consumerValueModel.getServiceName(), consumerValueModel.getConsumerName());
 				// RegisterLoadBalanceModel registerLoadBalanceModel = new RegisterLoadBalanceModel();
 				// registerLoadBalanceModel.setType(ServiceType.client);
 				// registerLoadBalanceModel.setServerName(consumerValueModel.getServerName());
@@ -54,7 +52,13 @@ public class SimpleChannelFutureListener implements ChannelFutureListener {
 		}
 	}
 
-	public SimpleChannelFutureListener(NettyClient nettyClient, ConsumerValueModel consumerValueModel) {
+	/***
+	 * 
+	 * @param nettyClient
+	 *            客户端主控
+	 * @param consumerValueModel
+	 */
+	public SimpleChannelFutureListener(NetworkClient nettyClient, ConsumerValueModel consumerValueModel) {
 		this.consumerValueModel = consumerValueModel;
 		this.nettyClient = nettyClient;
 	}

@@ -10,24 +10,25 @@ import org.slf4j.LoggerFactory;
 
 import com.cheuks.bin.original.common.rmi.LoadBalanceFactory;
 import com.cheuks.bin.original.common.rmi.RmiClient;
+import com.cheuks.bin.original.common.rmi.model.ConsumerValueModel;
 import com.cheuks.bin.original.common.rmi.model.RegisterLoadBalanceModel;
 import com.cheuks.bin.original.common.rmi.model.RegisterLoadBalanceModel.ServiceType;
+import com.cheuks.bin.original.common.rmi.net.NetworkClient;
 import com.cheuks.bin.original.common.util.AbstractObjectPool;
 import com.cheuks.bin.original.rmi.config.RmiConfigArg;
-import com.cheuks.bin.original.rmi.model.ConsumerValueModel;
 import com.cheuks.bin.original.rmi.net.netty.SimpleChannelFutureListener;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.AttributeKey;
 
-public class NettyClientPool extends AbstractObjectPool<NettyClientHandle, InetSocketAddress> implements RmiClient<String, Void, NettyClient, RmiConfigArg> {
-	private static final Logger LOG = LoggerFactory.getLogger(NettyClient.class);
+public class NettyClientPool extends AbstractObjectPool<NettyClientHandle, InetSocketAddress> implements RmiClient<String, Void, NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel>, RmiConfigArg> {
 
-	public static final AttributeKey<NettyClient> NETTY_CLIENT_OBJECT_POOL = AttributeKey.valueOf("NETTY_CLIENT_OBJECT_POOL");
+	private static final Logger LOG = LoggerFactory.getLogger(SimpleNettyClient.class);
 
 	private LoadBalanceFactory<String, Void> loadBalanceFactory;
 
-	private NettyClient nettyClient;
+	private NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel> nettyClient;
 
 	private RmiConfigArg rmiConfigArg;
 
@@ -35,8 +36,6 @@ public class NettyClientPool extends AbstractObjectPool<NettyClientHandle, InetS
 	 * 默认连接处理数,默认CPU*2
 	 */
 	private int availableProcessors;
-
-	private String serviceName;
 
 	// 连接任务
 	private Thread connectionWorker = null;
@@ -74,6 +73,10 @@ public class NettyClientPool extends AbstractObjectPool<NettyClientHandle, InetS
 			// }
 			// }
 
+			// 连接生成数
+			for (int i = 0; i < availableProcessors; i++) {
+				connectionQueue.add(new ConsumerValueModel(rmiConfigArg.getProtocolModel().getLocalName() + "_" + getPoolName() + "_" + i, getPoolName()));
+			}
 			connectionWorker = new Thread(new Runnable() {
 				public void run() {
 					try {
@@ -86,10 +89,6 @@ public class NettyClientPool extends AbstractObjectPool<NettyClientHandle, InetS
 				}
 			});
 			connectionWorker.start();
-			// 连接生成数
-			for (int i = 0; i < availableProcessors; i++) {
-				connectionQueue.add(new ConsumerValueModel(rmiConfigArg.getProtocolModel().getLocalName() + "_" + serviceName + "_" + i, serviceName));
-			}
 		}
 	}
 
@@ -113,7 +112,8 @@ public class NettyClientPool extends AbstractObjectPool<NettyClientHandle, InetS
 
 			// String address = loadBalanceFactory.getResourceAndUseRegistration(registerLoadBalanceModel);
 			List<String> address = loadBalanceFactory.getResource(registerLoadBalanceModel);
-			LOG.debug("资源服务器地址：{}", address);
+			if (LOG.isDebugEnabled())
+				LOG.debug("资源服务器地址：{}", address);
 			if (null == address || address.isEmpty())
 				throw new Throwable("not service resource online.");
 			String[] tempServerInfo = address.get(0).split("@");
@@ -130,7 +130,8 @@ public class NettyClientPool extends AbstractObjectPool<NettyClientHandle, InetS
 	@Override
 	public void invalidateReBuildObject(int count) throws Exception {
 		// 一共过期N个对象
-		LOG.info("一共过期" + count + "个对象。");
+		if (LOG.isDebugEnabled())
+			LOG.debug("连接池{}:一共过期{}个对象。", getPoolName(), count);
 	}
 
 	public void invalidateObject(NettyClientHandle t) throws Exception {
@@ -166,12 +167,7 @@ public class NettyClientPool extends AbstractObjectPool<NettyClientHandle, InetS
 		return this;
 	}
 
-	public NettyClientPool setServiceName(String serviceName) {
-		this.serviceName = serviceName;
-		return this;
-	}
-
-	public NettyClientPool setNettyClient(NettyClient client) {
+	public NettyClientPool setNettyClient(NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel> client) {
 		this.nettyClient = client;
 		return this;
 	}
@@ -180,25 +176,25 @@ public class NettyClientPool extends AbstractObjectPool<NettyClientHandle, InetS
 		super(poolSize, serviceName);
 	}
 
-	public NettyClientPool(int poolSize) {
-		super(poolSize);
-	}
-
 	public NettyClientPool(String serviceName) {
 		super(serviceName);
+	}
+
+	public RmiClient<String, Void, NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel>, RmiConfigArg> setServiceName(String serviceName) {
+		setPoolName(serviceName);
+		return this;
 	}
 
 	public boolean isFailure(NettyClientHandle t) throws Exception {
 		return !t.getChannelHandlerContext().channel().isActive();
 	}
 
-	public NettyClientPool(NettyClient nettyClient, LoadBalanceFactory<String, Void> loadBalanceFactory, RmiConfigArg rmiConfigArg, int availableProcessors, String serviceName) {
-		super();
+	public NettyClientPool(NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel> nettyClient, LoadBalanceFactory<String, Void> loadBalanceFactory, RmiConfigArg rmiConfigArg, int availableProcessors, String serviceName) {
 		this.nettyClient = nettyClient;
 		this.loadBalanceFactory = loadBalanceFactory;
 		this.rmiConfigArg = rmiConfigArg;
 		this.availableProcessors = availableProcessors;
-		this.serviceName = serviceName;
+		setPoolName(serviceName);
 	}
 
 }

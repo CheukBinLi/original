@@ -4,32 +4,36 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.ApplicationContextEvent;
 
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.cheuks.bin.original.common.rmi.RmiBeanFactory;
 import com.cheuks.bin.original.common.rmi.RmiContant;
+import com.cheuks.bin.original.common.rmi.net.NetworkClient;
 import com.cheuks.bin.original.rmi.SimpleRmiBeanFactory;
+import com.cheuks.bin.original.rmi.config.RmiConfigArg;
 import com.cheuks.bin.original.rmi.config.ReferenceGroupConfig.ReferenceGroup;
 import com.cheuks.bin.original.rmi.config.ReferenceGroupConfig.ReferenceGroupModel;
-import com.cheuks.bin.original.rmi.config.RmiConfigArg;
 import com.cheuks.bin.original.rmi.config.ServiceGroupConfig.ServiceGroup;
 import com.cheuks.bin.original.rmi.config.model.ProtocolModel;
 import com.cheuks.bin.original.rmi.config.model.RegistryModel;
 import com.cheuks.bin.original.rmi.config.model.ScanModel;
 import com.cheuks.bin.original.rmi.net.netty.NettyRmiInvokeClientImpl;
-import com.cheuks.bin.original.rmi.net.netty.client.NettyClient;
+import com.cheuks.bin.original.rmi.net.netty.client.SimpleNettyClient;
 import com.cheuks.bin.original.rmi.net.netty.client.NettyClientPool;
 import com.cheuks.bin.original.rmi.net.netty.server.NettyServer;
 
-public class SimpleRmiService implements ApplicationListener<ContextRefreshedEvent> {
+public class SimpleRmiService implements ApplicationContextAware {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SimpleRmiService.class);
 	private CacheSerialize cacheSerialize;
@@ -37,12 +41,14 @@ public class SimpleRmiService implements ApplicationListener<ContextRefreshedEve
 	private RmiBeanFactory<RmiConfigArg, Boolean> rmiBeanFactory;
 	private RmiConfigArg rmiConfigArg;
 
-	public void onApplicationEvent(ContextRefreshedEvent event) {
+	public void setApplicationContext(ApplicationContext ac) throws BeansException {
+		System.err.println(null == ac.getParent());
 		try {
 			if (LOG.isDebugEnabled())
 				LOG.debug("init -- NettyServer");
 
-			ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) event.getApplicationContext();
+			// ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) event.getApplicationContext();
+			ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) (null == ac.getParent() ? ac : ac.getParent());
 			DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getBeanFactory();
 
 			// ProtocolConfig protocolConfig = applicationContext.getBean(ProtocolConfig.class);
@@ -79,24 +85,27 @@ public class SimpleRmiService implements ApplicationListener<ContextRefreshedEve
 				defaultListableBeanFactory.registerBeanDefinition("nettyRmiServer", nettyRmiServerBean);
 
 				NettyServer nettyServer = (NettyServer) applicationContext.getBean("nettyRmiServer");
-				nettyServer.run();
+				nettyServer.start();
 			}
 			if (null != referenceGroupConfig && !referenceGroupConfig.getReferenceGroup().isEmpty()) {
-
+				
 				// 初始化客户端
 				ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
 
 				MutablePropertyValues mutablePropertyValues = new MutablePropertyValues();
-				BeanDefinition nettyRmiClientBean = new RootBeanDefinition(NettyClient.class, constructorArgumentValues, mutablePropertyValues);
-//				nettyRmiClientBean.getPropertyValues().add("rmiBeanFactory", rmiBeanFactory);
+				BeanDefinition nettyRmiClientBean = new RootBeanDefinition(SimpleNettyClient.class, constructorArgumentValues, mutablePropertyValues);
+				 nettyRmiClientBean.getPropertyValues().add("rmiBeanFactory", rmiBeanFactory);
 				nettyRmiClientBean.getPropertyValues().add("cacheSerialize", cacheSerialize);
 				nettyRmiClientBean.getPropertyValues().add("rmiConfigArg", rmiConfigArg);
 				defaultListableBeanFactory.registerBeanDefinition("nettyRmiClient", nettyRmiClientBean);
 
+				NetworkClient nettyClient = (NetworkClient) defaultListableBeanFactory.getBean("nettyRmiClient");
+
 				BeanDefinition rmiClientBean = new RootBeanDefinition(NettyRmiInvokeClientImpl.class);
+				rmiClientBean.getPropertyValues().add("nettyClient", nettyClient);
+
 				defaultListableBeanFactory.registerBeanDefinition("rmiClientBean", rmiClientBean);
-				 NettyClient nettyClient = (NettyClient) applicationContext.getBean("nettyRmiClient");
-//				NettyClient nettyClient = applicationContext.getBean(NettyClient.class);
+				// NettyClient nettyClient = applicationContext.getBean(NettyClient.class);
 				nettyClient.start();
 				// 根据服务初始各服务线程池
 				// referenceGroup

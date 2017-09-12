@@ -6,8 +6,10 @@
 	">
 
 	<rmi:config>
-		<rmi:registry serverAddress="192.168.3.66:2181" />
-		<rmi:protocol port="119" localAddress="192.168.3.78" localName="ben-pc" />
+		<!-- <rmi:registry serverAddress="192.168.3.66:2181" /> -->
+		<rmi:registry serverAddress="10.73.18.96:2181" />
+		<!-- <rmi:protocol port="119" localAddress="192.168.3.78" localName="ben-pc" /> -->
+		<rmi:protocol port="119" localAddress="10.73.18.93" localName="ben-pc" />
 	</rmi:config>
 
 	<rmi:service-group applicationName="NBA">

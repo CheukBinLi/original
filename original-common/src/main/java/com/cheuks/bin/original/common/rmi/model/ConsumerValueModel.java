@@ -1,12 +1,28 @@
-package com.cheuks.bin.original.rmi.model;
+package com.cheuks.bin.original.common.rmi.model;
 
+/***
+ * 
+ * @Title: original-rmi
+ * @Description: 消费者连接信息模型
+ * @Company:
+ * @Email: 20796698@qq.com
+ * @author cheuk.bin.li
+ * @date 2017年9月12日 上午9:55:37
+ *
+ */
 public class ConsumerValueModel {
 
-	private String consumerName;
+	// 服务名
 	private String serviceName;
-	private String serverName;
-	private String serverUrl;
+	// 消费者名
+	private String consumerName;
+	// 消费者连接地址
 	private String consumerUrl;
+	// 被连接服务器名称
+	private String serverName;
+	// 被连接服务器地址
+	private String serverUrl;
+
 	public String getConsumerName() {
 		return consumerName;
 	}

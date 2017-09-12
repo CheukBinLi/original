@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.rmi.model;
+package com.cheuks.bin.original.common.rmi.model;
 
 public class ProviderValueModel implements Comparable<ProviderValueModel> {
 	private String serverName;

@@ -9,6 +9,8 @@ public class ObjectPoolManager<T, V> {
 
 	private final Map<String, AbstractObjectPool<T, V>> POOL = new ConcurrentSkipListMap<String, AbstractObjectPool<T, V>>();
 
+	private int tryAgain = 10;
+
 	public AbstractObjectPool<T, V> getPool(String poolName) throws Throwable {
 		return POOL.get(poolName);
 	}
@@ -37,11 +39,15 @@ public class ObjectPoolManager<T, V> {
 	}
 
 	public T borrowObject(String poolName) throws Throwable {
-		AbstractObjectPool<T, V> pool = POOL.get(poolName);
-		if (null == pool) {
-			throw new NullPointerException("can't found objectPool is [" + poolName + "],you can check it.");
+		int tryCount = tryAgain;
+		while (true) {
+			AbstractObjectPool<T, V> pool = POOL.get(poolName);
+			if (null != pool) {
+				return pool.borrowObject();
+			} else if (tryCount-- < 0)
+				throw new NullPointerException("can't found objectPool is [" + poolName + "],you can check it.");
+			Thread.sleep(500);
 		}
-		return pool.borrowObject();
 	}
 
 	public void returnObject(String poolName, T t) throws Throwable {

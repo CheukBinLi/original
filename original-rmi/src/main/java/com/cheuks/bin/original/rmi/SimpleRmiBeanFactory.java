@@ -20,9 +20,9 @@ import com.cheuks.bin.original.common.rmi.RmiBeanFactory;
 import com.cheuks.bin.original.common.rmi.RmiException;
 import com.cheuks.bin.original.common.rmi.RmiInvokeClient;
 import com.cheuks.bin.original.common.rmi.model.ClassBean;
+import com.cheuks.bin.original.rmi.config.RmiConfigArg;
 import com.cheuks.bin.original.rmi.config.ReferenceGroupConfig.ReferenceGroup;
 import com.cheuks.bin.original.rmi.config.ReferenceGroupConfig.ReferenceGroupModel;
-import com.cheuks.bin.original.rmi.config.RmiConfigArg;
 import com.cheuks.bin.original.rmi.config.ServiceGroupConfig.ServiceGroup;
 import com.cheuks.bin.original.rmi.config.ServiceGroupConfig.ServiceGroupModel;
 import com.cheuks.bin.original.rmi.config.model.ReferenceModel;
@@ -180,7 +180,7 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory<RmiConfigArg, Boolea
 
 						// 注册
 						BeanDefinitionBuilder bean = BeanDefinitionBuilder.genericBeanDefinition(classBean.getProxyClassFile());
-//						bean.addPropertyValue("rmiClientInvokeMethod", applicationContext.getBean("rmiClientBean"));
+						// bean.addPropertyValue("rmiClientInvokeMethod", applicationContext.getBean("rmiClientBean"));
 						bean.addPropertyValue("rmiClientInvokeMethod", applicationContext.getBean(NettyRmiInvokeClientImpl.class));
 						if (multiInstance)
 							bean.setScope("prototype");
@@ -251,7 +251,7 @@ public class SimpleRmiBeanFactory implements RmiBeanFactory<RmiConfigArg, Boolea
 			newClass.addInterface(orginalClass);
 		else
 			newClass.setSuperclass(orginalClass);
-		
+
 		// 添加注入
 		// 添加 rmiclient里的field
 		CtField rmiClientInvokeMethod = CtField.make(String.format("public %s rmiClientInvokeMethod;", rmiClientInterface.getName(), rmiClientImpl.getName()), newClass);

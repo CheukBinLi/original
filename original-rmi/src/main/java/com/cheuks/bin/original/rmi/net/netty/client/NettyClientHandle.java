@@ -1,12 +1,17 @@
 package com.cheuks.bin.original.rmi.net.netty.client;
 
+import java.net.InetSocketAddress;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cheuks.bin.original.common.rmi.model.TransmissionModel;
 import com.cheuks.bin.original.common.rmi.net.MessageHandle;
-import com.cheuks.bin.original.common.util.ObjectPoolManager;
+import com.cheuks.bin.original.common.rmi.net.NetworkClient;
+import com.cheuks.bin.original.rmi.config.RmiConfigArg;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -16,7 +21,7 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 
 	private static final Logger LOG = LoggerFactory.getLogger(NettyClientHandle.class);
 
-	private NettyClient nettyClient;
+	private NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel> nettyClient;
 
 	private volatile ChannelHandlerContext channelHandlerContext;
 
@@ -30,7 +35,6 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, TransmissionModel msg) throws Exception {
-		// System.out.println("收到消息_交给 invoke handler处理");
 		if (MessageHandle.RMI_SERVICE_TYPE_RESPONSE == msg.getServiceType()) {
 			setResult(msg);
 		}
@@ -59,32 +63,17 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		System.out.println(ctx.channel().remoteAddress());
 		ctx.close();
 		ctx.channel().close();
 		super.channelInactive(ctx);
-		LOG.warn("disconnect: reconnection");
+		if (LOG.isDebugEnabled())
+			LOG.debug("disconnect: reconnection");
 		try {
-			// NettyClient nettyClientObjectPool = ctx.channel().attr(NettyClient.NETTY_CLIENT_OBJECT_POOL).get();
-			// nettyClientObjectPool.removeObject(this);
-			// nettyClientObjectPool.cancleRegistration(ctx.channel());
+			// 断线重连
 			nettyClient.changeServerConnection(this);
 		} catch (Throwable e1) {
 			throw new Exception(e1);
 		}
-		// 断线重连
-		// try {
-		// // registerClientHandler.unRegister(id);
-		// loadBalanceFactory.cancleRegistration(id);
-		// } catch (Throwable e) {
-		// LOG.error(null, e);
-		// }
-
-		// try {
-		// nettyClientObjectPool.addConnectionByServerName(id);
-		// } catch (Throwable e) {
-		// LOG.error(null, e);
-		// }
 	}
 
 	@Override
@@ -94,7 +83,7 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 		ctx.channel().close();
 	}
 
-	public NettyClientHandle(NettyClient nettyClient) {
+	public NettyClientHandle(NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel> nettyClient) {
 		super();
 		this.nettyClient = nettyClient;
 	}

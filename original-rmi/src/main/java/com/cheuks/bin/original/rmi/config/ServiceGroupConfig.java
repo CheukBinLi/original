@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

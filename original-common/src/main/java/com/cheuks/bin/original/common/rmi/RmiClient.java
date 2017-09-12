@@ -3,13 +3,13 @@ package com.cheuks.bin.original.common.rmi;
 /***
  * 
  * @Title: original-common
- * @Description:
- *               <p>
- *               T :LoadBalanceFactory 方法带resource返回类型
- *               <p>
- *               R:LoadBalanceFactory 方法带registration返回类型
- *               <p>
- *               C 连接客户端类型
+ * @Description:客户端接口
+ *                    <p>
+ *                    T :LoadBalanceFactory 方法带resource返回类型
+ *                    <p>
+ *                    R:LoadBalanceFactory 方法带registration返回类型
+ *                    <p>
+ *                    C 连接客户端类型
  * @Company:
  * @Email: 20796698@qq.com
  * @author cheuk.bin.li
@@ -25,14 +25,37 @@ package com.cheuks.bin.original.common.rmi;
  */
 public interface RmiClient<T, R, C, CONFIG> {
 
+	/***
+	 * 设置参数集合
+	 * 
+	 * @param rmiConfigArg
+	 * @return
+	 */
 	RmiClient<T, R, C, CONFIG> setRmiConfigArg(CONFIG rmiConfigArg);
 
+	/***
+	 * 负载工厂
+	 * 
+	 * @return
+	 */
 	LoadBalanceFactory<T, R> getLoadBalanceFactory();
 
 	RmiClient<T, R, C, CONFIG> setLoadBalanceFactory(LoadBalanceFactory<T, R> loadBalanceFactory);
 
+	/***
+	 * 服务名
+	 * 
+	 * @param serviceName
+	 * @return
+	 */
 	RmiClient<T, R, C, CONFIG> setServiceName(String serviceName);
 
+	/***
+	 * 客户端这主控对象
+	 * 
+	 * @param client
+	 * @return
+	 */
 	RmiClient<T, R, C, CONFIG> setNettyClient(C client);
 
 }

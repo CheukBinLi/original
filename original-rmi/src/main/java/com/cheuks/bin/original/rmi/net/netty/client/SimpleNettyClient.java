@@ -10,12 +10,14 @@ import org.slf4j.LoggerFactory;
 import com.cheuks.bin.original.cache.FstCacheSerialize;
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.cheuks.bin.original.common.rmi.LoadBalanceFactory;
+import com.cheuks.bin.original.common.rmi.RmiBeanFactory;
+import com.cheuks.bin.original.common.rmi.model.ConsumerValueModel;
 import com.cheuks.bin.original.common.rmi.model.RegisterLoadBalanceModel;
 import com.cheuks.bin.original.common.rmi.model.RegisterLoadBalanceModel.ServiceType;
+import com.cheuks.bin.original.common.rmi.net.NetworkClient;
 import com.cheuks.bin.original.common.util.AbstractObjectPool;
 import com.cheuks.bin.original.common.util.ObjectPoolManager;
 import com.cheuks.bin.original.rmi.config.RmiConfigArg;
-import com.cheuks.bin.original.rmi.model.ConsumerValueModel;
 import com.cheuks.bin.original.rmi.net.ZookeeperLoadBalanceFactory;
 import com.cheuks.bin.original.rmi.net.netty.NettyMessageDecoder;
 import com.cheuks.bin.original.rmi.net.netty.NettyMessageEncoder;
@@ -36,11 +38,11 @@ import io.netty.handler.timeout.IdleStateHandler;
  * @author ben
  *
  */
-public class NettyClient {
+public class SimpleNettyClient implements NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(NettyClient.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SimpleNettyClient.class);
 
-	private ObjectPoolManager<NettyClientHandle, InetSocketAddress> objectPoolManager;
+	private volatile ObjectPoolManager<NettyClientHandle, InetSocketAddress> objectPoolManager;
 
 	// session跟服务关联
 	private Map<String, ConsumerValueModel> sessionInfo = new ConcurrentSkipListMap<String, ConsumerValueModel>();
@@ -48,6 +50,8 @@ public class NettyClient {
 	private RmiConfigArg rmiConfigArg;
 
 	private LoadBalanceFactory<String, Void> loadBalanceFactory;
+
+	private RmiBeanFactory<RmiConfigArg, Boolean> rmiBeanFactory;
 
 	private Bootstrap client;
 
@@ -57,14 +61,24 @@ public class NettyClient {
 
 	private volatile boolean isInit;
 
-	public NettyClient() {
+	public SimpleNettyClient() {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#start()
+	 */
 	public void start() {
 		if (isInit)
 			return;
 		isInit = true;
 		try {
+			if (null == rmiBeanFactory) {
+				// rmiBeanFactory = new SimpleRmiBeanFactory();
+				throw new NullPointerException("rmiBeanFactory is null");
+			}
+			// 参数
 			if (null == cacheSerialize)
 				cacheSerialize = new FstCacheSerialize();
 			if (null == loadBalanceFactory) {
@@ -78,6 +92,7 @@ public class NettyClient {
 			if (null == objectPoolManager) {
 				objectPoolManager = new ObjectPoolManager<NettyClientHandle, InetSocketAddress>();
 			}
+			rmiBeanFactory.start(rmiConfigArg, false);
 			if (null == rmiConfigArg)
 				throw new NullPointerException("can't found rmiConfigArg instance.");
 			client = new Bootstrap();
@@ -85,13 +100,12 @@ public class NettyClient {
 			worker = new NioEventLoopGroup((temp = rmiConfigArg.getProtocolModel().getNetWorkThreads()) > 0 ? temp : Runtime.getRuntime().availableProcessors() * 2);
 			client.group(worker).option(ChannelOption.TCP_NODELAY, true).channel(NioSocketChannel.class);
 			client.handler(new ChannelInitializer<SocketChannel>() {
-
 				@Override
 				protected void initChannel(SocketChannel ch) throws Exception {
 					ch.pipeline().addLast(new NettyMessageDecoder(rmiConfigArg.getProtocolModel().getFrameLength(), 4, 4, cacheSerialize));
 					ch.pipeline().addLast(new NettyMessageEncoder(cacheSerialize));
 					ch.pipeline().addLast(new IdleStateHandler(0, 0, rmiConfigArg.getProtocolModel().getHeartbeat()));
-					ch.pipeline().addLast(new NettyClientHandle(NettyClient.this));
+					ch.pipeline().addLast(new NettyClientHandle(SimpleNettyClient.this));
 				}
 			});
 		} catch (Throwable e) {
@@ -99,20 +113,35 @@ public class NettyClient {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#getObjectPoolManager()
+	 */
 	public ObjectPoolManager<NettyClientHandle, InetSocketAddress> getObjectPoolManager() {
 		return objectPoolManager;
 	}
 
-	public NettyClient setObjectPoolManager(ObjectPoolManager<NettyClientHandle, InetSocketAddress> objectPoolManager) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#setObjectPoolManager(com.cheuks.bin.original.common.util.ObjectPoolManager)
+	 */
+	public SimpleNettyClient setObjectPoolManager(ObjectPoolManager<NettyClientHandle, InetSocketAddress> objectPoolManager) {
 		this.objectPoolManager = objectPoolManager;
 		return this;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#getClient()
+	 */
 	public Bootstrap getClient() {
 		return client;
 	}
 
-	public NettyClient setClient(Bootstrap client) {
+	public SimpleNettyClient setClient(Bootstrap client) {
 		this.client = client;
 		return this;
 	}
@@ -121,7 +150,12 @@ public class NettyClient {
 		return rmiConfigArg;
 	}
 
-	public NettyClient setRmiConfigArg(RmiConfigArg rmiConfigArg) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#setRmiConfigArg(com.cheuks.bin.original.rmi.config.RmiConfigArg)
+	 */
+	public SimpleNettyClient setRmiConfigArg(RmiConfigArg rmiConfigArg) {
 		this.rmiConfigArg = rmiConfigArg;
 		return this;
 	}
@@ -130,29 +164,58 @@ public class NettyClient {
 		return cacheSerialize;
 	}
 
-	public NettyClient setCacheSerialize(CacheSerialize cacheSerialize) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#setCacheSerialize(com.cheuks.bin.original.common.cache.CacheSerialize)
+	 */
+	public SimpleNettyClient setCacheSerialize(CacheSerialize cacheSerialize) {
 		this.cacheSerialize = cacheSerialize;
 		return this;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#getLoadBalanceFactory()
+	 */
 	public LoadBalanceFactory<String, Void> getLoadBalanceFactory() {
 		return loadBalanceFactory;
 	}
 
-	public NettyClient setLoadBalanceFactory(LoadBalanceFactory<String, Void> loadBalanceFactory) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#setLoadBalanceFactory(com.cheuks.bin.original.common.rmi.LoadBalanceFactory)
+	 */
+	public SimpleNettyClient setLoadBalanceFactory(LoadBalanceFactory<String, Void> loadBalanceFactory) {
 		this.loadBalanceFactory = loadBalanceFactory;
 		return this;
 	}
 
-	/***
-	 * 连接完城
+	public RmiBeanFactory<RmiConfigArg, Boolean> getRmiBeanFactory() {
+		return rmiBeanFactory;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param channel
-	 * @throws Throwable
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#setRmiBeanFactory(com.cheuks.bin.original.common.rmi.RmiBeanFactory)
+	 */
+	public SimpleNettyClient setRmiBeanFactory(RmiBeanFactory<RmiConfigArg, Boolean> rmiBeanFactory) {
+		this.rmiBeanFactory = rmiBeanFactory;
+		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#operationComplete(io.netty.channel.Channel, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public void operationComplete(Channel channel, String serverName, String serviceName, String serverUrl, String consumerName, String consumerUrl) throws Throwable {
-		sessionInfo.put(channel.id().asLongText(), new ConsumerValueModel(serverName, serviceName));
-		// 注册
+		synchronized (sessionInfo) {
+			sessionInfo.put(channel.id().asLongText(), new ConsumerValueModel(serverName, serviceName));
+		} // 注册
 		RegisterLoadBalanceModel registerLoadBalanceModel = new RegisterLoadBalanceModel();
 		registerLoadBalanceModel.setType(ServiceType.client);
 		registerLoadBalanceModel.setServerName(serverName);
@@ -176,16 +239,19 @@ public class NettyClient {
 		return sessionInfo.remove(channel.id().asLongText());
 	}
 
-	/***
-	 * 连接完成，向对象池添加，worker
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param nettyClientHandle
-	 * @throws Throwable
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#addWorker(com.cheuks.bin.original.rmi.net.netty.client.NettyClientHandle)
 	 */
 	public synchronized void addWorker(NettyClientHandle nettyClientHandle) throws Throwable {
 		ConsumerValueModel serverInfo = getServerInfo(nettyClientHandle.getChannelHandlerContext().channel());
 		if (null == serverInfo) {
-			throw new NullPointerException("can't found sessionId's value.");
+			synchronized (sessionInfo) {
+				serverInfo = getServerInfo(nettyClientHandle.getChannelHandlerContext().channel());
+				if (null == serverInfo)
+					throw new NullPointerException("can't found sessionId's value.");
+			}
 		} else {
 			AbstractObjectPool<NettyClientHandle, InetSocketAddress> pool = objectPoolManager.getPool(serverInfo.getServiceName());
 			NettyClientPool nettyClientPool;
@@ -199,11 +265,10 @@ public class NettyClient {
 		}
 	}
 
-	/***
-	 * 掉线更搞服务器
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param nettyClientHandle
-	 * @throws Throwable
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#changeServerConnection(com.cheuks.bin.original.rmi.net.netty.client.NettyClientHandle)
 	 */
 	public void changeServerConnection(NettyClientHandle nettyClientHandle) throws Throwable {
 		ConsumerValueModel serverInfo = removeServerInfo(nettyClientHandle.getChannelHandlerContext().channel());
@@ -217,6 +282,11 @@ public class NettyClient {
 			((NettyClientPool) pool).addConnectionByServerName(serverInfo);
 		}
 	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#changeServerConnection(com.cheuks.bin.original.rmi.model.ConsumerValueModel)
+	 */
 	public void changeServerConnection(ConsumerValueModel consumerValueModel) throws Throwable {
 		AbstractObjectPool<NettyClientHandle, InetSocketAddress> pool = objectPoolManager.getPool(consumerValueModel.getServiceName());
 		if (null == pool)

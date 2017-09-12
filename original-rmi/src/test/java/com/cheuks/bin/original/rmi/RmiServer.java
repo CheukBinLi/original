@@ -1,13 +1,19 @@
 package com.cheuks.bin.original.rmi;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
 
 import com.cheuks.bin.original.rmi.net.SimpleRmiService;
 import com.cheuks.bin.original.rmi.t.test2I;
 
+@Component
 public class RmiServer {
 
-	public static void main(String[] args) {
+//	@Autowired
+	private test2I test2i;
+
+	public static void main(String[] args) throws InterruptedException {
 
 		// PropertyConfigurator.configure("log4j.properties");
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("rmi/application-config.xml");
@@ -15,9 +21,14 @@ public class RmiServer {
 
 		SimpleRmiService simpleRmiService = applicationContext.getBean(SimpleRmiService.class);
 
-		test2I t = (test2I) applicationContext.getBean("CCTV-1");
-		System.err.println(t.a3("xxx", 10));
 		SimpleRmiBeanFactory factory = applicationContext.getBean(SimpleRmiBeanFactory.class);
+
+		 Thread.sleep(5000);
+		// test2I t = (test2I) applicationContext.getBean("CCTV2");
+		// System.err.println(t.a3("xxx", 10));
+
+		RmiServer rmiServer = applicationContext.getBean(RmiServer.class);
+		rmiServer.test2i.a4("xxxxxxxxxxxxx");
 
 	}
 

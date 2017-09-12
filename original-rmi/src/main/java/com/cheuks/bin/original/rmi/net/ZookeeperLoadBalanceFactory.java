@@ -13,10 +13,10 @@ import com.cheuks.bin.original.common.registrationcenter.ElectionCallBack;
 import com.cheuks.bin.original.common.registrationcenter.RegistrationEventListener;
 import com.cheuks.bin.original.common.registrationcenter.RegistrationFactory;
 import com.cheuks.bin.original.common.rmi.LoadBalanceFactory;
+import com.cheuks.bin.original.common.rmi.model.ProviderValueModel;
 import com.cheuks.bin.original.common.rmi.model.RegisterLoadBalanceModel;
 import com.cheuks.bin.original.common.rmi.model.RegisterLoadBalanceModel.ServiceType;
 import com.cheuks.bin.original.registration.center.ZookeeperRegistrationFactory;
-import com.cheuks.bin.original.rmi.model.ProviderValueModel;
 
 public class ZookeeperLoadBalanceFactory implements LoadBalanceFactory<String, Void> {
 
