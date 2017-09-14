@@ -6,9 +6,7 @@
 		<artifactId>original</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>com.cheuks.bin</groupId>
 	<artifactId>original-test</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>original-test</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -195,12 +193,7 @@
 			<version>1.46</version>
 		</dependency>
 
-<!-- 		<dependency>
-			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka_2.10</artifactId>
-			<version>0.10.2.0</version>
-			<scope>test</scope>
-		</dependency> -->
+		<!-- <dependency> <groupId>org.apache.kafka</groupId> <artifactId>kafka_2.10</artifactId> <version>0.10.2.0</version> <scope>test</scope> </dependency> -->
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>

@@ -6,9 +6,7 @@
 		<artifactId>original</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>com.cheuks.bin</groupId>
 	<artifactId>original-web-common</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>original-web Maven Webapp</name>
 	<url>http://maven.apache.org</url>

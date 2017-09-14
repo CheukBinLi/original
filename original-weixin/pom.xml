@@ -6,9 +6,7 @@
 		<artifactId>original</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>com.cheuks.bin</groupId>
 	<artifactId>original-weixin</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>original-weixin</name>
 	<url>http://maven.apache.org</url>
 	<properties>

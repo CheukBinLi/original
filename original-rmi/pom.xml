@@ -6,10 +6,8 @@
 		<artifactId>original</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>com.cheuks.bin</groupId>
 	<artifactId>original-rmi</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>original-reflect</name>
+	<name>original-rmi</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
