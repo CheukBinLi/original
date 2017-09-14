@@ -10,14 +10,13 @@ import org.slf4j.LoggerFactory;
 import com.cheuks.bin.original.cache.FstCacheSerialize;
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.cheuks.bin.original.common.rmi.LoadBalanceFactory;
-import com.cheuks.bin.original.common.rmi.RmiBeanFactory;
 import com.cheuks.bin.original.common.rmi.model.ConsumerValueModel;
 import com.cheuks.bin.original.common.rmi.model.RegisterLoadBalanceModel;
 import com.cheuks.bin.original.common.rmi.model.RegisterLoadBalanceModel.ServiceType;
 import com.cheuks.bin.original.common.rmi.net.NetworkClient;
-import com.cheuks.bin.original.common.util.AbstractObjectPool;
-import com.cheuks.bin.original.common.util.ObjectPoolManager;
-import com.cheuks.bin.original.rmi.config.RmiConfigArg;
+import com.cheuks.bin.original.common.util.pool.AbstractObjectPool;
+import com.cheuks.bin.original.common.util.pool.ObjectPoolManager;
+import com.cheuks.bin.original.rmi.config.RmiConfig.RmiConfigGroup;
 import com.cheuks.bin.original.rmi.net.ZookeeperLoadBalanceFactory;
 import com.cheuks.bin.original.rmi.net.netty.NettyMessageDecoder;
 import com.cheuks.bin.original.rmi.net.netty.NettyMessageEncoder;
@@ -38,20 +37,18 @@ import io.netty.handler.timeout.IdleStateHandler;
  * @author ben
  *
  */
-public class SimpleNettyClient implements NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel> {
+public class NettyNetworkClient implements NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, Channel, RmiConfigGroup> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SimpleNettyClient.class);
+	private static final Logger LOG = LoggerFactory.getLogger(NettyNetworkClient.class);
 
-	private volatile ObjectPoolManager<NettyClientHandle, InetSocketAddress> objectPoolManager;
+	private ObjectPoolManager<NettyClientHandle, InetSocketAddress> objectPoolManager;
 
 	// session跟服务关联
 	private Map<String, ConsumerValueModel> sessionInfo = new ConcurrentSkipListMap<String, ConsumerValueModel>();
 
-	private RmiConfigArg rmiConfigArg;
+	private RmiConfigGroup rmiConfigGroup;
 
 	private LoadBalanceFactory<String, Void> loadBalanceFactory;
-
-	private RmiBeanFactory<RmiConfigArg, Boolean> rmiBeanFactory;
 
 	private Bootstrap client;
 
@@ -61,7 +58,7 @@ public class SimpleNettyClient implements NetworkClient<Bootstrap, NettyClientHa
 
 	private volatile boolean isInit;
 
-	public SimpleNettyClient() {
+	public NettyNetworkClient() {
 	}
 
 	/*
@@ -70,14 +67,11 @@ public class SimpleNettyClient implements NetworkClient<Bootstrap, NettyClientHa
 	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#start()
 	 */
 	public void start() {
+		System.err.println("start client");
 		if (isInit)
 			return;
 		isInit = true;
 		try {
-			if (null == rmiBeanFactory) {
-				// rmiBeanFactory = new SimpleRmiBeanFactory();
-				throw new NullPointerException("rmiBeanFactory is null");
-			}
 			// 参数
 			if (null == cacheSerialize)
 				cacheSerialize = new FstCacheSerialize();
@@ -86,26 +80,26 @@ public class SimpleNettyClient implements NetworkClient<Bootstrap, NettyClientHa
 				 * @todo 根据协议区分
 				 */
 				loadBalanceFactory = new ZookeeperLoadBalanceFactory();
-				loadBalanceFactory.setUrl(rmiConfigArg.getRegistryModel().getServerAddress());
-				loadBalanceFactory.init();
+				loadBalanceFactory.setUrl(rmiConfigGroup.getRegistryModel().getServerAddress());
 			}
+			loadBalanceFactory.init();
 			if (null == objectPoolManager) {
 				objectPoolManager = new ObjectPoolManager<NettyClientHandle, InetSocketAddress>();
 			}
-			rmiBeanFactory.start(rmiConfigArg, false);
-			if (null == rmiConfigArg)
-				throw new NullPointerException("can't found rmiConfigArg instance.");
+			// rmiBeanFactory.start(rmiConfigArg, false);
+			if (null == rmiConfigGroup)
+				throw new NullPointerException("can't found rmiConfigGroup instance.");
 			client = new Bootstrap();
 			int temp;
-			worker = new NioEventLoopGroup((temp = rmiConfigArg.getProtocolModel().getNetWorkThreads()) > 0 ? temp : Runtime.getRuntime().availableProcessors() * 2);
+			worker = new NioEventLoopGroup((temp = rmiConfigGroup.getProtocolModel().getNetWorkThreads()) > 0 ? temp : Runtime.getRuntime().availableProcessors() * 2);
 			client.group(worker).option(ChannelOption.TCP_NODELAY, true).channel(NioSocketChannel.class);
 			client.handler(new ChannelInitializer<SocketChannel>() {
 				@Override
 				protected void initChannel(SocketChannel ch) throws Exception {
-					ch.pipeline().addLast(new NettyMessageDecoder(rmiConfigArg.getProtocolModel().getFrameLength(), 4, 4, cacheSerialize));
+					ch.pipeline().addLast(new NettyMessageDecoder(rmiConfigGroup.getProtocolModel().getFrameLength(), 4, 4, cacheSerialize));
 					ch.pipeline().addLast(new NettyMessageEncoder(cacheSerialize));
-					ch.pipeline().addLast(new IdleStateHandler(0, 0, rmiConfigArg.getProtocolModel().getHeartbeat()));
-					ch.pipeline().addLast(new NettyClientHandle(SimpleNettyClient.this));
+					ch.pipeline().addLast(new IdleStateHandler(0, 0, rmiConfigGroup.getProtocolModel().getHeartbeat()));
+					ch.pipeline().addLast(new NettyClientHandle(NettyNetworkClient.this));
 				}
 			});
 		} catch (Throwable e) {
@@ -119,35 +113,25 @@ public class SimpleNettyClient implements NetworkClient<Bootstrap, NettyClientHa
 	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#getObjectPoolManager()
 	 */
 	public ObjectPoolManager<NettyClientHandle, InetSocketAddress> getObjectPoolManager() {
-		return objectPoolManager;
+		return this.objectPoolManager;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#setObjectPoolManager(com.cheuks.bin.original.common.util.ObjectPoolManager)
-	 */
-	public SimpleNettyClient setObjectPoolManager(ObjectPoolManager<NettyClientHandle, InetSocketAddress> objectPoolManager) {
+	public NettyNetworkClient setObjectPoolManager(ObjectPoolManager<NettyClientHandle, InetSocketAddress> objectPoolManager) {
 		this.objectPoolManager = objectPoolManager;
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#getClient()
-	 */
 	public Bootstrap getClient() {
 		return client;
 	}
 
-	public SimpleNettyClient setClient(Bootstrap client) {
+	public NettyNetworkClient setClient(Bootstrap client) {
 		this.client = client;
 		return this;
 	}
 
-	public RmiConfigArg getRmiConfigArg() {
-		return rmiConfigArg;
+	public RmiConfigGroup getRmiConfigGroup() {
+		return this.rmiConfigGroup;
 	}
 
 	/*
@@ -155,8 +139,8 @@ public class SimpleNettyClient implements NetworkClient<Bootstrap, NettyClientHa
 	 * 
 	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#setRmiConfigArg(com.cheuks.bin.original.rmi.config.RmiConfigArg)
 	 */
-	public SimpleNettyClient setRmiConfigArg(RmiConfigArg rmiConfigArg) {
-		this.rmiConfigArg = rmiConfigArg;
+	public NettyNetworkClient setRmiConfigGroup(RmiConfigGroup rmiConfigGroup) {
+		this.rmiConfigGroup = rmiConfigGroup;
 		return this;
 	}
 
@@ -169,7 +153,7 @@ public class SimpleNettyClient implements NetworkClient<Bootstrap, NettyClientHa
 	 * 
 	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#setCacheSerialize(com.cheuks.bin.original.common.cache.CacheSerialize)
 	 */
-	public SimpleNettyClient setCacheSerialize(CacheSerialize cacheSerialize) {
+	public NettyNetworkClient setCacheSerialize(CacheSerialize cacheSerialize) {
 		this.cacheSerialize = cacheSerialize;
 		return this;
 	}
@@ -188,22 +172,8 @@ public class SimpleNettyClient implements NetworkClient<Bootstrap, NettyClientHa
 	 * 
 	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#setLoadBalanceFactory(com.cheuks.bin.original.common.rmi.LoadBalanceFactory)
 	 */
-	public SimpleNettyClient setLoadBalanceFactory(LoadBalanceFactory<String, Void> loadBalanceFactory) {
+	public NettyNetworkClient setLoadBalanceFactory(LoadBalanceFactory<String, Void> loadBalanceFactory) {
 		this.loadBalanceFactory = loadBalanceFactory;
-		return this;
-	}
-
-	public RmiBeanFactory<RmiConfigArg, Boolean> getRmiBeanFactory() {
-		return rmiBeanFactory;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#setRmiBeanFactory(com.cheuks.bin.original.common.rmi.RmiBeanFactory)
-	 */
-	public SimpleNettyClient setRmiBeanFactory(RmiBeanFactory<RmiConfigArg, Boolean> rmiBeanFactory) {
-		this.rmiBeanFactory = rmiBeanFactory;
 		return this;
 	}
 
@@ -253,10 +223,10 @@ public class SimpleNettyClient implements NetworkClient<Bootstrap, NettyClientHa
 					throw new NullPointerException("can't found sessionId's value.");
 			}
 		} else {
-			AbstractObjectPool<NettyClientHandle, InetSocketAddress> pool = objectPoolManager.getPool(serverInfo.getServiceName());
+			AbstractObjectPool<NettyClientHandle, InetSocketAddress> pool = this.objectPoolManager.getPool(serverInfo.getServiceName());
 			NettyClientPool nettyClientPool;
 			if (null == pool) {
-				nettyClientPool = new NettyClientPool(this, loadBalanceFactory, rmiConfigArg, -1, serverInfo.getServiceName());
+				nettyClientPool = new NettyClientPool(this, serverInfo.getServiceName());
 				nettyClientPool.addObject(nettyClientHandle);
 				objectPoolManager.addPool(nettyClientPool);
 			} else {

@@ -1,9 +1,11 @@
-package com.cheuks.bin.original.common.util;
+package com.cheuks.bin.original.common.util.xml;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
+import com.cheuks.bin.original.common.util.ReflectionCache;
+import com.cheuks.bin.original.common.util.ReflectionUtil;
 
 /***
  * 

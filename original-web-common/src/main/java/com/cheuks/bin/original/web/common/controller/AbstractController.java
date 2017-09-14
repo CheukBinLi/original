@@ -12,9 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cheuks.bin.original.common.dbmanager.LogicStatus;
-import com.cheuks.bin.original.common.util.CollectionUtil;
-import com.cheuks.bin.original.common.util.JsonMsgModel;
-import com.cheuks.bin.original.common.util.ObjectFill;
+import com.cheuks.bin.original.common.util.conver.CollectionUtil;
+import com.cheuks.bin.original.common.util.conver.JsonMsgModel;
+import com.cheuks.bin.original.common.util.conver.ObjectFill;
 import com.cheuks.bin.original.common.web.common.controller.BaseController;
 
 public abstract class AbstractController<ModelAndView> extends ObjectFill implements BaseController<HttpServletRequest, HttpServletResponse, JsonMsgModel, ModelAndView> {

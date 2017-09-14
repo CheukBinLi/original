@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import com.cheuks.bin.original.common.cache.redis.RedisExcecption;
 import com.cheuks.bin.original.common.cache.redis.RedisFactory;
 import com.cheuks.bin.original.common.cache.redis.RedisLua;
-import com.cheuks.bin.original.common.util.Scan;
-import com.cheuks.bin.original.common.util.ScanSimple;
+import com.cheuks.bin.original.common.util.scan.Scan;
+import com.cheuks.bin.original.common.util.scan.ScanSimple;
 
 public class RedisLuaSimple implements RedisLua {
 

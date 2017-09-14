@@ -4,11 +4,12 @@ import java.net.InetSocketAddress;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.cheuks.bin.original.common.rmi.RmiInvokeClient;
 import com.cheuks.bin.original.common.rmi.model.TransmissionModel;
 import com.cheuks.bin.original.common.rmi.net.NetworkClient;
-import com.cheuks.bin.original.rmi.config.RmiConfigArg;
+import com.cheuks.bin.original.rmi.config.RmiConfig.RmiConfigGroup;
 import com.cheuks.bin.original.rmi.net.netty.client.NettyClientHandle;
 
 import io.netty.bootstrap.Bootstrap;
@@ -24,7 +25,8 @@ public class NettyRmiInvokeClientImpl implements RmiInvokeClient {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NettyRmiInvokeClientImpl.class);
 
-	private NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel> nettyClient;
+	@Autowired
+	private NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, Channel, RmiConfigGroup> rmiNetworkClient;
 
 	public Object rmiInvoke(String applicationName, String methodName, Object... params) {
 		TransmissionModel transmissionModel = new TransmissionModel();
@@ -33,11 +35,13 @@ public class NettyRmiInvokeClientImpl implements RmiInvokeClient {
 		try {
 			try {
 				// nettyClientHandle = nettyClientFactory.borrowObject();
-				nettyClientHandle = nettyClient.getObjectPoolManager().borrowObject(applicationName);
+				nettyClientHandle = rmiNetworkClient.getObjectPoolManager().borrowObject(applicationName);
 				nettyClientHandle.getObject().getChannelHandlerContext().writeAndFlush(transmissionModel);
 				transmissionModel = nettyClientHandle.callBack();
 				// return transmissionModel.getResult();
-				if (null != transmissionModel.getError()) {
+				if (null == transmissionModel) {
+					throw new RuntimeException("server is busy,try again");
+				} else if (null != transmissionModel.getError()) {
 					LOG.error(null, transmissionModel.getError());
 					return null;
 				}
@@ -47,7 +51,7 @@ public class NettyRmiInvokeClientImpl implements RmiInvokeClient {
 			}
 		} finally {
 			try {
-				nettyClient.getObjectPoolManager().returnObject(applicationName, nettyClientHandle);
+				rmiNetworkClient.getObjectPoolManager().returnObject(applicationName, nettyClientHandle);
 			} catch (Throwable e) {
 				LOG.error(null, e);
 			}
@@ -55,12 +59,12 @@ public class NettyRmiInvokeClientImpl implements RmiInvokeClient {
 		return null;
 	}
 
-	public NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel> getNettyClient() {
-		return nettyClient;
+	public NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, Channel, RmiConfigGroup> getRmiNetworkClient() {
+		return rmiNetworkClient;
 	}
 
-	public void setNettyClient(NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel> nettyClient) {
-		this.nettyClient = nettyClient;
+	public void setRmiNetworkClient(NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, Channel, RmiConfigGroup> rmiNetworkClient) {
+		this.rmiNetworkClient = rmiNetworkClient;
 	}
 
 }

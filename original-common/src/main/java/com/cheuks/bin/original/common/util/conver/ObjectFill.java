@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.common.util;
+package com.cheuks.bin.original.common.util.conver;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
+import com.cheuks.bin.original.common.util.ReflectionUtil;
 
 public class ObjectFill {
 
@@ -112,7 +113,7 @@ public class ObjectFill {
 		return t;
 	}
 
-	protected Object getValue(Class<?> c, Object data) {
+	public Object getValue(Class<?> c, Object data) {
 		String simpleName = c.getSimpleName();
 		boolean isArray = data.getClass().isArray();
 		try {

@@ -21,7 +21,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.cheuks.bin.original.common.dbmanager.QueryFactory;
-import com.cheuks.bin.original.common.util.Scan;
+import com.cheuks.bin.original.common.util.scan.Scan;
 
 public abstract class AbstractQueryFactory implements QueryType, QueryFactory {
 

@@ -175,6 +175,9 @@ public class ZookeeperLoadBalanceFactory implements LoadBalanceFactory<String, V
 			 * value: ""
 			 */
 			registrationFactory.register(simpleLdapFactory.getConsumerDirectory(registerInfo.getServerName()), "", null);
+		} else if (ServiceType.load == registerInfo.getType()) {
+			String serverName = new ProviderValueModel(registerInfo.getServerName(), registerInfo.getUrl()).getValue();
+			registrationFactory.setValue(simpleLdapFactory.getLoadDirectory(serverName), registerInfo.getValue());
 		}
 		return null;
 	}

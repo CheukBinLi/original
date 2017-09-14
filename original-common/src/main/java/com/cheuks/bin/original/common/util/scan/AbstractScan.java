@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.common.util;
+package com.cheuks.bin.original.common.util.scan;
 
 import java.util.Map;
 import java.util.Set;

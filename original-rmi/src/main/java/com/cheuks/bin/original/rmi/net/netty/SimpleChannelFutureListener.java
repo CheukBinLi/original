@@ -19,6 +19,7 @@ import io.netty.channel.ChannelFutureListener;
  * @date 2017年5月1日 上午7:51:49
  *
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class SimpleChannelFutureListener implements ChannelFutureListener {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SimpleChannelFutureListener.class);

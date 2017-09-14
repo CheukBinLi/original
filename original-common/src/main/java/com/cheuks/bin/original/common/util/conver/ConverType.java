@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.common.util;
+package com.cheuks.bin.original.common.util.conver;
 
 @SuppressWarnings("unchecked")
 public class ConverType extends ObjectFill {

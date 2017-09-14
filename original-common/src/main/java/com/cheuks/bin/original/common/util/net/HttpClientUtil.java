@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.common.util;
+package com.cheuks.bin.original.common.util.net;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

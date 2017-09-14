@@ -2,9 +2,8 @@ package com.cheuks.bin.original.common.rmi.net;
 
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.cheuks.bin.original.common.rmi.LoadBalanceFactory;
-import com.cheuks.bin.original.common.rmi.RmiBeanFactory;
 import com.cheuks.bin.original.common.rmi.model.ConsumerValueModel;
-import com.cheuks.bin.original.common.util.ObjectPoolManager;
+import com.cheuks.bin.original.common.util.pool.ObjectPoolManager;
 
 /***
  * 
@@ -18,9 +17,9 @@ import com.cheuks.bin.original.common.util.ObjectPoolManager;
  *      <p>
  *      S, V LoadBalanceFactory 的类型(<String, Void>)
  *      <p>
- *      R, B RmiBeanFactory 的类型(<RmiConfigArg, Boolean>)
- *      <p>
  *      C operationComplete 的类型(<Channel>)
+ *      <p>
+ *      R rmiConfigGroup 配置集合
  * @Company:
  * @Email: 20796698@qq.com
  * @author cheuk.bin.li
@@ -28,7 +27,7 @@ import com.cheuks.bin.original.common.util.ObjectPoolManager;
  *
  *       defaultType : <Bootstrap,NettyClientHandle,InetSocketAddress,String,Void,RmiConfigArg,Boolean,Channel>
  */
-public interface NetworkClient<T, H, I, S, V, R, B, C> {
+public interface NetworkClient<T, H, I, S, V, C, R> {
 
 	/***
 	 * 初始化
@@ -37,19 +36,19 @@ public interface NetworkClient<T, H, I, S, V, R, B, C> {
 
 	ObjectPoolManager<H, I> getObjectPoolManager();
 
-	NetworkClient<T, H, I, S, V, R, B, C> setObjectPoolManager(ObjectPoolManager<H, I> objectPoolManager);
+	NetworkClient<T, H, I, S, V, C, R> setObjectPoolManager(ObjectPoolManager<H, I> objectPoolManager);
 
 	T getClient();
 
-	NetworkClient<T, H, I, S, V, R, B, C> setRmiConfigArg(R rmiConfigArg);
-
-	NetworkClient<T, H, I, S, V, R, B, C> setCacheSerialize(CacheSerialize cacheSerialize);
+	NetworkClient<T, H, I, S, V, C, R> setCacheSerialize(CacheSerialize cacheSerialize);
 
 	LoadBalanceFactory<S, V> getLoadBalanceFactory();
 
-	NetworkClient<T, H, I, S, V, R, B, C> setLoadBalanceFactory(LoadBalanceFactory<S, V> loadBalanceFactory);
+	NetworkClient<T, H, I, S, V, C, R> setLoadBalanceFactory(LoadBalanceFactory<S, V> loadBalanceFactory);
 
-	NetworkClient<T, H, I, S, V, R, B, C> setRmiBeanFactory(RmiBeanFactory<R, B> rmiBeanFactory);
+	R getRmiConfigGroup();
+
+	NetworkClient<T, H, I, S, V, C, R> setRmiConfigGroup(R rmiConfigGroup);
 
 	/***
 	 * 连接完城

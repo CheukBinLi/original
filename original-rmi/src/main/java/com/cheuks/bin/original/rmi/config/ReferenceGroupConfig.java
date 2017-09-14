@@ -11,8 +11,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.cheuks.bin.original.common.rmi.RmiContant;
-import com.cheuks.bin.original.common.util.CollectionUtil;
+import com.cheuks.bin.original.common.util.conver.CollectionUtil;
+import com.cheuks.bin.original.common.util.pool.ObjectPoolManager;
+import com.cheuks.bin.original.rmi.GenerateRmiBeanFactory;
 import com.cheuks.bin.original.rmi.config.model.ReferenceModel;
+import com.cheuks.bin.original.rmi.net.netty.NettyRmiInvokeClientImpl;
+import com.cheuks.bin.original.rmi.net.netty.client.NettyNetworkClient;
 
 public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 
@@ -20,11 +24,13 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 
 	@Override
 	public AbstractConfig makeConfig(Element element, ParserContext parserContext) {
-		doParser(element.getAttribute(RMI_CONFIG_ATTRIBUTE_APPLICATION_NAME), element, parserContext);
+		String applicationName = element.getAttribute(RMI_CONFIG_ATTRIBUTE_APPLICATION_NAME);
+		ReferenceGroupModel referenceGroupModel = doParser(applicationName, element, parserContext);
+		doGenerate(parserContext, referenceGroupModel, applicationName);
 		return this;
 	}
 
-	private void doParser(String applicationName, Element element, ParserContext parserContext) {
+	private ReferenceGroupModel doParser(String applicationName, Element element, ParserContext parserContext) {
 		NodeList list = element.getChildNodes();
 		ReferenceGroupModel referenceGroupModel = getServiceGroupModel(parserContext, applicationName);
 		ReferenceModel referenceModel;
@@ -32,7 +38,6 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 		Element tempElement;
 		for (int i = 0, len = list.getLength(); i < len; i++) {
 			node = list.item(i);
-			System.err.println(RMI_CONFIG_ELEMENT_REFERENCE + "==" + node.getNodeName() + "  ||  " + node.getLocalName());
 			if (RMI_CONFIG_ELEMENT_REFERENCE.equals(node.getNodeName()) || RMI_CONFIG_ELEMENT_REFERENCE.equals(node.getLocalName())) {
 				tempElement = (Element) node;
 				referenceModel = new ReferenceModel();
@@ -40,10 +45,46 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 				referenceModel.setInterfaceName(tempElement.getAttribute("interface"));
 				referenceModel.setVersion(tempElement.getAttribute("version"));
 				referenceModel.setMultiInstance(Boolean.valueOf(element.getAttribute("multiInstance")));
-				// referenceModels.add(referenceModel);
 				referenceGroupModel.getReferenceGroup().put(referenceModel.getId(), referenceModel);
 			}
 		}
+		return referenceGroupModel;
+	}
+
+	private void doGenerate(ParserContext parserContext, ReferenceGroupModel referenceGroupModel, String applicationName) {
+
+		if (!parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_CONFIG_GROUP)) {
+			throw new NullPointerException("The configuration sequence must be <rmi:config> in first.");
+		}
+
+		// objectPoolManager
+		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_OBJECT_POOL_MANAGER)) {
+			registerBeanDefinition(parserContext, ObjectPoolManager.class, BEAN_OBJECT_POOL_MANAGER, null);
+		}
+		// RmiNetworkClinet
+		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_NETWORK_CLIENT)) {
+			Map<String, Object> proprety = CollectionUtil.newInstance().toMap(
+						BEAN_OBJECT_POOL_MANAGER, getConfig(parserContext, BEAN_OBJECT_POOL_MANAGER), 
+						RMI_CONFIG_BEAN_CONFIG_GROUP,getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP),
+						BEAN_CACHE_SERIALIZE, getConfig(parserContext, BEAN_CACHE_SERIALIZE), 
+						BEAN_LOAD_BALANCE_FACTORY,getConfig(parserContext, BEAN_LOAD_BALANCE_FACTORY), 
+						RMI_CONFIG_BEAN_CONFIG_GROUP, getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP)
+					);
+			registerBeanDefinition(parserContext, NettyNetworkClient.class, BEAN_RMI_NETWORK_CLIENT, proprety);
+			// NettyRmiInvokeClientImpl
+			if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_INVOKE_CLIENT)) {
+//				Map<String, Object> property = CollectionUtil.newInstance().toMap(BEAN_RMI_NETWORK_CLIENT, rmiMainClient);
+				registerBeanDefinition(parserContext, NettyRmiInvokeClientImpl.class, BEAN_RMI_INVOKE_CLIENT, null);
+			}
+		}
+
+		// 生成注入
+		try {
+			GenerateRmiBeanFactory.instance().referenceGroupHandle(parserContext, referenceGroupModel, applicationName);
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -56,19 +97,11 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 			beanDefinition = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP);
 			referenceGroup = (Map<String, ReferenceGroupModel>) beanDefinition.getPropertyValues().get(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP);
 		} else {
-			// synchronized (this) {
-			// if (parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP)) {
-			// beanDefinition = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP);
-			// referenceGroup = (Map<String, ReferenceGroupModel>) beanDefinition.getPropertyValues().get(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP);
-			// } else {
 			referenceGroup = new ConcurrentSkipListMap<String, ReferenceGroupModel>();
-			// beanDefinition = new RootBeanDefinition(ReferenceGroup.class);
-			// parserContext.getRegistry().registerBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP, beanDefinition);
-			// beanDefinition.getPropertyValues().add(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP, referenceGroup = new ConcurrentSkipListMap<String, ReferenceGroupModel>());
-			// parserContext.getRegistry().registerBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP, beanDefinition);
 			registerBeanDefinition(parserContext, ReferenceGroup.class, RMI_CONFIG_BEAN_REFERENCE_GROUP, CollectionUtil.newInstance().toMap(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP, referenceGroup));
-			// }
-			// }
+			// rmiConfigGroup注入
+			BeanDefinition rmiConfigGroup = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_CONFIG_GROUP);
+			rmiConfigGroup.getPropertyValues().add(RMI_CONFIG_BEAN_CONFIG_REFERENCE_GROUP, parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP));
 		}
 
 		ReferenceGroupModel referenceGroupModel = referenceGroup.get(applicationName);
@@ -132,6 +165,6 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 			this.referenceGroup = referenceGroup;
 			return this;
 		}
-
 	}
+
 }

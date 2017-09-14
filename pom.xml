@@ -28,7 +28,8 @@
 		<fst.version>2.48</fst.version>
 		<netty-all.version>4.1.6.Final</netty-all.version>
 		<javassist.version>3.20.0-GA</javassist.version>
-		<curator.version>2.10.0</curator.version>
+		<org.apache.curator.version>2.10.0</org.apache.curator.version>
+		<com.orbitz.consul.client>0.16.3</com.orbitz.consul.client>
 		<git.jar.path>d:/lib/maven</git.jar.path>
 		<jackson.version>2.8.9</jackson.version>
 	</properties>

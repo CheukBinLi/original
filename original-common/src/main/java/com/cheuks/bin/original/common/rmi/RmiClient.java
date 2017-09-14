@@ -31,7 +31,7 @@ public interface RmiClient<T, R, C, CONFIG> {
 	 * @param rmiConfigArg
 	 * @return
 	 */
-	RmiClient<T, R, C, CONFIG> setRmiConfigArg(CONFIG rmiConfigArg);
+	// RmiClient<T, R, C, CONFIG> setRmiConfigArg(CONFIG rmiConfigArg);
 
 	/***
 	 * 负载工厂

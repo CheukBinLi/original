@@ -1,6 +1,6 @@
 package com.cheuks.bin.original.weixin;
 
-import com.cheuks.bin.original.common.util.ClassToXml;
+import com.cheuks.bin.original.common.util.xml.ClassToXml;
 import com.cheuks.bin.original.weixin.bak.messageModel.NewsMessageResponse;
 import com.cheuks.bin.original.weixin.bak.messageModel.NewsMessageResponse.NewsArticlesItem;
 import com.cheuks.bin.original.weixin.mp.model.api.Scene;

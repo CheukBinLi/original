@@ -16,7 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import com.cheuks.bin.original.common.annotation.weixin.MessageEventHandleAnnotation;
-import com.cheuks.bin.original.common.util.XmlReaderAll;
+import com.cheuks.bin.original.common.util.xml.XmlReaderAll;
 import com.cheuks.bin.original.common.weixin.mp.MessageEventHandle;
 import com.cheuks.bin.original.common.weixin.mp.MessageEventHandleManager;
 import com.cheuks.bin.original.common.weixin.mp.MessageEventHandleWorker;

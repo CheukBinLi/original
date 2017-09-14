@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.cheuks.bin.original.common.util.conver.ConverType;
+
 /***
  * 
  * @Title: original-common

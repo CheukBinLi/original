@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.common.util;
+package com.cheuks.bin.original.common.util.scan;
 
 import java.io.File;
 import java.io.IOException;

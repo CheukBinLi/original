@@ -16,7 +16,7 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.cheuks.bin.original.common.cache.redis.RedisFactory;
 import com.cheuks.bin.original.common.util.ConfigManager;
-import com.cheuks.bin.original.common.util.HttpClientUtil;
+import com.cheuks.bin.original.common.util.net.HttpClientUtil;
 import com.cheuks.bin.original.common.weixin.mp.MessageEventHandleManager;
 import com.cheuks.bin.original.common.weixin.mp.model.MessageEventModel;
 import com.cheuks.bin.original.weixin.mp.model.MpBaseModel;

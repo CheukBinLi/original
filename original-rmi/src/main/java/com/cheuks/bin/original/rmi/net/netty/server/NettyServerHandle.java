@@ -17,19 +17,22 @@ public class NettyServerHandle extends SimpleChannelInboundHandler<TransmissionM
 
 	private final MessageHandleFactory<Object, Object, Object> messageHandle;
 
+	private NettyServer nettyServer;
+
 	private AtomicInteger counter = new AtomicInteger();
 
 	private final static Logger LOG = LoggerFactory.getLogger(NettyServerHandle.class);
 
-	public NettyServerHandle(MessageHandleFactory<Object, Object, Object> messageHandle) {
+	public NettyServerHandle(NettyServer nettyServer, MessageHandleFactory<Object, Object, Object> messageHandle) {
+		this.nettyServer = nettyServer;
 		this.messageHandle = messageHandle;
+		nettyServer.modifyConnectionCount(1);
 	}
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, TransmissionModel msg) throws Exception {
 		// System.out.println("收到消息_交给 invoke handler处理");
 		counter.set(0);
-		// NettyHandleServiceFactory.newInstance().messageHandle(ctx, msg, msg.getServiceType());
 		messageHandle.messageHandle(ctx, msg, msg.getServiceType());
 		ReferenceCountUtil.release(msg);
 	}
@@ -39,6 +42,7 @@ public class NettyServerHandle extends SimpleChannelInboundHandler<TransmissionM
 		super.exceptionCaught(ctx, cause);
 		ctx.close();
 		ctx.channel().close();
+		nettyServer.modifyConnectionCount(-1);
 	}
 
 	@Override
@@ -57,4 +61,5 @@ public class NettyServerHandle extends SimpleChannelInboundHandler<TransmissionM
 			}
 		}
 	}
+	
 }

@@ -13,7 +13,7 @@ import java.util.Map;
  * @date 2017年9月8日 上午11:26:25
  *
  */
-public class RegisterLoadBalanceModel implements Serializable {
+public class RegisterLoadBalanceModel implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = -9081330390454362380L;
 
@@ -86,6 +86,11 @@ public class RegisterLoadBalanceModel implements Serializable {
 	public RegisterLoadBalanceModel setAdditional(Map<String, Object> additional) {
 		this.additional = additional;
 		return this;
+	}
+	
+	public Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return super.clone();
 	}
 
 }

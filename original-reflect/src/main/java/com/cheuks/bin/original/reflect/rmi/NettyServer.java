@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.cheuks.bin.original.cache.FstCacheSerialize;
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.cheuks.bin.original.common.registrationcenter.RegistrationFactory;
-import com.cheuks.bin.original.common.util.CollectionUtil;
+import com.cheuks.bin.original.common.util.conver.CollectionUtil;
 import com.cheuks.bin.original.reflect.rmi.net.MessageHandle;
 import com.cheuks.bin.original.reflect.rmi.net.netty.NettyHandleServiceFactory;
 import com.cheuks.bin.original.reflect.rmi.net.netty.NettyHearBeatServiceHandle;

@@ -6,7 +6,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import com.cheuks.bin.original.common.util.XmlReaderAll;
+import com.cheuks.bin.original.common.util.xml.XmlReaderAll;
 
 public class XmlReaderTest {
 

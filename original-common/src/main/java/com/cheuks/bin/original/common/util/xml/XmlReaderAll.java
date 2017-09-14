@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.common.util;
+package com.cheuks.bin.original.common.util.xml;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -13,6 +13,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import com.cheuks.bin.original.common.util.ReflectionCache;
+import com.cheuks.bin.original.common.util.ReflectionUtil;
+import com.cheuks.bin.original.common.util.conver.ObjectFill;
 
 /***
  * xml数据填充

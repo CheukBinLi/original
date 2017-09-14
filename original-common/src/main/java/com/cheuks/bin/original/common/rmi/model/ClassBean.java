@@ -2,6 +2,8 @@ package com.cheuks.bin.original.common.rmi.model;
 
 import java.io.Serializable;
 
+import com.cheuks.bin.original.common.rmi.RmiBeanFactory;
+
 public class ClassBean implements Serializable {
 
 	/**
@@ -62,13 +64,11 @@ public class ClassBean implements Serializable {
 		return this;
 	}
 
-	public Object getInstance() throws InstantiationException, IllegalAccessException {
-		if (this.isMultiInstance())
-			return this.proxyClassFile.newInstance();
-		else if (null == this.instance) {
+	public Object getInstance(@SuppressWarnings("rawtypes") RmiBeanFactory rmiBeanFactory) throws InstantiationException, IllegalAccessException {
+		if (null == this.instance) {
 			synchronized (this) {
 				if (null == this.instance)
-					setInstance(this.proxyClassFile.newInstance());
+					setInstance(rmiBeanFactory.getBean(this.registrationServiceName));
 			}
 		}
 		return instance;
@@ -88,8 +88,7 @@ public class ClassBean implements Serializable {
 		return this;
 	}
 
-	public ClassBean(Class<?> originalClassFile, String registrationServiceName, String version,
-			boolean multiInstance) {
+	public ClassBean(Class<?> originalClassFile, String registrationServiceName, String version, boolean multiInstance) {
 		super();
 		this.originalClassFile = originalClassFile;
 		this.registrationServiceName = registrationServiceName;
@@ -105,8 +104,8 @@ public class ClassBean implements Serializable {
 		this.instance = instance;
 	}
 
-	// public ClassBean() {
-	// super();
-	// }
+	public ClassBean() {
+		super();
+	}
 
 }

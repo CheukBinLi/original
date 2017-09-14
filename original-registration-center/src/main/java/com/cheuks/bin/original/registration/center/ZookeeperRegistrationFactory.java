@@ -131,7 +131,6 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 			throw new Throwable("the serviceDirectory must be start with /");
 		byte[] result;
 		result = curatorFramework.getData().forPath(serviceDirectory);
-		System.err.println(new String(result));
 		return null == result ? null : new String(result);
 	}
 

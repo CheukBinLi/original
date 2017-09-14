@@ -1,6 +1,7 @@
 package com.cheuks.bin.original.rmi.net.netty.server;
 
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,14 +14,13 @@ import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.common.rmi.model.RegisterLoadBalanceModel;
 import com.cheuks.bin.original.common.rmi.model.RegisterLoadBalanceModel.ServiceType;
 import com.cheuks.bin.original.common.rmi.net.MessageHandleFactory;
-import com.cheuks.bin.original.rmi.config.RmiConfigArg;
+import com.cheuks.bin.original.rmi.config.RmiConfig.RmiConfigGroup;
 import com.cheuks.bin.original.rmi.config.ServiceGroupConfig.ServiceGroupModel;
 import com.cheuks.bin.original.rmi.net.ZookeeperLoadBalanceFactory;
 import com.cheuks.bin.original.rmi.net.netty.NettyMessageDecoder;
 import com.cheuks.bin.original.rmi.net.netty.NettyMessageEncoder;
 import com.cheuks.bin.original.rmi.net.netty.message.NettyHearBeatServiceHandle;
 import com.cheuks.bin.original.rmi.net.netty.message.RmiServiceHandle;
-import com.cheuks.bin.original.rmi.net.netty.message.handle.HandleService;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -37,27 +37,25 @@ import io.netty.handler.timeout.IdleStateHandler;
 public class NettyServer implements RmiContant {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NettyServer.class);
-	private Thread task;
-
+	private RmiConfigGroup rmiConfigGroup;
 	private CacheSerialize cacheSerialize;
-	private RmiConfigArg rmiConfigArg;
-	private RmiBeanFactory<RmiConfigArg, Boolean> rmiBeanFactory;
+	private RmiBeanFactory rmiBeanFactory;
 	private MessageHandleFactory messageHandleFactory;
 	private LoadBalanceFactory<String, Void> loadBalanceFactory;
-
+	private AtomicInteger connectionCount = new AtomicInteger(0);
+	private RegisterLoadBalanceModel registerLoadBalanceModel;
+	private Thread uploadLoadInfotask;
 	private Thread work;
 
 	public synchronized void start() throws InterruptedException, NullPointerException {
-		if (null == task || !task.isInterrupted()) {
-			try {
-				int poolSize = rmiConfigArg.getProtocolModel().getHandleThreads();
-				if (poolSize < 0) {
-					poolSize = Runtime.getRuntime().availableProcessors() * 2;
-				}
-				init(poolSize);
-			} catch (Throwable e) {
-				LOG.error("NettyServer.class -method: run()", e);
+		try {
+			int poolSize = rmiConfigGroup.getProtocolModel().getHandleThreads();
+			if (poolSize < 0) {
+				poolSize = Runtime.getRuntime().availableProcessors() * 2;
 			}
+			init(poolSize);
+		} catch (Throwable e) {
+			LOG.error("NettyServer.class -method: run()", e);
 		}
 	}
 
@@ -71,13 +69,13 @@ public class NettyServer implements RmiContant {
 				throw new NullPointerException("rmiBeanFactory is null");
 			}
 			// 参数
-			rmiBeanFactory.start(rmiConfigArg, true);
+			// rmiBeanFactory.start(rmiConfigArg, true);
 
 			if (null == cacheSerialize)
 				cacheSerialize = new FstCacheSerialize();
 			if (null == messageHandleFactory) {
 				messageHandleFactory = new HandleService();
-				messageHandleFactory.start(rmiConfigArg.getProtocolModel().getHandleThreads() < 0 ? Runtime.getRuntime().availableProcessors() * 2 : rmiConfigArg.getProtocolModel().getHandleThreads());
+				messageHandleFactory.start(rmiConfigGroup.getProtocolModel().getHandleThreads() < 0 ? Runtime.getRuntime().availableProcessors() * 2 : rmiConfigGroup.getProtocolModel().getHandleThreads());
 			}
 			// messageHandleFactory = NettyHandleServiceFactory.newInstance(handleThreads);
 			// throw new NullPointerException("messageHandle is
@@ -91,24 +89,22 @@ public class NettyServer implements RmiContant {
 			// 注解目录
 			if (null == loadBalanceFactory) {
 				loadBalanceFactory = new ZookeeperLoadBalanceFactory();
-				loadBalanceFactory.setUrl(rmiConfigArg.getRegistryModel().getServerAddress());
-				loadBalanceFactory.init();
-				// throw new NullPointerException("loadBalanceFactory is null");
-				// loadBalanceFactory = new ZookeeperRegistrationFactory(zookeeperServerList, baseSleepTimeMs, maxRetries);
+				loadBalanceFactory.setUrl(rmiConfigGroup.getRegistryModel().getServerAddress());
 			}
+			loadBalanceFactory.init();
 			/***
 			 * 注册服务
 			 */
-			RegisterLoadBalanceModel registerLoadBalanceModel = new RegisterLoadBalanceModel();
-			for (Entry<String, ServiceGroupModel> en : rmiConfigArg.getServiceGroup().getServiceGroupConfig().entrySet()) {
+			for (Entry<String, ServiceGroupModel> en : rmiConfigGroup.getServiceGroup().getServiceGroupConfig().entrySet()) {
+				registerLoadBalanceModel = new RegisterLoadBalanceModel();
 				// 拥有的服务
 				registerLoadBalanceModel.setServiceName(en.getKey()).setType(ServiceType.server);
 				// 服务器主机名
-				registerLoadBalanceModel.setServerName(rmiConfigArg.getProtocolModel().getLocalName());
+				registerLoadBalanceModel.setServerName(rmiConfigGroup.getProtocolModel().getLocalName());
 				// 服务地址
-				registerLoadBalanceModel.setUrl(rmiConfigArg.getProtocolModel().getLocalAddress() + ":" + rmiConfigArg.getProtocolModel().getPort());
+				registerLoadBalanceModel.setUrl(rmiConfigGroup.getProtocolModel().getLocalAddress() + ":" + rmiConfigGroup.getProtocolModel().getPort());
 				// 健康
-				registerLoadBalanceModel.setHealthCheck(rmiConfigArg.getProtocolModel().getLocalAddress() + ":" + rmiConfigArg.getProtocolModel().getPort());
+				registerLoadBalanceModel.setHealthCheck(rmiConfigGroup.getProtocolModel().getLocalAddress() + ":" + rmiConfigGroup.getProtocolModel().getPort());
 				loadBalanceFactory.registration(registerLoadBalanceModel);
 			}
 			work = new Thread(new Runnable() {
@@ -123,14 +119,14 @@ public class NettyServer implements RmiContant {
 								@Override
 								public void initChannel(SocketChannel ch) throws Exception {
 									// 注册handler
-									ch.pipeline().addLast(new NettyMessageDecoder(rmiConfigArg.getProtocolModel().getFrameLength(), 4, 4, cacheSerialize));
+									ch.pipeline().addLast(new NettyMessageDecoder(rmiConfigGroup.getProtocolModel().getFrameLength(), 4, 4, cacheSerialize));
 									ch.pipeline().addLast(new NettyMessageEncoder(cacheSerialize));
-									ch.pipeline().addLast(new IdleStateHandler(rmiConfigArg.getProtocolModel().getHeartbeat(), 0, 0));
+									ch.pipeline().addLast(new IdleStateHandler(rmiConfigGroup.getProtocolModel().getHeartbeat(), 0, 0));
 									// 服务处理
-									ch.pipeline().addLast(new NettyServerHandle(messageHandleFactory));
+									ch.pipeline().addLast(new NettyServerHandle(NettyServer.this, messageHandleFactory));
 								}
 							});
-							server.bind(rmiConfigArg.getProtocolModel().getPort()).sync().channel().closeFuture().sync();
+							server.bind(rmiConfigGroup.getProtocolModel().getPort()).sync().channel().closeFuture().sync();
 							LOG.warn("service is close.");
 
 						} finally {
@@ -143,17 +139,51 @@ public class NettyServer implements RmiContant {
 				}
 			});
 			work.start();
+			// 更新任务
+			uploadLoadInfotask = new Thread(new Runnable() {
+				public void run() {
+					RegisterLoadBalanceModel loadBalanceModel = null;
+					try {
+						while (true) {
+							// if (connectionCount.get() % 2 > 0) {
+							if (null == loadBalanceModel) {
+								loadBalanceModel = (RegisterLoadBalanceModel) registerLoadBalanceModel.clone();
+							}
+							loadBalanceModel.setType(ServiceType.load).setValue(Integer.toString(connectionCount.get()));
+							loadBalanceFactory.registration(loadBalanceModel);
+							// }
+							synchronized (uploadLoadInfotask) {
+								uploadLoadInfotask.wait();
+							}
+						}
+					} catch (Throwable e) {
+						LOG.error(null, e);
+					}
+				}
+			});
+			uploadLoadInfotask.start();
 		}
+	}
 
+	/***
+	 * 
+	 * @param value
+	 *            基数加/减 value
+	 */
+	public void modifyConnectionCount(int value) {
+		connectionCount.addAndGet(value);
+		synchronized (uploadLoadInfotask) {
+			uploadLoadInfotask.notify();
+		}
 	}
 
 	public NettyServer() {
 		super();
 	}
 
-	public NettyServer(RmiConfigArg rmiConfigArg, RmiBeanFactory rmiBeanFactory, MessageHandleFactory<Object, Object, Object> messageHandleFactory) {
+	public NettyServer(RmiConfigGroup rmiConfigGroup, RmiBeanFactory rmiBeanFactory, MessageHandleFactory<Object, Object, Object> messageHandleFactory) {
 		super();
-		this.rmiConfigArg = rmiConfigArg;
+		this.rmiConfigGroup = rmiConfigGroup;
 		this.rmiBeanFactory = rmiBeanFactory;
 		this.messageHandleFactory = messageHandleFactory;
 	}
@@ -167,20 +197,20 @@ public class NettyServer implements RmiContant {
 		return this;
 	}
 
-	public RmiConfigArg getRmiConfigArg() {
-		return rmiConfigArg;
+	public RmiConfigGroup getRmiConfigGroup() {
+		return this.rmiConfigGroup;
 	}
 
-	public NettyServer setRmiConfigArg(RmiConfigArg rmiConfigArg) {
-		this.rmiConfigArg = rmiConfigArg;
+	public NettyServer setRmiConfigGroup(RmiConfigGroup rmiConfigGroup) {
+		this.rmiConfigGroup = rmiConfigGroup;
 		return this;
 	}
 
-	public RmiBeanFactory<RmiConfigArg, Boolean> getRmiBeanFactory() {
+	public RmiBeanFactory getRmiBeanFactory() {
 		return rmiBeanFactory;
 	}
 
-	public NettyServer setRmiBeanFactory(RmiBeanFactory<RmiConfigArg, Boolean> rmiBeanFactory) {
+	public NettyServer setRmiBeanFactory(RmiBeanFactory rmiBeanFactory) {
 		this.rmiBeanFactory = rmiBeanFactory;
 		return this;
 	}
@@ -203,29 +233,4 @@ public class NettyServer implements RmiContant {
 		return this;
 	}
 
-	public static void main(String[] args) throws Throwable {
-		// RmiBeanFactory rmiBeanFactory = DefaultRmiBeanFactory.newInstance();
-		// rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", "com.cheuks.bin.original.reflect"));
-		// NettyServer ns = new NettyServer();
-		// NettyHandleServiceFactory handleServiceFactory = NettyHandleServiceFactory.newInstance(8);
-		//
-		// ns.setPoolSize(5).setMessageHandle(handleServiceFactory).setPort(10087).setRmiBeanFactory(rmiBeanFactory).setCacheSerialize(new FstCacheSerialize());
-		// ns.run();
-
-		// NettyServer ns = new NettyServer();
-		//
-		// RegistrationFactory register = new
-		// ZookeeperRegistrationFactory(ns.getZookeeperServerList(),
-		// ns.baseSleepTimeMs, ns.maxRetries);
-		// register.init();
-		// register.createService("/abcdefg", new
-		// RegistrationEventListener<PathChildrenCacheEvent>() {
-		// public void nodeChanged(PathChildrenCacheEvent params) throws
-		// Exception {
-		// System.err.println("createService:" + new
-		// String(params.getData().getData()));
-		// }
-		// });
-
-	}
 }

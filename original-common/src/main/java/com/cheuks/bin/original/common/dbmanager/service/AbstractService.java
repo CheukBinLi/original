@@ -7,7 +7,7 @@ import java.util.Map;
 import com.cheuks.bin.original.common.dbmanager.BasePage;
 import com.cheuks.bin.original.common.dbmanager.dao.BaseDao;
 import com.cheuks.bin.original.common.util.GeneratedIDService;
-import com.cheuks.bin.original.common.util.ObjectFill;
+import com.cheuks.bin.original.common.util.conver.ObjectFill;
 
 public abstract class AbstractService<entity, ID extends Serializable> extends ObjectFill implements BaseService<entity, ID> {
 

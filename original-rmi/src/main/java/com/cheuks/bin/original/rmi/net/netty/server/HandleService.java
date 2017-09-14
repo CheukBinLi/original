@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.rmi.net.netty.message.handle;
+package com.cheuks.bin.original.rmi.net.netty.server;
 
 import java.util.Map;
 import java.util.concurrent.BlockingDeque;
@@ -67,7 +67,6 @@ public class HandleService<Input extends Object, Value extends Object> implement
 			InvokeModel invokeModel;
 			try {
 				while (!interrupt) {
-					// if (null == (invokeModel = QUEUE.poll())) {
 					if (null == (invokeModel = QUEUE.poll(pollInterval, TimeUnit.MILLISECONDS))) {
 						continue;
 					}

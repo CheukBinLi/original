@@ -10,9 +10,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.cheuks.bin.original.common.rmi.RmiBeanFactory;
 import com.cheuks.bin.original.common.rmi.RmiContant;
-import com.cheuks.bin.original.common.util.CollectionUtil;
+import com.cheuks.bin.original.common.util.conver.CollectionUtil;
+import com.cheuks.bin.original.rmi.GenerateRmiBeanFactory;
 import com.cheuks.bin.original.rmi.config.model.ServiceModel;
+import com.cheuks.bin.original.rmi.model.MethodBean;
+import com.cheuks.bin.original.rmi.net.netty.server.NettyServer;
 
 public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 
@@ -20,11 +24,13 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 
 	@Override
 	public AbstractConfig makeConfig(Element element, ParserContext parserContext) {
-		doParser(element.getAttribute(RMI_CONFIG_ATTRIBUTE_APPLICATION_NAME), element, parserContext);
+		String applicationName = element.getAttribute(RMI_CONFIG_ATTRIBUTE_APPLICATION_NAME);
+		ServiceGroupModel serviceGroup = doParser(applicationName, element, parserContext);
+		doGenerate(parserContext, serviceGroup, applicationName);
 		return this;
 	}
 
-	private void doParser(String applicationName, Element element, ParserContext parserContext) {
+	private ServiceGroupModel doParser(String applicationName, Element element, ParserContext parserContext) {
 		NodeList list = element.getChildNodes();
 		ServiceGroupModel serviceGroup = getServiceGroup(parserContext, applicationName);
 		ServiceModel serviceModel;
@@ -46,6 +52,39 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 				serviceGroup.getServices().put(serviceModel.getId(), serviceModel);
 			}
 		}
+		return serviceGroup; 
+	}
+
+	@SuppressWarnings("unchecked")
+	private void doGenerate(ParserContext parserContext, ServiceGroupModel serviceGroupModel, String applicationName) {
+
+		if (!parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_CONFIG_GROUP)) {
+			throw new NullPointerException("The configuration sequence must be <rmi:config> in first.");
+		}
+		// 调用工厂
+		BeanDefinition rmiBeanFactory = parserContext.getRegistry().getBeanDefinition(BEAN_RMI_BEAN_FACTORY);
+		Map<String, MethodBean> methodBeans = (Map<String, MethodBean>) rmiBeanFactory.getPropertyValues().get(RmiBeanFactory.POOL_OBJECT_FIELD_NAME);
+		if (null == methodBeans) {
+			rmiBeanFactory.getPropertyValues().add(RmiBeanFactory.POOL_OBJECT_FIELD_NAME, methodBeans = new ConcurrentSkipListMap<String, MethodBean>());
+		}
+		// 服务端
+		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_NETWORK_SERVER)) {
+			Map<String, Object> property = CollectionUtil.newInstance().toMap(
+						RMI_CONFIG_BEAN_CONFIG_GROUP,getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP),
+						BEAN_CACHE_SERIALIZE,getConfig(parserContext, BEAN_CACHE_SERIALIZE),
+						BEAN_RMI_BEAN_FACTORY, rmiBeanFactory,
+						BEAN_LOAD_BALANCE_FACTORY,getConfig(parserContext, BEAN_LOAD_BALANCE_FACTORY)
+					);
+			
+			registerBeanDefinition(parserContext, NettyServer.class, BEAN_RMI_NETWORK_SERVER, property);
+		}
+
+		// 生成注入
+		try {
+			GenerateRmiBeanFactory.instance().serviceGroupHandle(parserContext, serviceGroupModel, methodBeans, applicationName);
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
 
 	}
 
@@ -58,44 +97,17 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 			bean = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_SERVICE_GROUP);
 			serviceGroups = (Map<String, ServiceGroupModel>) bean.getPropertyValues().get(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG);
 		} else {
-//			bean = new RootBeanDefinition(ServiceGroup.class);
 			serviceGroups = new ConcurrentSkipListMap<String, ServiceGroupModel>();
-//			bean.getPropertyValues().add(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG, serviceGroups);
 			registerBeanDefinition(parserContext, ServiceGroup.class, RMI_CONFIG_BEAN_SERVICE_GROUP, CollectionUtil.newInstance().toMap(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG, serviceGroups));
+			// rmiConfigGroup注入
+			BeanDefinition rmiConfigGroup = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_CONFIG_GROUP);
+			rmiConfigGroup.getPropertyValues().add(RMI_CONFIG_BEAN_CONFIG_SERVICE_GROUP, parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_SERVICE_GROUP));
 		}
 		if (null == (serviceGroup = serviceGroups.get(applicationName))) {
 			serviceGroups.put(applicationName, serviceGroup = new ServiceGroupModel(applicationName, true));
 		}
 		return serviceGroup;
 	}
-
-	// List<ServiceModel> getServiceGroupList(ParserContext parserContext, String applicationName) {
-	// BeanDefinition beanDefinition = null;
-	// if (parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_SERVICE_GROUP)) {
-	// beanDefinition = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_SERVICE_GROUP);
-	// } else {
-	// synchronized (this) {
-	// if (parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_SERVICE_GROUP))
-	// beanDefinition = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_SERVICE_GROUP);
-	// else if (null == beanDefinition) {
-	// beanDefinition = new RootBeanDefinition(ServiceGroup.class);
-	// parserContext.getRegistry().registerBeanDefinition(RMI_CONFIG_BEAN_SERVICE_GROUP, beanDefinition);
-	// }
-	// }
-	// }
-	// ServiceGroup serviceGroup = beanDefinition.getPropertyValues().get("SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG");
-	// if (null == serviceGroup) {
-	// serviceGroup = new ConcurrentSkipListMap<String, List<ServiceModel>>();
-	// beanDefinition.getPropertyValues().add(RMI_CONFIG_BEAN_SERVICE_GROUP, serviceGroup);
-	// }
-	// List<ServiceModel> result = serviceGroup.get(applicationName);
-	// if (null == result) {
-	// result = new ArrayList<ServiceModel>();
-	// serviceGroup.put(applicationName, result);
-	// }
-	// return result;
-	// return null;
-	// }
 
 	public static class ServiceGroupModel implements Serializable {
 		private static final long serialVersionUID = 1L;

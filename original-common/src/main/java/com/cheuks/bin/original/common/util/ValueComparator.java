@@ -13,12 +13,11 @@ public class ValueComparator<K, V extends Number> implements Comparator<K> {
 	}
 
 	public int compare(K a, K b) {
-//		Number a1 = base.get(a);
 		if (base.get(a).longValue() >= base.get(b).longValue()) {
 			return -1;
 		} else {
 			return 1;
-		} // returning 0 would merge keys
+		}
 	}
 
 }

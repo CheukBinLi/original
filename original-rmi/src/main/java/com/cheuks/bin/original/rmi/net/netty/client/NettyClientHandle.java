@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
 import com.cheuks.bin.original.common.rmi.model.TransmissionModel;
 import com.cheuks.bin.original.common.rmi.net.MessageHandle;
 import com.cheuks.bin.original.common.rmi.net.NetworkClient;
-import com.cheuks.bin.original.rmi.config.RmiConfigArg;
+import com.cheuks.bin.original.rmi.config.RmiConfig.RmiConfigGroup;
+import com.cheuks.bin.original.rmi.net.netty.message.NettyClientMessageHandleAdapter;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -21,7 +22,7 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 
 	private static final Logger LOG = LoggerFactory.getLogger(NettyClientHandle.class);
 
-	private NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel> nettyClient;
+	private NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, Channel, RmiConfigGroup> nettyClient;
 
 	private volatile ChannelHandlerContext channelHandlerContext;
 
@@ -83,7 +84,7 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 		ctx.channel().close();
 	}
 
-	public NettyClientHandle(NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, RmiConfigArg, Boolean, Channel> nettyClient) {
+	public NettyClientHandle(NetworkClient<Bootstrap, NettyClientHandle, InetSocketAddress, String, Void, Channel, RmiConfigGroup> nettyClient) {
 		super();
 		this.nettyClient = nettyClient;
 	}

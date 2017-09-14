@@ -11,6 +11,11 @@ public interface RegistrationFactory<Client, SubNodeEvent, NodeEvent> {
 	 */
 	void setUrl(String url);
 
+	/***
+	 * 客户端:直接调API
+	 * 
+	 * @return
+	 */
 	Client getClient();
 
 	/***

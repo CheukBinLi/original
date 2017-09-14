@@ -22,7 +22,7 @@ public abstract class AbstractConfig implements Serializable, Cloneable {
 
 	public abstract AbstractConfig makeConfig(Element element, ParserContext parserContext);
 
-	protected void registerBeanDefinition(ParserContext parserContext, Class<?> bean, String beanName, Map<String, Object> pagams, Object... constructorArgumentValues) {
+	protected BeanDefinition registerBeanDefinition(ParserContext parserContext, Class<?> bean, String beanName, Map<String, Object> pagams, Object... constructorArgumentValues) {
 
 		ConstructorArgumentValues constructor = new ConstructorArgumentValues();
 		if (null != constructorArgumentValues) {
@@ -31,9 +31,12 @@ public abstract class AbstractConfig implements Serializable, Cloneable {
 		}
 		MutablePropertyValues mutablePropertyValues = new MutablePropertyValues(pagams);
 		BeanDefinition beanDefinition = new RootBeanDefinition(bean, constructor, mutablePropertyValues);
+		beanDefinition.setScope("singleton");
+		beanDefinition.setPrimary(true);
 		parserContext.getRegistry().registerBeanDefinition(beanName, beanDefinition);
+		return beanDefinition;
 	}
-
+	
 	protected BeanDefinition getConfig(ParserContext parserContext, String beanName) {
 		return parserContext.getRegistry().getBeanDefinition(beanName);
 	}

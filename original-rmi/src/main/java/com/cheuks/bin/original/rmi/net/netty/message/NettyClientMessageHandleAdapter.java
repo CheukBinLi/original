@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.rmi.net.netty.client;
+package com.cheuks.bin.original.rmi.net.netty.message;
 
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;

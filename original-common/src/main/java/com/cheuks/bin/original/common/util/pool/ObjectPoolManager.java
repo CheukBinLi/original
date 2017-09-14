@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.common.util;
+package com.cheuks.bin.original.common.util.pool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,11 +9,14 @@ public class ObjectPoolManager<T, V> {
 
 	private final Map<String, AbstractObjectPool<T, V>> POOL = new ConcurrentSkipListMap<String, AbstractObjectPool<T, V>>();
 
+	/***
+	 * 重试次数
+	 */
 	private int tryAgain = 10;
-
-	public AbstractObjectPool<T, V> getPool(String poolName) throws Throwable {
-		return POOL.get(poolName);
-	}
+	/***
+	 * 重试间隔
+	 */
+	private int tryInterval = 200;
 
 	/***
 	 * 添加池对象
@@ -23,7 +26,9 @@ public class ObjectPoolManager<T, V> {
 	 * @throws Throwable
 	 */
 	public AbstractObjectPool<T, V> addPool(AbstractObjectPool<T, V> abstractObjectPool) throws Throwable {
-		return POOL.put(abstractObjectPool.getPoolName(), abstractObjectPool);
+		synchronized (this) {
+			return POOL.put(abstractObjectPool.getPoolName(), abstractObjectPool);
+		}
 	}
 
 	public String[] getPoolNames() {
@@ -39,14 +44,14 @@ public class ObjectPoolManager<T, V> {
 	}
 
 	public T borrowObject(String poolName) throws Throwable {
-		int tryCount = tryAgain;
+		int tryCount = getTryAgain();
 		while (true) {
 			AbstractObjectPool<T, V> pool = POOL.get(poolName);
 			if (null != pool) {
 				return pool.borrowObject();
 			} else if (tryCount-- < 0)
 				throw new NullPointerException("can't found objectPool is [" + poolName + "],you can check it.");
-			Thread.sleep(500);
+			Thread.sleep(getTryInterval());
 		}
 	}
 
@@ -56,6 +61,28 @@ public class ObjectPoolManager<T, V> {
 			throw new NullPointerException("can't found objectPool is [" + poolName + "],fail by return object,you can check it.");
 		}
 		result.returnObject(t);
+	}
+
+	public AbstractObjectPool<T, V> getPool(String poolName) throws Throwable {
+		return POOL.get(poolName);
+	}
+
+	public int getTryAgain() {
+		return tryAgain;
+	}
+
+	public ObjectPoolManager<T, V> setTryAgain(int tryAgain) {
+		this.tryAgain = tryAgain;
+		return this;
+	}
+
+	public int getTryInterval() {
+		return tryInterval;
+	}
+
+	public ObjectPoolManager<T, V> setTryInterval(int tryInterval) {
+		this.tryInterval = tryInterval;
+		return this;
 	}
 
 }

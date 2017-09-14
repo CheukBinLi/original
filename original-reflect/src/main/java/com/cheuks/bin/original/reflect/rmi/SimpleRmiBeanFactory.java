@@ -20,9 +20,9 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.cheuks.bin.original.common.annotation.rmi.RmiClient;
 import com.cheuks.bin.original.common.annotation.rmi.RmiServer;
-import com.cheuks.bin.original.common.util.ConverType;
-import com.cheuks.bin.original.common.util.Scan;
-import com.cheuks.bin.original.common.util.ScanSimple;
+import com.cheuks.bin.original.common.util.conver.ConverType;
+import com.cheuks.bin.original.common.util.scan.Scan;
+import com.cheuks.bin.original.common.util.scan.ScanSimple;
 import com.cheuks.bin.original.reflect.Reflection;
 import com.cheuks.bin.original.reflect.config.ReferenceConfig;
 import com.cheuks.bin.original.reflect.config.ServiceConfig;
