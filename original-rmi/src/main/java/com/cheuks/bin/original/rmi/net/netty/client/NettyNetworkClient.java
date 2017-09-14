@@ -249,7 +249,8 @@ public class NettyNetworkClient implements NetworkClient<Bootstrap, NettyClientH
 			if (null == pool)
 				throw new NullPointerException("can't found sessionId's value.");
 			// 断开重连接
-			((NettyClientPool) pool).addConnectionByServerName(serverInfo);
+			pool.removeObject(nettyClientHandle);
+			((NettyClientPool) pool).addConnectionByServerName(serverInfo.setTryAgain(rmiConfigGroup.getRegistryModel().getMaxRetries()));
 		}
 	}
 	/*

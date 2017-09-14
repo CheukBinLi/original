@@ -8,8 +8,6 @@ import com.cheuks.bin.original.common.registrationcenter.RegistrationEventListen
 import com.cheuks.bin.original.common.registrationcenter.RegistrationFactory;
 import com.google.common.net.HostAndPort;
 import com.orbitz.consul.Consul;
-import com.orbitz.consul.cache.ConsulCache;
-import com.orbitz.consul.cache.ServiceHealthCache;
 import com.orbitz.consul.cache.ServiceHealthKey;
 import com.orbitz.consul.model.health.ServiceHealth;
 

@@ -86,12 +86,9 @@ public abstract class AbstractObjectPool<T, V> implements ObjectPool<T> {
 	});
 
 	public T borrowObject() throws Exception, NoSuchElementException, IllegalStateException {
-		// T result;
-		T result = QUEUE.takeFirst();
-		// while (null == (result = QUEUE.pop())) {
-		// Thread.sleep(5);
-		// }
-		BORROW_QUEUE.put(result, System.currentTimeMillis() + timeout);
+		T result = QUEUE.pollFirst();
+		if (null != result)
+			BORROW_QUEUE.put(result, System.currentTimeMillis() + timeout);
 		return result;
 	}
 

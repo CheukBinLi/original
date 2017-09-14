@@ -79,9 +79,9 @@ public class ZookeeperLoadBalanceFactory implements LoadBalanceFactory<String, V
 			LinkedList<ProviderValueModel> providerValueModels = new LinkedList<ProviderValueModel>();
 			ProviderValueModel providerValueModel = null;
 			for (String server : servers) {
-				providerValueModels.add(new ProviderValueModel(server, registrationFactory.getValue(simpleLdapFactory.getProviderDirectory(server))));
+				providerValueModels.add(new ProviderValueModel(server, Integer.valueOf(registrationFactory.getValue(simpleLdapFactory.getLoadDirectory(server)))));
 			}
-			Collections.reverse(providerValueModels);
+			Collections.sort(providerValueModels);
 			if (providerValueModels.isEmpty())
 				return null;
 			return Arrays.asList((providerValueModel = providerValueModels.pollFirst()).getServerName() + "@" + providerValueModel.getUrl());

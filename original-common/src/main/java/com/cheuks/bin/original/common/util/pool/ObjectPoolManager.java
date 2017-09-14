@@ -58,7 +58,8 @@ public class ObjectPoolManager<T, V> {
 	public void returnObject(String poolName, T t) throws Throwable {
 		AbstractObjectPool<T, V> result = POOL.get(poolName);
 		if (null == result) {
-			throw new NullPointerException("can't found objectPool is [" + poolName + "],fail by return object,you can check it.");
+			return;
+			// throw new NullPointerException("can't found objectPool is [" + poolName + "],fail by return object,you can check it.");
 		}
 		result.returnObject(t);
 	}

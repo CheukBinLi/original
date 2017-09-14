@@ -11,6 +11,7 @@ import com.cheuks.bin.original.cache.FstCacheSerialize;
 import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.common.util.conver.CollectionUtil;
 import com.cheuks.bin.original.rmi.DefaultRmiBeanFactory;
+import com.cheuks.bin.original.rmi.SimpleRmiService;
 import com.cheuks.bin.original.rmi.config.ReferenceGroupConfig.ReferenceGroup;
 import com.cheuks.bin.original.rmi.config.ServiceGroupConfig.ServiceGroup;
 import com.cheuks.bin.original.rmi.config.model.ProtocolModel;
@@ -53,7 +54,10 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 			// 协议过滤(后继)
 			registerBeanDefinition(parserContext, ZookeeperLoadBalanceFactory.class, BEAN_LOAD_BALANCE_FACTORY, CollectionUtil.newInstance().toMap("url", rmiConfigGroup.getRegistryModel().getServerAddress()));
 		}
-
+		//simpleRmiService初始化
+		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_SERVICE_INIT)) {
+			registerBeanDefinition(parserContext, SimpleRmiService.class, BEAN_RMI_SERVICE_INIT, null);
+		}
 	}
 
 	private RmiConfigGroup doParser(Element element, ParserContext parserContext) {

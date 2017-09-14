@@ -30,6 +30,8 @@ public interface RmiContant {
 	String RMI_CONFIG_ELEMENT_REFERENCE = "reference";
 	String RMI_CONFIG_ATTRIBUTE_APPLICATION_NAME = "applicationName";
 
+	String BEAN_RMI_SERVICE_INIT="rmiServiceInit";
+	
 	String BEAN_RMI_INVOKE_CLIENT = "rmiInvokeClient";
 	/***
 	 * NetworkServer
