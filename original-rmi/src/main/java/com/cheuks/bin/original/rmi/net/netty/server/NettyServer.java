@@ -30,6 +30,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.internal.logging.InternalLogLevel;
 
 @SuppressWarnings({"rawtypes", "unchecked", "static-access"})
 public class NettyServer implements RmiContant {
@@ -109,13 +110,14 @@ public class NettyServer implements RmiContant {
 						final EventLoopGroup workerGroup = new NioEventLoopGroup(poolSize);
 						try {
 							ServerBootstrap server = new ServerBootstrap();
-							server.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).option(ChannelOption.SO_BACKLOG, 128).handler(new LoggingHandler(LogLevel.INFO)).childHandler(new ChannelInitializer<SocketChannel>() {
+							server.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).option(ChannelOption.TCP_NODELAY, true).option(ChannelOption.SO_BACKLOG, 1024).childHandler(new ChannelInitializer<SocketChannel>() {
 								@Override
 								public void initChannel(SocketChannel ch) throws Exception {
 									// 注册handler
 									ch.pipeline().addLast(new NettyMessageDecoder(rmiConfigGroup.getProtocolModel().getFrameLength(), 4, 4, cacheSerialize));
 									ch.pipeline().addLast(new NettyMessageEncoder(cacheSerialize));
 									ch.pipeline().addLast(new IdleStateHandler(rmiConfigGroup.getProtocolModel().getHeartbeat(), 0, 0));
+//									ch.pipeline().addLast("logging", new LoggingHandler(LogLevel.DEBUG));
 									// 服务处理
 									ch.pipeline().addLast(new NettyServerHandle(NettyServer.this, messageHandleFactory));
 								}

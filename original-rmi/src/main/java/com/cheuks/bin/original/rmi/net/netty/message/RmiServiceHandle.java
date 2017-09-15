@@ -44,6 +44,7 @@ public class RmiServiceHandle implements MessageHandle<ChannelHandlerContext, Tr
 			} else {
 				v.setError(new NullPointerException("can't found " + v.getMethodCode()));
 			}
+			v.setParams(null);
 		} catch (Throwable e) {
 			v.setError(e);
 		} finally {

@@ -89,7 +89,7 @@ public class NettyNetworkClient implements NetworkClient<Bootstrap, NettyClientH
 			client = new Bootstrap();
 			int temp;
 			worker = new NioEventLoopGroup((temp = rmiConfigGroup.getProtocolModel().getNetWorkThreads()) > 0 ? temp : Runtime.getRuntime().availableProcessors() * 2);
-			client.group(worker).option(ChannelOption.TCP_NODELAY, true).channel(NioSocketChannel.class);
+			client.group(worker).option(ChannelOption.SO_KEEPALIVE, true).channel(NioSocketChannel.class);
 			client.handler(new ChannelInitializer<SocketChannel>() {
 				@Override
 				protected void initChannel(SocketChannel ch) throws Exception {
