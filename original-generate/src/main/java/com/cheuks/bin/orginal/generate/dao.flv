@@ -1,6 +1,0 @@
-package ${entityPackage}.dao;
-
-import ${entityFullName};
-
-public interface ${entitySimpleName}Dao extends BaseDao<${entitySimpleName}, ${idType}> {
-}

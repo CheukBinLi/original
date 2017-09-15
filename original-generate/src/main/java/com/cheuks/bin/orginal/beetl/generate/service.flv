@@ -1,8 +1,0 @@
-package ${entityPackage}.service;
-
-import ${entityFullName};
-import com.cheuks.bin.original.common.dbmanager.service.BaseService;
-
-public interface ${entitySimpleName}Service extends BaseService<${entitySimpleName}, ${idType}> {
-
-}
