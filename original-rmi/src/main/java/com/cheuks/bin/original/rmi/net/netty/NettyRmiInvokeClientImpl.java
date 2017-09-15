@@ -36,6 +36,9 @@ public class NettyRmiInvokeClientImpl implements RmiInvokeClient {
 			try {
 				// nettyClientHandle = nettyClientFactory.borrowObject();
 				nettyClientHandle = rmiNetworkClient.getObjectPoolManager().borrowObject(applicationName);
+				if (null == nettyClientHandle) {
+					return null;
+				}
 				nettyClientHandle.getObject().getChannelHandlerContext().writeAndFlush(transmissionModel);
 				transmissionModel = nettyClientHandle.callBack();
 				// return transmissionModel.getResult();

@@ -12,11 +12,16 @@ public class ObjectPoolManager<T, V> {
 	/***
 	 * 重试次数
 	 */
-	private int tryAgain = 10;
+	private int tryAgain = 30;
 	/***
 	 * 重试间隔
 	 */
-	private int tryInterval = 300;
+	private int tryInterval = 50;
+
+	/***
+	 * 初始连接为空时池等待权重
+	 */
+	private int weight = 10;
 
 	/***
 	 * 添加池对象
@@ -45,11 +50,15 @@ public class ObjectPoolManager<T, V> {
 
 	public T borrowObject(String poolName) throws Throwable {
 		int tryCount = getTryAgain();
+		T result;
 		while (true) {
 			AbstractObjectPool<T, V> pool = POOL.get(poolName);
-			if (null != pool) {
-				return pool.borrowObject();
-			} else if (tryCount-- < 0)
+			if (null == pool) {
+				Thread.sleep(getTryInterval() * this.weight);
+			} else if (null != (result = pool.borrowObject())) {
+				return result;
+			}
+			if (tryCount-- < 0)
 				throw new NullPointerException("can't found objectPool is [" + poolName + "],you can check it.");
 			Thread.sleep(getTryInterval());
 		}

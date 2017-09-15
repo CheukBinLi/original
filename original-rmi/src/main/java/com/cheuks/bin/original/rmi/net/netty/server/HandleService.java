@@ -33,7 +33,7 @@ public class HandleService<Input extends Object, Value extends Object> implement
 	private final Map<String, MessageHandle<Input, Value>> SERVICE_HANDLE = new ConcurrentHashMap<String, MessageHandle<Input, Value>>();
 
 	private volatile boolean interrupt;
-	private volatile int pollInterval = 50;
+	private volatile int pollInterval = 20;
 
 	public Input getObject() {
 		return null;

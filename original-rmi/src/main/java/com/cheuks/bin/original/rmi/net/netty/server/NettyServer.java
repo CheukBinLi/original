@@ -47,7 +47,7 @@ public class NettyServer implements RmiContant {
 
 	public synchronized void start() throws InterruptedException, NullPointerException {
 		try {
-			int poolSize = rmiConfigGroup.getProtocolModel().getHandleThreads();
+			int poolSize = rmiConfigGroup.getProtocolModel().getNetWorkThreads();
 			if (poolSize < 0) {
 				poolSize = Runtime.getRuntime().availableProcessors() * 2;
 			}
