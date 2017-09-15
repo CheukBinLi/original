@@ -1,10 +1,8 @@
 package com.cheuks.bin.message.queue.rocketmq;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;

@@ -39,9 +39,9 @@ public class T1 {
 		System.out.println(client.getAllServiceInstances(name).getResponse().size());
 
 		// 获取所有正常的服务（健康检测通过的）
-		client.getHealthyServiceInstances(name).getResponse().forEach((resp) -> {
-			System.out.println(resp);
-		});
+//		client.getHealthyServiceInstances(name).getResponse().forEach((resp) -> {
+//			System.out.println(resp);
+//		});
 	}
 
 	public static void main(String[] args) {

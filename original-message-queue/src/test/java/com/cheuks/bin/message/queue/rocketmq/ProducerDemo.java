@@ -7,10 +7,7 @@ import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 
 public class ProducerDemo {
-	/*
-	 * Constructs a client instance with your account for accessing
-	 * DefaultMQProducer
-	 */
+	
 	private static DefaultMQProducer producer = new DefaultMQProducer("ProducerGroupName");
 	private static int initialState = 0;
 

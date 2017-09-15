@@ -16,7 +16,7 @@ public class ObjectPoolManager<T, V> {
 	/***
 	 * 重试间隔
 	 */
-	private int tryInterval = 200;
+	private int tryInterval = 300;
 
 	/***
 	 * 添加池对象

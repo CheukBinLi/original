@@ -17,6 +17,8 @@ import com.cheuks.bin.original.rmi.config.ServiceGroupConfig.ServiceGroup;
 import com.cheuks.bin.original.rmi.config.model.ProtocolModel;
 import com.cheuks.bin.original.rmi.config.model.RegistryModel;
 import com.cheuks.bin.original.rmi.config.model.ScanModel;
+import com.cheuks.bin.original.rmi.net.ConsulLoadBalanceFactory;
+import com.cheuks.bin.original.rmi.net.P2pLoadBalanceFactory;
 import com.cheuks.bin.original.rmi.net.ZookeeperLoadBalanceFactory;
 
 public class RmiConfig extends AbstractConfig implements RmiContant {
@@ -33,7 +35,7 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 		return this;
 	}
 
-	private void doGenerate(ParserContext parserContext, RmiConfigGroup rmiConfigGroup) {
+	private void doGenerate(ParserContext parserContext, final RmiConfigGroup rmiConfigGroup) {
 		// 初始化
 		String tempValue;
 		if (null != (tempValue = rmiConfigGroup.getProtocolModel().getRefSerialize()) && parserContext.getRegistry().containsBeanDefinition(tempValue)) {
@@ -52,9 +54,26 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 		// loadBalanceFactory
 		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_LOAD_BALANCE_FACTORY)) {
 			// 协议过滤(后继)
-			registerBeanDefinition(parserContext, ZookeeperLoadBalanceFactory.class, BEAN_LOAD_BALANCE_FACTORY, CollectionUtil.newInstance().toMap("url", rmiConfigGroup.getRegistryModel().getServerAddress()));
+			String address = rmiConfigGroup.getRegistryModel().getServerAddress();
+			String[] addresses;
+			Class<?> loadBalanceFactory = null;
+			if (address.contains("://")) {
+				addresses = address.split("://");
+				if ("zookeeper".equals(addresses[0].toLowerCase())) {
+					loadBalanceFactory = ZookeeperLoadBalanceFactory.class;
+				} else if ("consul".equals(addresses[0].toLowerCase())) {
+					loadBalanceFactory = ConsulLoadBalanceFactory.class;
+				} else if ("p2p".equals(addresses[0].toLowerCase())) {
+					loadBalanceFactory = P2pLoadBalanceFactory.class;
+				}
+				address = addresses[1];
+			} else {
+				loadBalanceFactory = P2pLoadBalanceFactory.class;
+			}
+			//
+			registerBeanDefinition(parserContext, loadBalanceFactory, BEAN_LOAD_BALANCE_FACTORY, CollectionUtil.newInstance().toMap("url", address));
 		}
-		//simpleRmiService初始化
+		// simpleRmiService初始化
 		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_SERVICE_INIT)) {
 			registerBeanDefinition(parserContext, SimpleRmiService.class, BEAN_RMI_SERVICE_INIT, null);
 		}
@@ -164,5 +183,4 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 		}
 
 	}
-
 }

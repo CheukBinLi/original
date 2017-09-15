@@ -33,6 +33,9 @@ public class RmiServer {
 		// NettyRmiInvokeClientImpl r=applicationContext.getBean(NettyRmiInvokeClientImpl.class);
 		// System.err.println(r);
 
+		Thread.sleep(13000); 
+		
+		System.err.println(rmiServer.test2i.a4("换服"));
 	}
 
 }

@@ -17,7 +17,6 @@ import com.cheuks.bin.original.common.rmi.net.NetworkClient;
 import com.cheuks.bin.original.common.util.pool.AbstractObjectPool;
 import com.cheuks.bin.original.common.util.pool.ObjectPoolManager;
 import com.cheuks.bin.original.rmi.config.RmiConfig.RmiConfigGroup;
-import com.cheuks.bin.original.rmi.net.ZookeeperLoadBalanceFactory;
 import com.cheuks.bin.original.rmi.net.netty.NettyMessageDecoder;
 import com.cheuks.bin.original.rmi.net.netty.NettyMessageEncoder;
 
@@ -73,22 +72,20 @@ public class NettyNetworkClient implements NetworkClient<Bootstrap, NettyClientH
 		isInit = true;
 		try {
 			// 参数
+			if (null == rmiConfigGroup)
+				throw new NullPointerException("can't found rmiConfigGroup instance.");
 			if (null == cacheSerialize)
 				cacheSerialize = new FstCacheSerialize();
 			if (null == loadBalanceFactory) {
-				/***
-				 * @todo 根据协议区分
-				 */
-				loadBalanceFactory = new ZookeeperLoadBalanceFactory();
-				loadBalanceFactory.setUrl(rmiConfigGroup.getRegistryModel().getServerAddress());
+				throw new NullPointerException("can't found loadBalanceFactory instance.");
 			}
 			loadBalanceFactory.init();
 			if (null == objectPoolManager) {
-				objectPoolManager = new ObjectPoolManager<NettyClientHandle, InetSocketAddress>();
+				throw new NullPointerException("can't found objectPoolManager instance.");
 			}
+			objectPoolManager.setTryAgain(rmiConfigGroup.getRegistryModel().getMaxRetries());
+
 			// rmiBeanFactory.start(rmiConfigArg, false);
-			if (null == rmiConfigGroup)
-				throw new NullPointerException("can't found rmiConfigGroup instance.");
 			client = new Bootstrap();
 			int temp;
 			worker = new NioEventLoopGroup((temp = rmiConfigGroup.getProtocolModel().getNetWorkThreads()) > 0 ? temp : Runtime.getRuntime().availableProcessors() * 2);

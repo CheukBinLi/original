@@ -60,6 +60,7 @@
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-to-slf4j</artifactId>
 			<version>${log4j-to-slf4j.version}</version>
+			<!-- <scope>runtime</scope> -->
 		</dependency>
 	</dependencies>
 	<modules>

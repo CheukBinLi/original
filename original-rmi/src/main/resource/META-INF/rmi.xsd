@@ -68,7 +68,7 @@
 	<xsd:complexType name="registryType">
 		<xsd:attribute name="serverAddress" use="required" type="xsd:string">
 			<xsd:annotation>
-				<xsd:documentation><![CDATA[zookeeper://192.168.1.1:2181,192,168.1.2:2181|zookeeper注册中心地址,consul://192.168.1.1:8500,182.168.1.2:8500|consul注册中心]]></xsd:documentation>
+				<xsd:documentation><![CDATA[[点对点连接 1]p2p://127.0.0.1:123[点对点连接2]127.0.0.1:123|[zookeeper注册中心地址]zookeeper://192.168.1.1:2181,192,168.1.2:2181|[consul注册中心(末完成，无法启动)]consul://192.168.1.1:8500]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="maxRetries" use="optional" type="xsd:integer" default="20">

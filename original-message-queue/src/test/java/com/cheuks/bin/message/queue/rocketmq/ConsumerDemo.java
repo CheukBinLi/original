@@ -12,15 +12,10 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.util.internal.MessagePassingQueue.Consumer;
-
 public class ConsumerDemo {
 
 	private final static Logger LOG = LoggerFactory.getLogger(ConsumerDemo.class);
-	/*
-	 * Constructs a client instance with your account for accessing
-	 * DefaultMQConsumer
-	 */
+
 	private static DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("ConsumerGroupName");
 	private static int initialState = 0;
 
@@ -30,7 +25,7 @@ public class ConsumerDemo {
 		}
 		if (initialState == 0) {
 			consumer.setNamesrvAddr("192.168.3.27:9876");
-//			consumer.setNamesrvAddr("10.73.11.117:9876");
+			// consumer.setNamesrvAddr("10.73.11.117:9876");
 			consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
 			initialState = 1;
 		}
@@ -45,7 +40,7 @@ public class ConsumerDemo {
 		// 订阅主体
 		try {
 			consumer.subscribe("tt1", "*");
-			//批量
+			// 批量
 			consumer.setConsumeMessageBatchMaxSize(1000);
 			consumer.registerMessageListener(new MessageListenerConcurrently() {
 

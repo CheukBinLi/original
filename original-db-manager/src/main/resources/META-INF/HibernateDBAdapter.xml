@@ -19,7 +19,7 @@
 	<!-- <bean id="scan" class="com.cheuks.bin.original.common.util.ScanSimple"> -->
 	<!-- <property name="scanPath" value="mapper.*.*query$xml" /> -->
 	<!-- </bean> -->
-	<bean id="scan" class="om.cheuks.bin.original.common.util.ScanFile">
+	<bean id="scan" class="com.cheuks.bin.original.common.util.scan.ScanFile">
 		<property name="scanPath" value="*.query.xml" />
 	</bean>
 	<!-- QueryFile 注入 -->

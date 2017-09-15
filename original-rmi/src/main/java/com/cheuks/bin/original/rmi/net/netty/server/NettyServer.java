@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cheuks.bin.original.cache.FstCacheSerialize;
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.cheuks.bin.original.common.rmi.LoadBalanceFactory;
 import com.cheuks.bin.original.common.rmi.RmiBeanFactory;
@@ -16,7 +15,6 @@ import com.cheuks.bin.original.common.rmi.model.RegisterLoadBalanceModel.Service
 import com.cheuks.bin.original.common.rmi.net.MessageHandleFactory;
 import com.cheuks.bin.original.rmi.config.RmiConfig.RmiConfigGroup;
 import com.cheuks.bin.original.rmi.config.ServiceGroupConfig.ServiceGroupModel;
-import com.cheuks.bin.original.rmi.net.ZookeeperLoadBalanceFactory;
 import com.cheuks.bin.original.rmi.net.netty.NettyMessageDecoder;
 import com.cheuks.bin.original.rmi.net.netty.NettyMessageEncoder;
 import com.cheuks.bin.original.rmi.net.netty.message.NettyHearBeatServiceHandle;
@@ -65,14 +63,11 @@ public class NettyServer implements RmiContant {
 			if (LOG.isDebugEnabled())
 				LOG.info("server is start.");
 			if (null == rmiBeanFactory) {
-				// rmiBeanFactory = new SimpleRmiBeanFactory();
 				throw new NullPointerException("rmiBeanFactory is null");
 			}
 			// 参数
-			// rmiBeanFactory.start(rmiConfigArg, true);
-
 			if (null == cacheSerialize)
-				cacheSerialize = new FstCacheSerialize();
+				throw new NullPointerException("cacheSerialize is null");
 			if (null == messageHandleFactory) {
 				messageHandleFactory = new HandleService();
 				messageHandleFactory.start(rmiConfigGroup.getProtocolModel().getHandleThreads() < 0 ? Runtime.getRuntime().availableProcessors() * 2 : rmiConfigGroup.getProtocolModel().getHandleThreads());
@@ -88,8 +83,7 @@ public class NettyServer implements RmiContant {
 			}
 			// 注解目录
 			if (null == loadBalanceFactory) {
-				loadBalanceFactory = new ZookeeperLoadBalanceFactory();
-				loadBalanceFactory.setUrl(rmiConfigGroup.getRegistryModel().getServerAddress());
+				throw new NullPointerException("loadBalanceFactory is null");
 			}
 			loadBalanceFactory.init();
 			/***

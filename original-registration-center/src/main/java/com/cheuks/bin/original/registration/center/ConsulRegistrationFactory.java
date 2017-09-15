@@ -13,7 +13,7 @@ import com.orbitz.consul.model.health.ServiceHealth;
 
 public class ConsulRegistrationFactory implements RegistrationFactory<Consul, Void, Map<ServiceHealthKey, ServiceHealth>> {
 
-	private String serverList = "127.0.0.1:2181";// 127.0.0.1:2181,127.0.0.2:2181,192.168.3.12:2181
+	private String serverList = "127.0.0.1:8500";// 127.0.0.1:2181,127.0.0.2:2181,192.168.3.12:2181
 
 	private Consul client;
 
