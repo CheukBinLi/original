@@ -27,10 +27,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
-import io.netty.util.internal.logging.InternalLogLevel;
 
 @SuppressWarnings({"rawtypes", "unchecked", "static-access"})
 public class NettyServer implements RmiContant {
@@ -117,10 +114,10 @@ public class NettyServer implements RmiContant {
 									ch.pipeline().addLast(new NettyMessageDecoder(rmiConfigGroup.getProtocolModel().getFrameLength(), 4, 4, cacheSerialize));
 									ch.pipeline().addLast(new NettyMessageEncoder(cacheSerialize));
 									ch.pipeline().addLast(new IdleStateHandler(rmiConfigGroup.getProtocolModel().getHeartbeat(), 0, 0));
-//									ch.pipeline().addLast("logging", new LoggingHandler(LogLevel.DEBUG));
-									// 服务处理
 									ch.pipeline().addLast(new NettyServerHandle(NettyServer.this, messageHandleFactory));
+									// ch.pipeline().addLast("logging", new LoggingHandler(LogLevel.DEBUG));
 								}
+
 							});
 							server.bind(rmiConfigGroup.getProtocolModel().getPort()).sync().channel().closeFuture().sync();
 							LOG.warn("service is close.");
@@ -149,7 +146,7 @@ public class NettyServer implements RmiContant {
 							loadBalanceFactory.registration(loadBalanceModel);
 							// }
 							synchronized (uploadLoadInfotask) {
-								uploadLoadInfotask.wait();
+								uploadLoadInfotask.wait(60000);
 							}
 						}
 					} catch (Throwable e) {

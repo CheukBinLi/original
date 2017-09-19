@@ -139,7 +139,7 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 
 			// 注册
 			final ClassBean classBean = new ClassBean();
-			classBean.setRegistrationServiceName(id).setVersion(version);
+			classBean.setRegistrationServiceName(application).setId(id).setVersion(version);
 			classBean.setProxyClassFile(serviceImpl.getClass());
 			classBean.setOriginalClassFile(tempInterface);
 			classBean.setInterfaceClassFile(tempInterface);
@@ -192,7 +192,9 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 		for (final CtMethod m : orginalClassMethods) {
 			// 转换模版: ((Integer) 1).intValue();
 			methodString = generateMethod(m, null,
-					convery4CodeByCtClass("rmiClientInvokeMethod.rmiInvoke(\"" + classBean.getRegistrationServiceName() + "\",\"" + Reflection.newInstance().genericRmiMethodMd5Code(classBean.getInterfaceClassFile().getName(), classBean.getVersion(), m) + "\",$args)", m.getReturnType()));
+					convery4CodeByCtClass(
+							"rmiClientInvokeMethod.rmiInvoke(\"" + classBean.getRegistrationServiceName() + "\",\"" + Reflection.newInstance().genericRmiMethodMd5Code(classBean.getRegistrationServiceName(), classBean.getInterfaceClassFile().getName(), classBean.getVersion(), m) + "\",$args)",
+							m.getReturnType()));
 			newClass.addMethod(CtNewMethod.make(methodString, newClass));
 		}
 		// class输出

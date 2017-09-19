@@ -143,17 +143,19 @@ public class Reflection extends ReflectionUtil {
 		return sb.toString();
 	}
 
-	public String genericRmiMethodMd5Code(String registrationServiceName, String version, final CtMethod currentMethod) throws NotFoundException {
+	public String genericRmiMethodMd5Code(String registrationServiceName, String className, String version, final CtMethod currentMethod) throws NotFoundException {
 		StringBuilder sb = new StringBuilder();
 		sb.append(registrationServiceName).append(":");
+		sb.append(className).append(":");
 		sb.append(version).append(":");
 		sb.append(genericMethod(currentMethod));
 		return Encryption.newInstance().MD5(sb.toString());
 	}
 
-	public String genericRmiMethodMd5Code(String registrationServiceName, String version, final Method currentMethod) throws NotFoundException {
+	public String genericRmiMethodMd5Code(String registrationServiceName, String className, String version, final Method currentMethod) throws NotFoundException {
 		StringBuilder sb = new StringBuilder();
 		sb.append(registrationServiceName).append(":");
+		sb.append(className).append(":");
 		sb.append(version).append(":");
 		sb.append(genericMethod(currentMethod));
 		return Encryption.newInstance().MD5(sb.toString());

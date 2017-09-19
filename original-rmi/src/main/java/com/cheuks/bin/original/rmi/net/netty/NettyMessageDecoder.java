@@ -20,7 +20,6 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder implements
 
 	@Override
 	protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
-
 		ByteBuf b = (ByteBuf) super.decode(ctx, in);
 		if (null == b)
 			return null;

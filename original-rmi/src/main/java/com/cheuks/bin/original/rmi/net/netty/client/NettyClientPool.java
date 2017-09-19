@@ -81,7 +81,6 @@ public class NettyClientPool extends AbstractObjectPool<NettyClientHandle, InetS
 		connect(consumerValueModel);
 	}
 
-	@SuppressWarnings("resource")
 	private void connect(final ConsumerValueModel consumerValueModel) {
 		executorService.execute(new Runnable() {
 			public void run() {
@@ -107,7 +106,8 @@ public class NettyClientPool extends AbstractObjectPool<NettyClientHandle, InetS
 
 					InetSocketAddress inetSocketAddress = new InetSocketAddress(addresses[0], Integer.valueOf(addresses[1]));
 					try {
-						new Socket(inetSocketAddress.getAddress(), inetSocketAddress.getPort());
+						Socket ping = new Socket(inetSocketAddress.getAddress(), inetSocketAddress.getPort());
+						ping.close();
 					} catch (Exception e) {
 						if (consumerValueModel.getTryAgain() < 0)
 							return;

@@ -21,7 +21,7 @@ public class MethodBean extends com.cheuks.bin.original.common.rmi.model.MethodB
 		sb.append(classBean.getRegistrationServiceName()).append(":");
 		sb.append(classBean.getVersion()).append(":");
 		sb.append(Reflection.newInstance().genericMethod(currentMethod));
-		return Reflection.newInstance().genericRmiMethodMd5Code(classBean.getInterfaceClassFile().getName(), classBean.getVersion(), currentMethod);
+		return Reflection.newInstance().genericRmiMethodMd5Code(classBean.getRegistrationServiceName(),classBean.getInterfaceClassFile().getName(), classBean.getVersion(), currentMethod);
 	}
 
 	public MethodBean(ClassBean classBean, Method currentMethod, String md5Code) {

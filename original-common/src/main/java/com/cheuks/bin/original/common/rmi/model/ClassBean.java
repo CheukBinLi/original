@@ -11,13 +11,23 @@ public class ClassBean implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private Class<?> interfaceClassFile;
-	private Class<?> originalClassFile;
-	private Class<?> proxyClassFile;
-	private String registrationServiceName;
-	private String version;
+	private String id;// 注入ID
+	private Class<?> interfaceClassFile;// 接口
+	private Class<?> originalClassFile;// 原实现
+	private Class<?> proxyClassFile;// 代理
+	private String registrationServiceName;// 服务名
+	private String version;// 版本
 	private Object instance;
 	private boolean multiInstance;
+
+	public String getId() {
+		return id;
+	}
+
+	public ClassBean setId(String id) {
+		this.id = id;
+		return this;
+	}
 
 	public Class<?> getInterfaceClassFile() {
 		return interfaceClassFile;
@@ -68,7 +78,7 @@ public class ClassBean implements Serializable {
 		if (null == this.instance) {
 			synchronized (this) {
 				if (null == this.instance)
-					setInstance(rmiBeanFactory.getBean(this.registrationServiceName));
+					setInstance(rmiBeanFactory.getBean(this.id));
 			}
 		}
 		return instance;

@@ -15,13 +15,13 @@ import io.netty.util.ReferenceCountUtil;
 
 public class NettyServerHandle extends SimpleChannelInboundHandler<TransmissionModel> {
 
+	private final static Logger LOG = LoggerFactory.getLogger(NettyServerHandle.class);
+
 	private final MessageHandleFactory<Object, Object, Object> messageHandle;
 
 	private NettyServer nettyServer;
 
 	private AtomicInteger counter = new AtomicInteger();
-
-	private final static Logger LOG = LoggerFactory.getLogger(NettyServerHandle.class);
 
 	public NettyServerHandle(NettyServer nettyServer, MessageHandleFactory<Object, Object, Object> messageHandle) {
 		this.nettyServer = nettyServer;
@@ -31,20 +31,23 @@ public class NettyServerHandle extends SimpleChannelInboundHandler<TransmissionM
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, TransmissionModel msg) throws Exception {
-		// System.out.println("收到消息_交给 invoke handler处理");
 		counter.set(0);
 		messageHandle.messageHandle(ctx, msg, msg.getServiceType());
 		ReferenceCountUtil.release(msg);
 	}
 
 	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		super.exceptionCaught(ctx, cause);
-		ctx.close();
-		ctx.channel().close();
+	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+		super.channelInactive(ctx);
 		nettyServer.modifyConnectionCount(-1);
 	}
 
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		// super.exceptionCaught(ctx, cause);
+		ctx.close();
+		ctx.channel().close();
+	}
 	@Override
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
 		if (evt instanceof IdleStateEvent) {
@@ -59,7 +62,8 @@ public class NettyServerHandle extends SimpleChannelInboundHandler<TransmissionM
 				if (LOG.isDebugEnabled())
 					LOG.debug("丢失了第 " + counter + " 个心跳包");
 			}
-		}
+		} else
+			super.userEventTriggered(ctx, evt);
 	}
-	
+
 }
