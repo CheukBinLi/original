@@ -51,7 +51,7 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 		return referenceGroupModel;
 	}
 
-	private void doGenerate(ParserContext parserContext, ReferenceGroupModel referenceGroupModel, String applicationName) {
+	void doGenerate(ParserContext parserContext, ReferenceGroupModel referenceGroupModel, String applicationName) {
 
 		if (!parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_CONFIG_GROUP)) {
 			throw new NullPointerException("The configuration sequence must be <rmi:config> in first.");
@@ -63,17 +63,12 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 		}
 		// RmiNetworkClinet
 		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_NETWORK_CLIENT)) {
-			Map<String, Object> proprety = CollectionUtil.newInstance().toMap(
-						BEAN_OBJECT_POOL_MANAGER, getConfig(parserContext, BEAN_OBJECT_POOL_MANAGER), 
-						RMI_CONFIG_BEAN_CONFIG_GROUP,getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP),
-						BEAN_CACHE_SERIALIZE, getConfig(parserContext, BEAN_CACHE_SERIALIZE), 
-						BEAN_LOAD_BALANCE_FACTORY,getConfig(parserContext, BEAN_LOAD_BALANCE_FACTORY), 
-						RMI_CONFIG_BEAN_CONFIG_GROUP, getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP)
-					);
+			Map<String, Object> proprety = CollectionUtil.newInstance().toMap(BEAN_OBJECT_POOL_MANAGER, getConfig(parserContext, BEAN_OBJECT_POOL_MANAGER), RMI_CONFIG_BEAN_CONFIG_GROUP, getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP), BEAN_CACHE_SERIALIZE,
+					getConfig(parserContext, BEAN_CACHE_SERIALIZE), BEAN_LOAD_BALANCE_FACTORY, getConfig(parserContext, BEAN_LOAD_BALANCE_FACTORY), RMI_CONFIG_BEAN_CONFIG_GROUP, getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP));
 			registerBeanDefinition(parserContext, NettyNetworkClient.class, BEAN_RMI_NETWORK_CLIENT, proprety);
 			// NettyRmiInvokeClientImpl
 			if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_INVOKE_CLIENT)) {
-//				Map<String, Object> property = CollectionUtil.newInstance().toMap(BEAN_RMI_NETWORK_CLIENT, rmiMainClient);
+				// Map<String, Object> property = CollectionUtil.newInstance().toMap(BEAN_RMI_NETWORK_CLIENT, rmiMainClient);
 				registerBeanDefinition(parserContext, NettyRmiInvokeClientImpl.class, BEAN_RMI_INVOKE_CLIENT, null);
 			}
 		}

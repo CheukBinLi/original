@@ -1,8 +1,10 @@
 package com.cheuks.bin.original.rmi;
 
 import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,12 +13,18 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 
+import com.cheuks.bin.original.common.annotation.rmi.RmiConsumerAnnotation;
+import com.cheuks.bin.original.common.annotation.rmi.RmiProviderAnnotation;
 import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.common.rmi.RmiInvokeClient;
 import com.cheuks.bin.original.common.rmi.model.ClassBean;
+import com.cheuks.bin.original.common.util.conver.ConverType;
+import com.cheuks.bin.original.common.util.scan.Scan;
+import com.cheuks.bin.original.common.util.scan.ScanSimple;
 import com.cheuks.bin.original.rmi.config.ReferenceGroupConfig.ReferenceGroupModel;
 import com.cheuks.bin.original.rmi.config.ServiceGroupConfig.ServiceGroupModel;
 import com.cheuks.bin.original.rmi.config.model.ReferenceModel;
+import com.cheuks.bin.original.rmi.config.model.ScanModel;
 import com.cheuks.bin.original.rmi.config.model.ServiceModel;
 import com.cheuks.bin.original.rmi.model.MethodBean;
 import com.cheuks.bin.original.rmi.net.netty.NettyRmiInvokeClientImpl;
@@ -34,6 +42,8 @@ import javassist.bytecode.AnnotationsAttribute;
 public final class GenerateRmiBeanFactory implements RmiContant {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GenerateRmiBeanFactory.class);
+
+	private Scan scan;
 
 	private static GenerateRmiBeanFactory INSTANCE;
 
@@ -53,6 +63,8 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 		pool.insertClassPath(new ClassClassPath(this.getClass()));
 	}
 
+	private ConverType converType = new ConverType();
+
 	private final String suffixName = "$proxyClass";
 
 	public String getSuffixName(String nick) {
@@ -62,9 +74,6 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 	}
 
 	public void referenceGroupHandle(ParserContext parserContext, ReferenceGroupModel referenceGroupModel, String service) throws Throwable {
-		// ConfigurableApplicationContext cac = (ConfigurableApplicationContext) (null == applicationContext.getParent() ? applicationContext : applicationContext.getParent());
-		// DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) cac.getBeanFactory();
-		// DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
 		// 过滤
 		String id = null;
 		Class<?> tempClass;
@@ -156,6 +165,86 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 		}
 	}
 
+	public ReferenceGroupModel scanByReferenceGroupHandle(ScanModel scanModel) throws Throwable {
+		if (null == scan) {
+			scan = new ScanSimple();
+		}
+		Map<String, Set<String>> clazzes = scan.doScan(scanModel.getPackagePath());
+		ReferenceGroupModel referenceGroupModel = new ReferenceGroupModel(scanModel.getServiceName(), true);
+		// 过滤
+		Class<?> tempClass;
+		Set<String> classPaths;
+		String className;
+		Iterator<String> it;
+		RmiConsumerAnnotation consumer;
+		ReferenceModel referenceModel;
+		// 扫描CLASS
+		for (Entry<String, Set<String>> en : clazzes.entrySet()) {
+			classPaths = en.getValue();
+			if (null != classPaths) {
+				it = classPaths.iterator();
+				while (it.hasNext()) {
+					className = it.next();
+					if (className.endsWith("class")) {
+						tempClass = Class.forName(className.replace("/", ".").replace(".class", ""));
+						// 注解/xml
+						if (null != (consumer = tempClass.getDeclaredAnnotation(RmiConsumerAnnotation.class))) {
+							// Rmi注解
+							referenceModel = new ReferenceModel();
+							referenceModel.setId(converType.isEmpty(consumer.id(), converType.toLowerCaseFirstOne(tempClass.getSimpleName())));
+							referenceModel.setInterfaceName(tempClass.getName());
+							referenceModel.setMultiInstance(false);
+							referenceModel.setVersion(converType.isEmpty(consumer.version(), scanModel.getVersion()));
+							referenceGroupModel.getReferenceGroup().put(referenceModel.getId(), referenceModel);
+						}
+					}
+				}
+			}
+		}
+
+		return referenceGroupModel;
+	}
+
+	public ServiceGroupModel scanByServiceGroupHandle(ScanModel scanModel) throws Throwable {
+		if (null == scan) {
+			scan = new ScanSimple();
+		}
+		Map<String, Set<String>> clazzes = scan.doScan(scanModel.getPackagePath());
+		ServiceGroupModel serviceGroupModel = new ServiceGroupModel(scanModel.getServiceName(), true);
+		// 过滤
+		Class<?> tempClass;
+		Set<String> classPaths;
+		String className;
+		Iterator<String> it;
+		RmiProviderAnnotation provider;
+		ServiceModel serviceModel;
+		// 扫描CLASS
+		for (Entry<String, Set<String>> en : clazzes.entrySet()) {
+			classPaths = en.getValue();
+			if (null != classPaths) {
+				it = classPaths.iterator();
+				while (it.hasNext()) {
+					className = it.next();
+					if (className.endsWith("class")) {
+						tempClass = Class.forName(className.replace("/", ".").replace(".class", ""));
+						// 注解/xml
+						if (null != (provider = tempClass.getDeclaredAnnotation(RmiProviderAnnotation.class))) {
+							// Rmi注解
+							serviceModel = new ServiceModel();
+							serviceModel.setInterfaceName(provider.interfaceClass().getName());
+							serviceModel.setVersion(converType.isEmpty(provider.version(), scanModel.getVersion()));
+							serviceModel.setId(converType.isEmpty(provider.id(), converType.toLowerCaseFirstOne(tempClass.getSimpleName())));
+							serviceModel.setRefClass(tempClass.getName());
+							serviceGroupModel.getServices().put(serviceModel.getId(), serviceModel);
+						}
+					}
+				}
+			}
+		}
+
+		return serviceGroupModel;
+	}
+
 	// 普通类
 	public Class<?> classRefactor(final ClassBean classBean, final Class<?> rmiClientInterface, final Class<?> rmiClientImpl, String suffix) throws Throwable {
 
@@ -198,7 +287,7 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 			newClass.addMethod(CtNewMethod.make(methodString, newClass));
 		}
 		// class输出
-		// newClass.writeFile("D:/Desktop/1");
+		 newClass.writeFile("D:/Desktop/1");
 
 		return newClass.toClass();
 	}

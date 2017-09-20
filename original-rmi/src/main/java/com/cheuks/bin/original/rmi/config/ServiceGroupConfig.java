@@ -52,11 +52,11 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 				serviceGroup.getServices().put(serviceModel.getId(), serviceModel);
 			}
 		}
-		return serviceGroup; 
+		return serviceGroup;
 	}
 
 	@SuppressWarnings("unchecked")
-	private void doGenerate(ParserContext parserContext, ServiceGroupModel serviceGroupModel, String applicationName) {
+	void doGenerate(ParserContext parserContext, ServiceGroupModel serviceGroupModel, String applicationName) {
 
 		if (!parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_CONFIG_GROUP)) {
 			throw new NullPointerException("The configuration sequence must be <rmi:config> in first.");
@@ -69,13 +69,9 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 		}
 		// 服务端
 		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_NETWORK_SERVER)) {
-			Map<String, Object> property = CollectionUtil.newInstance().toMap(
-						RMI_CONFIG_BEAN_CONFIG_GROUP,getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP),
-						BEAN_CACHE_SERIALIZE,getConfig(parserContext, BEAN_CACHE_SERIALIZE),
-						BEAN_RMI_BEAN_FACTORY, rmiBeanFactory,
-						BEAN_LOAD_BALANCE_FACTORY,getConfig(parserContext, BEAN_LOAD_BALANCE_FACTORY)
-					);
-			
+			Map<String, Object> property = CollectionUtil.newInstance().toMap(RMI_CONFIG_BEAN_CONFIG_GROUP, getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP), BEAN_CACHE_SERIALIZE, getConfig(parserContext, BEAN_CACHE_SERIALIZE), BEAN_RMI_BEAN_FACTORY, rmiBeanFactory, BEAN_LOAD_BALANCE_FACTORY,
+					getConfig(parserContext, BEAN_LOAD_BALANCE_FACTORY));
+
 			registerBeanDefinition(parserContext, NettyServer.class, BEAN_RMI_NETWORK_SERVER, property);
 		}
 
@@ -89,7 +85,7 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected ServiceGroupModel getServiceGroup(ParserContext parserContext, String applicationName) {
+	ServiceGroupModel getServiceGroup(ParserContext parserContext, String applicationName) {
 		Map<String, ServiceGroupModel> serviceGroups;
 		ServiceGroupModel serviceGroup;
 		BeanDefinition bean;

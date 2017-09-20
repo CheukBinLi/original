@@ -77,13 +77,43 @@
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:complexType>
-	<xsd:complexType name="scanType">
-		<xsd:attribute name="packagePath" use="optional" type="xsd:string">
+
+	<xsd:complexType name="annotationDrivenServiceType">
+		<xsd:attribute name="applicationName" use="required">
 			<xsd:annotation>
-				<xsd:documentation><![CDATA[描述注解包路径|后继]]></xsd:documentation>
+				<xsd:documentation><![CDATA[应用服务名]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="packagePath" use="required" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[描述注解包路径]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="version" type="xsd:string" default="1.0">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[version|版本]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:complexType>
+
+	<xsd:complexType name="annotationDrivenReferenceType">
+		<xsd:attribute name="applicationName" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[应用服务名]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="packagePath" use="required" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[描述注解包路径]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="version" type="xsd:string" default="1.0">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[version|版本]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
 
 
 	<xsd:complexType name="protocolType">
@@ -118,9 +148,9 @@
 				<xsd:documentation><![CDATA[coding|编码]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="frameLength" use="optional" type="xsd:integer" default="5000">
+		<xsd:attribute name="frameLength" use="optional" type="xsd:integer" default="100000">
 			<xsd:annotation>
-				<xsd:documentation><![CDATA[network data frame length|数据块大小]]></xsd:documentation>
+				<xsd:documentation><![CDATA[network data frame length|数据块大小,默认100K]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="heartbeat" use="optional" type="xsd:integer" default="600">
@@ -165,7 +195,15 @@
 			<xsd:all>
 				<xsd:element maxOccurs="1" name="registry" type="registryType"></xsd:element>
 				<xsd:element maxOccurs="1" name="protocol" type="protocolType"></xsd:element>
-				<xsd:element minOccurs="0" maxOccurs="1" name="scan" type="scanType"></xsd:element>
+			</xsd:all>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="annotation-driven">
+		<xsd:complexType>
+			<xsd:all>
+				<xsd:element name="service" type="annotationDrivenServiceType" minOccurs="0"></xsd:element>
+				<xsd:element name="reference" type="annotationDrivenReferenceType" minOccurs="0"></xsd:element>
 			</xsd:all>
 		</xsd:complexType>
 	</xsd:element>

@@ -3,11 +3,11 @@ package com.cheuks.bin.original.common.util.conver;
 @SuppressWarnings("unchecked")
 public class ConverType extends ObjectFill {
 
-	private static final ConverType newInstance = new ConverType();
-
-	public static final ConverType newInstance() {
-		return newInstance;
-	}
+	// private static final ConverType newInstance = new ConverType();
+	//
+	// public static final ConverType newInstance() {
+	// return newInstance;
+	// }
 
 	public final <T> T forceConvery(Object o) {
 		if (null == o) {
@@ -53,15 +53,21 @@ public class ConverType extends ObjectFill {
 		return new String(ch);
 	}
 
+	public String isEmpty(String str, String defaultValue) {
+		if (null == str || str.length() < 1)
+			return defaultValue;
+		return str;
+	}
+
 	public static void main(String[] args) {
 		System.out.println(Thread.currentThread().getContextClassLoader().getResource(""));
-		int a = (Integer) ConverType.newInstance.convery(1);
+		// int a = (Integer) ConverType.newInstance.convery(1);
 		int[] b = new int[0];
 
 		Object o = new int[0];
 		int[] c = (int[]) o;
 
-		System.out.println(a);
+		// System.out.println(a);
 		System.out.println(c);
 		System.out.println(b.getClass().getSimpleName());
 	}

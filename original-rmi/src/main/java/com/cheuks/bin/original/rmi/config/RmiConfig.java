@@ -16,7 +16,6 @@ import com.cheuks.bin.original.rmi.config.ReferenceGroupConfig.ReferenceGroup;
 import com.cheuks.bin.original.rmi.config.ServiceGroupConfig.ServiceGroup;
 import com.cheuks.bin.original.rmi.config.model.ProtocolModel;
 import com.cheuks.bin.original.rmi.config.model.RegistryModel;
-import com.cheuks.bin.original.rmi.config.model.ScanModel;
 import com.cheuks.bin.original.rmi.net.ConsulLoadBalanceFactory;
 import com.cheuks.bin.original.rmi.net.P2pLoadBalanceFactory;
 import com.cheuks.bin.original.rmi.net.ZookeeperLoadBalanceFactory;
@@ -30,7 +29,7 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 		if (parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_CONFIG_GROUP))
 			return this;
 		RmiConfigGroup rmiConfigGroup = doParser(element, parserContext);
-		registerBeanDefinition(parserContext, RmiConfigGroup.class, RMI_CONFIG_BEAN_CONFIG_GROUP, CollectionUtil.newInstance().toMap("registryModel", rmiConfigGroup.getRegistryModel(), "protocolModel", rmiConfigGroup.getProtocolModel(), "scanModel", rmiConfigGroup.scanModel));
+		registerBeanDefinition(parserContext, RmiConfigGroup.class, RMI_CONFIG_BEAN_CONFIG_GROUP, CollectionUtil.newInstance().toMap("registryModel", rmiConfigGroup.getRegistryModel(), "protocolModel", rmiConfigGroup.getProtocolModel()));
 		doGenerate(parserContext, rmiConfigGroup);
 		return this;
 	}
@@ -128,12 +127,7 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 
 				// registerBeanDefinition(parserContext, RegistryModel.class, RMI_CONFIG_BEAN_REGISTRY, property);
 				rmiConfigGroup.setRegistryModel(registryModel);
-			} else if (RMI_CONFIG_ELEMENT_SCAN.equals(node.getNodeName()) || RMI_CONFIG_ELEMENT_SCAN.equals(node.getLocalName())) {
-				tempElement = (Element) node;
-				ScanModel scanModel = new ScanModel().setPackagePath(tempElement.getAttribute("scan"));
-				// registerBeanDefinition(parserContext, ScanModel.class, RMI_CONFIG_BEAN_SCAN, property);
-				rmiConfigGroup.setScanModel(scanModel);
-			}
+			} 
 		}
 		return rmiConfigGroup;
 	}
@@ -142,7 +136,6 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 
 		private RegistryModel registryModel;
 		private ProtocolModel protocolModel;
-		private ScanModel scanModel;
 		private ServiceGroup serviceGroup;
 		private ReferenceGroup referenceGroup;
 
@@ -160,13 +153,7 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 			this.protocolModel = protocolModel;
 			return this;
 		}
-		public ScanModel getScanModel() {
-			return scanModel;
-		}
-		public RmiConfigGroup setScanModel(ScanModel scanModel) {
-			this.scanModel = scanModel;
-			return this;
-		}
+
 		public ServiceGroup getServiceGroup() {
 			return serviceGroup;
 		}

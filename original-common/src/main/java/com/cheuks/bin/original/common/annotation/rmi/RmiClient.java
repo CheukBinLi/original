@@ -17,6 +17,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
+@Deprecated
 public @interface RmiClient {
 
 	// String host() default "127.0.0.1:10086";
