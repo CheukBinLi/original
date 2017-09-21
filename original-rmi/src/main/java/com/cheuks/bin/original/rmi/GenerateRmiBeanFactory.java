@@ -286,8 +286,7 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 							m.getReturnType()));
 			newClass.addMethod(CtNewMethod.make(methodString, newClass));
 		}
-		// class输出
-		 newClass.writeFile("D:/Desktop/1");
+		// newClass.writeFile("D:/Desktop/1");
 
 		return newClass.toClass();
 	}
