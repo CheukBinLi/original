@@ -10,7 +10,9 @@
 	</repositories>
 
 ### 引入配置文件
-<p><?xml version="1.0" encoding="UTF-8"?>
+```
+<?xml version="1.0" encoding="UTF-8"?>
+```
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://cheuks.bin.com/schema/rmi
@@ -44,5 +46,5 @@
 		<!-- <rmi:reference packagePath="com.cheuks.bin.original.rmi.t" applicationName="MMX"/> -->
 	</rmi:annotation-driven>
 
-</beans>	
-</p>
+</beans>
+```	
