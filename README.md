@@ -4,7 +4,7 @@
 
 	<repositories>
 		<repository>
-			<id>maven-repository</id>
+			<id>original-maven-repository</id>
 			<url>https://raw.github.com/fdisk123/original/snapshot2.11</url>
 		</repository>
 	</repositories>
