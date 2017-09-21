@@ -23,22 +23,23 @@ public class test2 implements test2I {
         <rmi:registry serverAddress="zookeeper://127.0.0.1:2181" /></br>
        <rmi:protocol port="119" /></br>
 </rmi:config></br>
-<rmi:annotation-driven></br>
+<<rmi:annotation-driven>></br>
        <!--扫描指定包路径,扫描实现--></br>
        <rmi:service packagePath="server.inf.impl" applicationName="MMX" /></br>
 </rmi:annotation-driven></br>
 
 ##### 客户端xml配置
-<rmi:config>
+<<rmi:config>>
 	<rmi:registry serverAddress="zookeeper://127.0.0.1:2181" />
 	<rmi:protocol port="119" />
 </rmi:config>
-<rmi:annotation-driven>
+<<rmi:annotation-driven>>
 	<!--扫描指定包路径,扫描接口-->
 	<rmi:reference packagePath="xx.inf" applicationName="MMX" />
 </rmi:annotation-driven>
 
 ##### 使用
+```
 @Component
 public class A{
 	@Autowired
@@ -54,7 +55,7 @@ public class A{
 		a.test2i.a(1,2,3,4);
 	}
 }
-
+```
 #### xml配置使用
 <bean id="test3impl" class="server.inf.impl.test3.impl"/>
 <rmi:service-group applicationName="NBA"> 
