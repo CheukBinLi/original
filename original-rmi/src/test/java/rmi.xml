@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans
-	http://www.springframework.org/schema/beans/spring-beans.xsd
-	http://cheuks.bin.com/schema/rmi
-	http://cheuks.bin.com/schema/rmi.xsd
-	">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans.xsd 
+http://cheuks.bin.com/schema/rmi
+http://cheuks.bin.com/schema/rmi.xsd">
 	<bean id="abcdef" class="com.cheuks.bin.original.cache.DefaultCacheSerialize" />
 
 	<rmi:config>
 		<!-- <rmi:registry serverAddress="zookeeper://10.73.18.105:2181" /> -->
 		<rmi:registry serverAddress="127.0.0.1:119" />
-		<rmi:protocol frameLength="5000000" port="119" localAddress="127.0.0.1" localName="ben-pc-server" netWorkThreads="1" handleThreads="4" />
+		<rmi:protocol port="119" />
 		<!-- <rmi:protocol frameLength="50000" port="399" localAddress="10.73.18.97" localName="ben-pc-server" netWorkThreads="16" handleThreads="8" /> -->
 	</rmi:config>
 
 	<!-- <rmi:service-group applicationName="NBA"> <rmi:service id="CCTV-1" interface="com.cheuks.bin.original.rmi.t.test2I" class="com.cheuks.bin.original.rmi.t.test2" /> </rmi:service-group> <rmi:reference-group applicationName="NBA"> <rmi:reference interface="com.cheuks.bin.original.rmi.t.test2I" id="CCTV2" /> </rmi:reference-group> -->
 
 	<rmi:annotation-driven>
-		<!--  <rmi:service packagePath="com.cheuks.bin.original.rmi.t" applicationName="MMX" /> -->
-		<rmi:reference packagePath="com.cheuks.bin.original.rmi.t" applicationName="MMX"/>
+		<rmi:service packagePath="com.cheuks.bin.original.rmi.t" applicationName="MMX" />
+		<!-- <rmi:reference packagePath="com.cheuks.bin.original.rmi.t" applicationName="MMX"/> -->
 	</rmi:annotation-driven>
 
 </beans>

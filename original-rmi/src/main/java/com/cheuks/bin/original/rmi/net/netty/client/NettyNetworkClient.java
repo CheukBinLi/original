@@ -87,8 +87,10 @@ public class NettyNetworkClient implements NetworkClient<Bootstrap, NettyClientH
 
 			// rmiBeanFactory.start(rmiConfigArg, false);
 			client = new Bootstrap();
-			int temp;
-			worker = new NioEventLoopGroup((temp = rmiConfigGroup.getProtocolModel().getNetWorkThreads()) > 0 ? temp : Runtime.getRuntime().availableProcessors() * 2);
+			if (rmiConfigGroup.getProtocolModel().getNetWorkThreads() > 0) {
+				rmiConfigGroup.getProtocolModel().setNetWorkThreads(Runtime.getRuntime().availableProcessors() * 2);
+			}
+			worker = new NioEventLoopGroup(rmiConfigGroup.getProtocolModel().getNetWorkThreads());
 			client.group(worker).option(ChannelOption.SO_KEEPALIVE, true).channel(NioSocketChannel.class);
 			client.handler(new ChannelInitializer<SocketChannel>() {
 				@Override
@@ -211,7 +213,7 @@ public class NettyNetworkClient implements NetworkClient<Bootstrap, NettyClientH
 	 * 
 	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#addWorker(com.cheuks.bin.original.rmi.net.netty.client.NettyClientHandle)
 	 */
-	public synchronized void addWorker(NettyClientHandle nettyClientHandle) throws Throwable {
+	public void addWorker(NettyClientHandle nettyClientHandle) throws Throwable {
 		ConsumerValueModel serverInfo = getServerInfo(nettyClientHandle.getChannelHandlerContext().channel());
 		if (null == serverInfo) {
 			synchronized (sessionInfo) {

@@ -340,9 +340,9 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 		if (("int").equals(typeName))
 			return "((Integer)" + objectName + ").intValue()";
 		else if (("boolean").equals(typeName)) {
-			return "((Boolean" + objectName + ").booleanValue()";
+			return "((Boolean)" + objectName + ").booleanValue()";
 		} else if (("float").equals(typeName)) {
-			return "((Float" + objectName + ").floatValue()";
+			return "((Float)" + objectName + ").floatValue()";
 		}
 		return String.format("(%s)%s", t.getName(), objectName);
 	}
