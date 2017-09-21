@@ -19,7 +19,7 @@ public class test2 implements test2I {
 }
 
 ##### 服务端xml配置
-<rmi:config></br>
+<<rmi:config></br>
 	<rmi:registry serverAddress="zookeeper://127.0.0.1:2181" /></br>
 	<rmi:protocol port="119" /></br>
 </rmi:config></br>
