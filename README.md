@@ -22,8 +22,8 @@
 		<!-- <rmi:registry serverAddress="zookeeper://10.73.18.105:2181" /> -->
 		<!--注册中心地址(不带zookeeper://协议显为P2P模式，即连接到指定服务服务提供者) -->
 		<rmi:registry serverAddress="127.0.0.1:119" />
-		<!--本机信息配置-->
-		<rmi:protocol frameLength="5000000" port="119" localAddress="127.0.0.1" localName="ben-pc-server" netWorkThreads="1" handleThreads="4" />
+		<!--本机信息配置,存在多张已连接的网卡，必需手工配置:localAddress、localName-->
+		<rmi:protocol port="119"/>
 	</rmi:config>
 
 	<!--服务供者，暴露的服务--> 
