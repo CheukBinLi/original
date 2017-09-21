@@ -1,5 +1,6 @@
 # original
-### maven仓库引用只需加入引下私有库信息
+### maven仓库引用
+    只需加入引下私有库信息
 
 	<repositories>
 		<repository>
