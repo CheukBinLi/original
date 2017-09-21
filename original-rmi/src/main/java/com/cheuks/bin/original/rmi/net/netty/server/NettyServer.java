@@ -48,6 +48,7 @@ public class NettyServer implements RmiContant {
 			int poolSize = rmiConfigGroup.getProtocolModel().getNetWorkThreads();
 			if (poolSize < 0) {
 				poolSize = Runtime.getRuntime().availableProcessors() * 2;
+				rmiConfigGroup.getProtocolModel().setNetWorkThreads(poolSize);
 			}
 			init(poolSize);
 		} catch (Throwable e) {
@@ -68,7 +69,10 @@ public class NettyServer implements RmiContant {
 				throw new NullPointerException("cacheSerialize is null");
 			if (null == messageHandleFactory) {
 				messageHandleFactory = new HandleService();
-				messageHandleFactory.start(rmiConfigGroup.getProtocolModel().getHandleThreads() < 0 ? Runtime.getRuntime().availableProcessors() * 2 : rmiConfigGroup.getProtocolModel().getHandleThreads());
+				if (rmiConfigGroup.getProtocolModel().getHandleThreads() < 0) {
+					rmiConfigGroup.getProtocolModel().setHandleThreads(Runtime.getRuntime().availableProcessors() * 2);
+				}
+				messageHandleFactory.start(rmiConfigGroup.getProtocolModel().getHandleThreads());
 			}
 			// messageHandleFactory = NettyHandleServiceFactory.newInstance(handleThreads);
 			// throw new NullPointerException("messageHandle is

@@ -1,9 +1,8 @@
 package com.cheuks.bin.original.rmi.config;
 
 import java.io.Serializable;
+import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -36,7 +35,7 @@ public abstract class AbstractConfig implements Serializable, Cloneable {
 		parserContext.getRegistry().registerBeanDefinition(beanName, beanDefinition);
 		return beanDefinition;
 	}
-	
+
 	protected BeanDefinition getConfig(ParserContext parserContext, String beanName) {
 		return parserContext.getRegistry().getBeanDefinition(beanName);
 	}
@@ -48,15 +47,16 @@ public abstract class AbstractConfig implements Serializable, Cloneable {
 
 	public InetAddress checkInterface() throws Exception {
 
-		Enumeration<NetworkInterface> ens = NetworkInterface.getNetworkInterfaces();
 		int count = 0;
-		while (ens.hasMoreElements()) {
-			count++;
-			if (count > 1) {
-				throw new Exception("NetWorkInterface is more than 1.you music setting server ipaddress or domain name.");
+		InetAddress result = null;
+		InetAddress[] addresses = InetAddress.getAllByName(InetAddress.getLocalHost().getHostName());
+		for (InetAddress address : addresses) {
+			if (address instanceof Inet4Address) {
+				if (++count > 1)
+					throw new Exception("NetWorkInterface is more than 1.you music setting server ipaddress or domain name.");
+				result = address;
 			}
 		}
-		return InetAddress.getLocalHost();
-
+		return result;
 	}
 }
