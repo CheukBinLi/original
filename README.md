@@ -19,25 +19,27 @@ public class test2 implements test2I {
 }
 
 ##### 服务端xml配置
-<<rmi:config>></br>
-        <rmi:registry serverAddress="zookeeper://127.0.0.1:2181" /></br>
-       <rmi:protocol port="119" /></br>
+```
+<rmi:config>>
+        <rmi:registry serverAddress="zookeeper://127.0.0.1:2181" />
+       <rmi:protocol port="119" />
 </rmi:config></br>
-<<rmi:annotation-driven>></br>
-       <!--扫描指定包路径,扫描实现--></br>
-       <rmi:service packagePath="server.inf.impl" applicationName="MMX" /></br>
-</rmi:annotation-driven></br>
-
+<rmi:annotation-driven>></br>
+       <!--扫描指定包路径,扫描实现-->
+       <rmi:service packagePath="server.inf.impl" applicationName="MMX" />
+</rmi:annotation-driven>
+```
 ##### 客户端xml配置
-<<rmi:config>>
+```
+<rmi:config>
 	<rmi:registry serverAddress="zookeeper://127.0.0.1:2181" />
 	<rmi:protocol port="119" />
 </rmi:config>
-<<rmi:annotation-driven>>
+<rmi:annotation-driven>
 	<!--扫描指定包路径,扫描接口-->
 	<rmi:reference packagePath="xx.inf" applicationName="MMX" />
 </rmi:annotation-driven>
-
+```
 ##### 使用
 ```
 @Component
@@ -57,6 +59,7 @@ public class A{
 }
 ```
 #### xml配置使用
+```
 <bean id="test3impl" class="server.inf.impl.test3.impl"/>
 <rmi:service-group applicationName="NBA"> 
 	<rmi:service id="CCTV-1" interface="com.cheuks.bin.original.rmi.t.test2I" class="com.cheuks.bin.original.rmi.t.test2" /> 
@@ -67,7 +70,7 @@ public class A{
 <rmi:reference-group applicationName="NBA"> 
 	<rmi:reference interface="com.cheuks.bin.original.rmi.t.test2I" id="CCTV2" />
 </rmi:reference-group>
-
+```
 直接配置就可以。使用方法跟注解那个main函数的方法一样。
 
 
@@ -84,7 +87,7 @@ public class A{
 	</repositories>
 
 ### 引入配置文件
-
+```
 ＜?xml version="1.0" encoding="UTF-8"?>
 <br/>
 ＜beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cheuks.bin.com/schema/rmi http://cheuks.bin.com/schema/rmi.xsd">
@@ -120,4 +123,6 @@ public class A{
 		<!-- <rmi:reference packagePath="com.cheuks.bin.original.rmi.t" applicationName="MMX"/> -->
 	</rmi:annotation-driven>
 <br/>
-＜/beans>	
+＜/beans>
+```
+##### s
