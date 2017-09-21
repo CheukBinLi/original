@@ -1,7 +1,6 @@
 package com.cheuks.bin.original.rmi;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -23,7 +22,7 @@ public class RmiServer {
 	public static void main(String[] args) throws InterruptedException, IOException {
 
 		// PropertyConfigurator.configure("log4j.properties");
-		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("rmi/application-config.xml");
+		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("application-config.xml");
 		applicationContext.start();
 
 		// SimpleRmiService simpleRmiService = applicationContext.getBean(SimpleRmiService.class);
