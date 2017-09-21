@@ -19,14 +19,15 @@ public class test2 implements test2I {
 }
 
 ##### 服务端xml配置
-<rmi:config>
-	<rmi:registry serverAddress="zookeeper://127.0.0.1:2181" />
-	<rmi:protocol port="119" />
-</rmi:config>
-<rmi:annotation-driven>
-	<!--扫描指定包路径,扫描实现-->
-	<rmi:service packagePath="server.inf.impl" applicationName="MMX" />
-</rmi:annotation-driven>
+
+<rmi:config></br>
+	<rmi:registry serverAddress="zookeeper://127.0.0.1:2181" /></br>
+	<rmi:protocol port="119" /></br>
+</rmi:config></br>
+<rmi:annotation-driven></br>
+	<!--扫描指定包路径,扫描实现--></br>
+	<rmi:service packagePath="server.inf.impl" applicationName="MMX" /></br>
+</rmi:annotation-driven></br>
 
 ##### 客户端xml配置
 <rmi:config>
