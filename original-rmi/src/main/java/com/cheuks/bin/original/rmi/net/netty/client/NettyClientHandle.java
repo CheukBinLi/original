@@ -47,7 +47,6 @@ public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClie
 		channelHandlerContext = ctx;
 		try {
 			// 对象池添加些对对象
-			Thread.sleep(200);
 			nettyClient.addWorker(this);
 		} catch (Throwable e) {
 			LOG.error(null, e);

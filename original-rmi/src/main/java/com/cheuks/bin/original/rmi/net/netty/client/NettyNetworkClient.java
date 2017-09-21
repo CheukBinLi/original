@@ -87,7 +87,7 @@ public class NettyNetworkClient implements NetworkClient<Bootstrap, NettyClientH
 
 			// rmiBeanFactory.start(rmiConfigArg, false);
 			client = new Bootstrap();
-			if (rmiConfigGroup.getProtocolModel().getNetWorkThreads() > 0) {
+			if (rmiConfigGroup.getProtocolModel().getNetWorkThreads() <= 0) {
 				rmiConfigGroup.getProtocolModel().setNetWorkThreads(Runtime.getRuntime().availableProcessors() * 2);
 			}
 			worker = new NioEventLoopGroup(rmiConfigGroup.getProtocolModel().getNetWorkThreads());
@@ -182,9 +182,8 @@ public class NettyNetworkClient implements NetworkClient<Bootstrap, NettyClientH
 	 * @see com.cheuks.bin.original.rmi.net.netty.client.NettyClient#operationComplete(io.netty.channel.Channel, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public void operationComplete(Channel channel, String serverName, String serviceName, String serverUrl, String consumerName, String consumerUrl) throws Throwable {
-		synchronized (sessionInfo) {
-			sessionInfo.put(channel.id().asLongText(), new ConsumerValueModel(serverName, serviceName));
-		} // 注册
+		sessionInfo.put(channel.id().asLongText(), new ConsumerValueModel(serverName, serviceName));
+		// 注册
 		RegisterLoadBalanceModel registerLoadBalanceModel = new RegisterLoadBalanceModel();
 		registerLoadBalanceModel.setType(ServiceType.client);
 		registerLoadBalanceModel.setServerName(serverName);
@@ -216,10 +215,20 @@ public class NettyNetworkClient implements NetworkClient<Bootstrap, NettyClientH
 	public void addWorker(NettyClientHandle nettyClientHandle) throws Throwable {
 		ConsumerValueModel serverInfo = getServerInfo(nettyClientHandle.getChannelHandlerContext().channel());
 		if (null == serverInfo) {
-			synchronized (sessionInfo) {
-				serverInfo = getServerInfo(nettyClientHandle.getChannelHandlerContext().channel());
-				if (null == serverInfo)
-					throw new NullPointerException("can't found sessionId's value.");
+			int tryagain = 5;
+			while (tryagain-- > 0) {
+				synchronized (sessionInfo) {
+					serverInfo = getServerInfo(nettyClientHandle.getChannelHandlerContext().channel());
+					if (null == serverInfo && tryagain < 0)
+						throw new NullPointerException("can't found sessionId's value.");
+					else if (null != serverInfo)
+						break;
+					try {
+						sessionInfo.wait(200);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		} else {
 			AbstractObjectPool<NettyClientHandle, InetSocketAddress> pool = this.objectPoolManager.getPool(serverInfo.getServiceName());
