@@ -1,6 +1,7 @@
 # original
 ### 功能描述
     一切接口马上变远程远程。无需做特定适配、修改、继承等等操作。只需要实上添加注解/在XML文件里配置一下即可以。对象完全依赖spring注入管理。直接使用spring的注解即可注入。或者xml注入对应的 注册id。
+    程序是长连接，比dubbo有效率是一定的。支持负载均衡，服务器挂掉自动寻找其它服务器
 
 #### 例如 - 注解例子
 ##### 接口(服务端/客户端)
@@ -73,27 +74,32 @@ public class A{
 ```
 直接配置就可以。使用方法跟注解那个main函数的方法一样。
 
+#### 注意
+##### 一般使场景
+##### 提供者使用注解(注解实现类)
+##### 消费者使用xml配置
+##### 原因：提供者给用户的接口90%都是打成jar包。所以一般情况都会这样使用
+##### 如果同一个项目既运行行了服务端，同时也运行了消费端，而已用房又用了直接注入的注解，注入时没指定注入的实现ID，会抛出异常。原因是程序注册了两个实现，所有必须指定实现的ID。最好还是不要用把  服务端/客户端同时运行在一个进程里。
 
 
 
 ### maven仓库引用
-    只需加入私有库信息
-
+只需加入私有库信息
+```
 	<repositories>
 		<repository>
 			<id>original-maven-repository</id>
 			<url>https://raw.github.com/fdisk123/original/snapshot2.11</url>
 		</repository>
 	</repositories>
-
+```
 ### 引入配置文件
 ```
-＜?xml version="1.0" encoding="UTF-8"?>
-<br/>
-＜beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cheuks.bin.com/schema/rmi http://cheuks.bin.com/schema/rmi.xsd">
-<br/>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cheuks.bin.com/schema/rmi http://cheuks.bin.com/schema/rmi.xsd">
+
 	<!-- 序列化实例，可以自由替换，默认使用fst-->
-	＜bean id="abcdef" class="com.cheuks.bin.original.cache.DefaultCacheSerialize" />
+	<bean id="abcdef" class="com.cheuks.bin.original.cache.DefaultCacheSerialize" />
 
 	<rmi:config>
 		<!-- <rmi:registry serverAddress="zookeeper://10.73.18.105:2181" /> -->
@@ -123,6 +129,6 @@ public class A{
 		<!-- <rmi:reference packagePath="com.cheuks.bin.original.rmi.t" applicationName="MMX"/> -->
 	</rmi:annotation-driven>
 <br/>
-＜/beans>
+</beans>
 ```
-##### s
+##### 东西写得不好请见谅。
