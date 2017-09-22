@@ -5,12 +5,15 @@
 
 #### 例如 - 注解例子
 ##### 接口(服务端/客户端)
+```
 package xx.inf;
 @RmiConsumerAnnotation
 public interface test2I {
 	int a(String a, int b, char c, long d, Boolean e);
 }
+```
 ##### 实现(服务端)
+```
 package server.inf.impl;
 @RmiProviderAnnotation(interfaceClass = test2I.class)
 public class test2 implements test2I {
@@ -18,7 +21,7 @@ public class test2 implements test2I {
 		return 0;
 	}
 }
-
+```
 ##### 服务端xml配置
 ```
 <rmi:config>>
