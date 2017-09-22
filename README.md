@@ -88,14 +88,16 @@ public class A{
 #### xml配置使用
 ```
 <bean id="test3impl" class="server.inf.impl.test3.impl"/>
+<!--服务器配置-->
 <rmi:service-group applicationName="NBA"> 
 	<rmi:service id="CCTV-1" interface="com.cheuks.bin.original.rmi.t.test2I" class="com.cheuks.bin.original.rmi.t.test2" /> 
 	<!--直接引用spring的bean-->
-	<rmi:service id="CCTV-1" interface="com.cheuks.bin.original.rmi.t.test3I" ref="test3impl" />
+	<rmi:service interface="com.cheuks.bin.original.rmi.t.test3I" ref="test3impl" />
 </rmi:service-group> 
-	
+
+<!--客户端配置-->
 <rmi:reference-group applicationName="NBA"> 
-	<rmi:reference interface="com.cheuks.bin.original.rmi.t.test2I" id="CCTV2" />
+	<rmi:reference interface="com.cheuks.bin.original.rmi.t.test2I" />
 </rmi:reference-group>
 ```
 直接配置就可以。使用方法跟注解那个main函数的方法一样。
@@ -106,6 +108,7 @@ public class A{
 ##### 消费者使用xml配置
 ##### 原因：提供者给用户的接口90%都是打成jar包。所以一般情况都会这样使用
 ##### 如果同一个项目既运行行了服务端，同时也运行了消费端，而已用房又用了直接注入的注解，注入时没指定注入的实现ID，会抛出异常。原因是程序注册了两个实现，所有必须指定实现的ID。最好还是不要用把  服务端/客户端同时运行在一个进程里。
+##### 同一个接口，不同的实现，最多是通过放在不同的 <应用名>（applicationName）或者不同的<版本>(version) 来区分。
 
 
 
