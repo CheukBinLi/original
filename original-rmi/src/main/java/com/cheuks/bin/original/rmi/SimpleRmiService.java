@@ -36,7 +36,7 @@ public class SimpleRmiService implements RmiContant, ApplicationContextAware {
 				LOG.info("registration center address:{}", rmiConfigGroup.getRegistryModel().getServerAddress());
 				LOG.info("registration name:{}", rmiConfigGroup.getProtocolModel().getLocalName());
 				LOG.info("network address:{}", rmiConfigGroup.getProtocolModel().getLocalAddress());
-				LOG.info("network frame max size:{}", (rmiConfigGroup.getProtocolModel().getFrameLength()/1000)+"KB");
+				LOG.info("network frame max size:{}", (rmiConfigGroup.getProtocolModel().getFrameLength()/1024)+"KB");
 				LOG.info("network access thread:{} , message handle thread:{}", rmiConfigGroup.getProtocolModel().getNetWorkThreads(), rmiConfigGroup.getProtocolModel().getHandleThreads());
 			}
 			if (applicationContext.containsBean(BEAN_RMI_NETWORK_CLIENT)) {
@@ -53,7 +53,7 @@ public class SimpleRmiService implements RmiContant, ApplicationContextAware {
 				LOG.info("registration center address:{}", rmiConfigGroup.getRegistryModel().getServerAddress());
 				LOG.info("registration name:{}", rmiConfigGroup.getProtocolModel().getLocalName());
 				LOG.info("network address:{}", rmiConfigGroup.getProtocolModel().getLocalAddress());
-				LOG.info("network frame max size:{}", (rmiConfigGroup.getProtocolModel().getFrameLength()/1000)+"KB");
+				LOG.info("network frame max size:{}", (rmiConfigGroup.getProtocolModel().getFrameLength()/1024)+"KB");
 				LOG.info("network access thread:{} , message handle thread:{}", rmiConfigGroup.getProtocolModel().getNetWorkThreads(), rmiConfigGroup.getProtocolModel().getHandleThreads());
 			}
 			if (LOG.isDebugEnabled())
