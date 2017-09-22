@@ -1,7 +1,9 @@
 # original
 ### 功能描述
-    一切接口马上变远程远程。无需做特定适配、修改、继承等等操作。只需要实上添加注解/在XML文件里配置一下即可以。对象完全依赖spring注入管理。直接使用spring的注解即可注入。或者xml注入对应的 注册id。
-    程序是长连接，比dubbo有效率是一定的。支持负载均衡，服务器挂掉自动寻找其它服务器
+######    一切接口马上变为程远程接口，分布式调用就变得及其简单。无需做特定适配、修改、继承等等操作。只需要实上添加注解/在XML文件里配置一下即可以。对象完全依赖spring注入管理。直接使用spring的注解即可注入。或者xml注入对应的 注册id。
+##### 程序是长连接，比dubbo有效率是一定的。支持负载均衡，服务器挂掉自动寻找其它服务器(自动发现),支持更换序列模块（自带fst,JDK序列化，kryo）更多的可以自己增加(probuf、thrift、json、xml等等)，只需要实现序列化接口即可。
+###### 此工具类组城主要有:netty做网络核心部件，以前用nio做网络部件不太省心(驱动事件、反应堆模式。。。)，因此网络部件没有做模块更换序列的设计。消息处理，可以自定义增加功能，不在介绍了。
+##### 注册中心使用了最为广泛的zookeeper,consul模块没时间做，还不能用。现在有的功能：p2p、zookeeper 两种模式，p2p一般开发调试用。
 
 #### 例如 - 注解例子
 ##### 接口(服务端/客户端)
@@ -44,7 +46,17 @@ public class test2 implements test2I {
 	<rmi:reference packagePath="xx.inf" applicationName="MMX" />
 </rmi:annotation-driven>
 ```
-##### 使用
+##### 使用 提供者端
+```
+public class A{
+
+	public static main(String[] args){
+		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("application-config.xml");
+		applicationContext.start();
+	}
+}
+```
+##### 使用 消费端
 ```
 @Component
 public class A{
