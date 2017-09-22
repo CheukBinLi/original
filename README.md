@@ -15,6 +15,9 @@
  因此网络部件没有做模块更换序列的设计。消息处理，可以自定义增加功能，不在介绍了。
 
 注册中心使用了最为广泛的zookeeper,consul模块没时间做，还不能用。现在有的功能：p2p、zookeeper 两种模式，p2p一般开发调试用。
+P2P模式:        p2p://192.168.1.101:10086   或者   192.168.1.101:10086
+zookeeper模式:  zookeeper://192.168.1.101:2181
+consul模式:     consul://192.168.1.101:8500
 ```
 #### 例如 - 注解例子
 ##### 接口(服务端/客户端)
@@ -53,8 +56,8 @@ public class test2 implements test2I {
 	<rmi:protocol port="119" />
 </rmi:config>
 <rmi:annotation-driven>
-	<!--扫描指定包路径,扫描接口-->
-	<rmi:reference packagePath="xx.inf" applicationName="MMX" />
+	<!--扫描指定包路径,扫描接口,支持多段路径扫描用豆号分隔-->
+	<rmi:reference packagePath="xx.inf,yyy.inf" applicationName="MMX" />
 </rmi:annotation-driven>
 ```
 ##### 使用 提供者端
@@ -160,4 +163,10 @@ public class A{
 <br/>
 </beans>
 ```
+日志输出log4j
+```
+#log4j.logger.com.cheuks=ALL
+log4j.logger.com.cheuks.bin.original.rmi=info
+```
+
 ##### 东西写得不好请见谅。
