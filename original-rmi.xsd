@@ -10,7 +10,7 @@
 	</xsd:annotation>
 
 	<xsd:complexType name="serviceType">
-		<xsd:attribute name="id" type="xsd:string" use="required">
+		<xsd:attribute name="id" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[register name|注入名称/唯一ID]]></xsd:documentation>
 			</xsd:annotation>
@@ -48,7 +48,7 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="referenceType" mixed="true">
-		<xsd:attribute name="id" type="xsd:string" use="required">
+		<xsd:attribute name="id" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[register name|注入名称/id]]></xsd:documentation>
 			</xsd:annotation>
