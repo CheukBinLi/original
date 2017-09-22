@@ -148,7 +148,7 @@
 				<xsd:documentation><![CDATA[coding|编码]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="frameLength" use="optional" type="xsd:integer" default="100000">
+		<xsd:attribute name="frameLength" use="optional" type="xsd:integer" default="102400">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[network data frame length|数据块大小,默认100K]]></xsd:documentation>
 			</xsd:annotation>
