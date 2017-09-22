@@ -17,8 +17,72 @@
 注册中心使用了最为广泛的zookeeper,consul模块没时间做，还不能用。现在有的功能：p2p、zookeeper 两种模式，p2p一般开发调试用。
 P2P模式:        p2p://192.168.1.101:10086   或者   192.168.1.101:10086
 zookeeper模式:  zookeeper://192.168.1.101:2181
-consul模式:     consul://192.168.1.101:8500
+consul模式:     consul://192.168.1.101:8500
+
+下面分别有 注解和XML配置的例子
 ```
+### maven仓库引用
+只需加入私有库信息
+```
+	<repositories>
+		<repository>
+			<id>original-maven-repository</id>
+			<url>https://raw.github.com/fdisk123/original/snapshot2.11</url>
+		</repository>
+	</repositories>
+```
+### 引入依赖包
+```
+	<dependency>
+		<groupId>com.cheuks.bin</groupId>
+		<artifactId>original-rmi</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency>
+```
+### 引入配置文件
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cheuks.bin.com/schema/rmi http://cheuks.bin.com/schema/rmi.xsd">
+
+	<!-- 序列化实例，可以自由替换，默认使用fst-->
+	<bean id="abcdef" class="com.cheuks.bin.original.cache.DefaultCacheSerialize" />
+
+	<rmi:config>
+		<!-- <rmi:registry serverAddress="zookeeper://10.73.18.105:2181" /> -->
+		<!--注册中心地址(不带zookeeper://协议显为P2P模式，即连接到指定服务服务提供者) -->
+		<rmi:registry serverAddress="127.0.0.1:119" />
+		<!--本机信息配置,存在多张已连接的网卡，必需手工配置:localAddress、localName-->
+		<rmi:protocol port="119"/>
+		<!-- 序列化实例，可以自由替换，默认使用fst-->
+		<!--<rmi:protocol port="119" refSerialize="abcdef" />-->
+	</rmi:config>
+
+	<!--服务供者，暴露的服务--> 
+	<!-- <rmi:service-group applicationName="NBA"> 
+		<rmi:service id="CCTV-1" interface="com.cheuks.bin.original.rmi.t.test2I" class="com.cheuks.bin.original.rmi.t.test2" /> 
+	</rmi:service-group>--> 
+	
+	<!--消费者，暴露的需求服务--> 
+	<!--<rmi:reference-group applicationName="NBA">
+		<rmi:reference interface="com.cheuks.bin.original.rmi.t.test2I" id="CCTV2" /> 
+	</rmi:reference-group> -->
+
+	<!-- 注解驱动 -->
+	<rmi:annotation-driven>
+		<!--服务供者，暴露的服务--> 
+		<!--  <rmi:service packagePath="com.cheuks.bin.original.rmi.t" applicationName="MMX" /> -->
+		<!--消费者，暴露的需求服务--> 
+		<!-- <rmi:reference packagePath="com.cheuks.bin.original.rmi.t" applicationName="MMX"/> -->
+	</rmi:annotation-driven>
+<br/>
+</beans>
+```
+日志输出log4j
+```
+#log4j.logger.com.cheuks=ALL
+log4j.logger.com.cheuks.bin.original.rmi=info
+```
+
 #### 例如 - 注解例子
 ##### 接口(服务端/客户端)
 ```
@@ -112,61 +176,5 @@ public class A{
 ##### 原因：提供者给用户的接口90%都是打成jar包。所以一般情况都会这样使用
 ##### 如果同一个项目既运行行了服务端，同时也运行了消费端，而已用房又用了直接注入的注解，注入时没指定注入的实现ID，会抛出异常。原因是程序注册了两个实现，所有必须指定实现的ID。最好还是不要用把  服务端/客户端同时运行在一个进程里。
 ##### 同一个接口，不同的实现，最多是通过放在不同的 <应用名>（applicationName）或者不同的<版本>(version) 来区分。
-
-
-
-### maven仓库引用
-只需加入私有库信息
-```
-	<repositories>
-		<repository>
-			<id>original-maven-repository</id>
-			<url>https://raw.github.com/fdisk123/original/snapshot2.11</url>
-		</repository>
-	</repositories>
-```
-### 引入配置文件
-```
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cheuks.bin.com/schema/rmi http://cheuks.bin.com/schema/rmi.xsd">
-
-	<!-- 序列化实例，可以自由替换，默认使用fst-->
-	<bean id="abcdef" class="com.cheuks.bin.original.cache.DefaultCacheSerialize" />
-
-	<rmi:config>
-		<!-- <rmi:registry serverAddress="zookeeper://10.73.18.105:2181" /> -->
-		<!--注册中心地址(不带zookeeper://协议显为P2P模式，即连接到指定服务服务提供者) -->
-		<rmi:registry serverAddress="127.0.0.1:119" />
-		<!--本机信息配置,存在多张已连接的网卡，必需手工配置:localAddress、localName-->
-		<rmi:protocol port="119"/>
-		<!-- 序列化实例，可以自由替换，默认使用fst-->
-		<!--<rmi:protocol port="119" refSerialize="abcdef" />-->
-	</rmi:config>
-
-	<!--服务供者，暴露的服务--> 
-	<!-- <rmi:service-group applicationName="NBA"> 
-		<rmi:service id="CCTV-1" interface="com.cheuks.bin.original.rmi.t.test2I" class="com.cheuks.bin.original.rmi.t.test2" /> 
-	</rmi:service-group>--> 
-	
-	<!--消费者，暴露的需求服务--> 
-	<!--<rmi:reference-group applicationName="NBA">
-		<rmi:reference interface="com.cheuks.bin.original.rmi.t.test2I" id="CCTV2" /> 
-	</rmi:reference-group> -->
-
-	<!-- 注解驱动 -->
-	<rmi:annotation-driven>
-		<!--服务供者，暴露的服务--> 
-		<!--  <rmi:service packagePath="com.cheuks.bin.original.rmi.t" applicationName="MMX" /> -->
-		<!--消费者，暴露的需求服务--> 
-		<!-- <rmi:reference packagePath="com.cheuks.bin.original.rmi.t" applicationName="MMX"/> -->
-	</rmi:annotation-driven>
-<br/>
-</beans>
-```
-日志输出log4j
-```
-#log4j.logger.com.cheuks=ALL
-log4j.logger.com.cheuks.bin.original.rmi=info
-```
 
 ##### 东西写得不好请见谅。
