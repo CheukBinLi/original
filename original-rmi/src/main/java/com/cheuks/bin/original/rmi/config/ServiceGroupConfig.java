@@ -13,6 +13,7 @@ import org.w3c.dom.NodeList;
 import com.cheuks.bin.original.common.rmi.RmiBeanFactory;
 import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.common.util.conver.CollectionUtil;
+import com.cheuks.bin.original.common.util.conver.ConverType;
 import com.cheuks.bin.original.rmi.GenerateRmiBeanFactory;
 import com.cheuks.bin.original.rmi.config.model.ServiceModel;
 import com.cheuks.bin.original.rmi.model.MethodBean;
@@ -21,6 +22,8 @@ import com.cheuks.bin.original.rmi.net.netty.server.NettyServer;
 public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 
 	private static final long serialVersionUID = 1L;
+
+	private final ConverType converType = new ConverType();
 
 	@Override
 	public AbstractConfig makeConfig(Element element, ParserContext parserContext) {
@@ -36,17 +39,29 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 		ServiceModel serviceModel;
 		Node node;
 		Element tempElement;
+		String id;
+		String tempValue;
 		for (int i = 0, len = list.getLength(); i < len; i++) {
 			node = list.item(i);
 			if (RMI_CONFIG_ELEMENT_SERVICE.equals(node.getNodeName()) || RMI_CONFIG_ELEMENT_SERVICE.equals(node.getLocalName())) {
 				tempElement = (Element) node;
 				serviceModel = new ServiceModel();
-				serviceModel.setId(tempElement.getAttribute("id"));
-				serviceModel.setInterfaceName(tempElement.getAttribute("interface"));
-				serviceModel.setRefClass(tempElement.getAttribute("class"));
-				serviceModel.setRef(tempElement.getAttribute("ref"));
-				serviceModel.setDescribe(tempElement.getAttribute("version"));
+				id = tempElement.getAttribute("id");
 				serviceModel.setVersion(tempElement.getAttribute("version"));
+				serviceModel.setRef(tempValue = tempElement.getAttribute("ref"));
+				if (converType.isEmpty(id) && !converType.isEmpty(tempValue)) {
+					id = converType.toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
+				}
+				serviceModel.setRefClass(tempValue = tempElement.getAttribute("class"));
+				if (converType.isEmpty(id) && !converType.isEmpty(tempValue)) {
+					id = converType.toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
+				}
+				serviceModel.setInterfaceName(tempValue = tempElement.getAttribute("interface"));
+				if (converType.isEmpty(id) && !converType.isEmpty(tempValue)) {
+					id = converType.toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
+				}
+				serviceModel.setId(id);
+				serviceModel.setDescribe(tempElement.getAttribute("describe"));
 				serviceModel.setMultiInstance(Boolean.valueOf(tempElement.getAttribute("multiInstance")));
 				// serviceModels.add(serviceModel);
 				serviceGroup.getServices().put(serviceModel.getId(), serviceModel);

@@ -86,10 +86,8 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 			multiInstance = referenceConfig.getMultiInstance();
 			tempClass = Class.forName(referenceConfig.getInterfaceName().replace("/", ".").replace(".class", ""));
 
-			id = referenceConfig.getId();
+			id = converType.isEmpty(referenceConfig.getId(), converType.toLowerCaseFirstOne(tempClass.getSimpleName()));
 			version = referenceConfig.getVersion();
-			// // 注册名
-			// serviceName = client.serviceImplementation();
 
 			final ClassBean classBean = new ClassBean(tempClass, id, version, multiInstance);
 			classBean.setInterfaceClassFile(tempClass);
@@ -103,57 +101,51 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 
 			BeanDefinition networkClient = parserContext.getRegistry().getBeanDefinition(BEAN_RMI_INVOKE_CLIENT);
 
-			// bean.addPropertyValue("rmiClientInvokeMethod", defaultListableBeanFactory.getBean(NettyRmiInvokeClientImpl.class));
 			bean.addPropertyValue("rmiClientInvokeMethod", networkClient);
 			if (multiInstance)
 				bean.setScope("prototype");
-			// defaultListableBeanFactory.registerBeanDefinition(id, bean.getRawBeanDefinition());
 			parserContext.getRegistry().registerBeanDefinition(id, bean.getRawBeanDefinition());
 
 			if (LOG.isDebugEnabled())
-				LOG.debug("RmiClient:" + classBean.getProxyClassFile().getName() + " ||  register:" + classBean.getRegistrationServiceName());
-			// 注解/xml
+				LOG.debug("application:{} || interface:{} || beanName:{} ||  version:{}", classBean.getRegistrationServiceName(), classBean.getInterfaceClassFile().getName(), classBean.getId(), classBean.getVersion());
 		}
 	}
 
 	public void serviceGroupHandle(ParserContext parserContext, ServiceGroupModel serviceGroupModel, final Map<String, MethodBean> METHOD_BEAN, String application) throws Throwable {
 
-		// DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
 		// 过滤
 		String tempValue;
 		String id = null;
-		Class<?> tempInterface;
+		Class<?> interfaceClass;
 		String version;
 		ServiceModel serviceConfig;
 		Method[] methods;
 		for (Entry<String, ServiceModel> en : serviceGroupModel.getServices().entrySet()) {
 			serviceConfig = en.getValue();
-			// 注解/xml
 			id = serviceConfig.getId();
 			serviceConfig.getInterfaceName();
-			String beanRef = id;
 			// 已注册，跳过
-			if (parserContext.getRegistry().containsBeanDefinition(beanRef))
+			if (null != id && parserContext.getRegistry().containsBeanDefinition(id))
 				continue;
 			version = serviceConfig.getVersion();
 			BeanDefinition serviceImpl;
 			// multiInstance = tempServiceConfig.isMultiInstance();
-			if (null != (beanRef = tempValue = serviceConfig.getRef()) && parserContext.getRegistry().containsBeanDefinition(tempValue)) {
-				serviceImpl = parserContext.getRegistry().getBeanDefinition(beanRef);
+			if (null != (tempValue = serviceConfig.getRef()) && parserContext.getRegistry().containsBeanDefinition(tempValue)) {
+				serviceImpl = parserContext.getRegistry().getBeanDefinition(tempValue);
 			} else {
 				serviceImpl = new RootBeanDefinition(Class.forName(serviceConfig.getRefClass()));
-				parserContext.getRegistry().registerBeanDefinition(id, serviceImpl);
 			}
-			tempInterface = Class.forName(serviceConfig.getInterfaceName());
+			interfaceClass = Class.forName(serviceConfig.getInterfaceName());
+			// id = converType.isEmpty(id, converType.toLowerCaseFirstOne(interfaceClass.getSimpleName()));
+			parserContext.getRegistry().registerBeanDefinition(id, serviceImpl);
 
 			// 注册
 			final ClassBean classBean = new ClassBean();
 			classBean.setRegistrationServiceName(application).setId(id).setVersion(version);
 			classBean.setProxyClassFile(serviceImpl.getClass());
-			classBean.setOriginalClassFile(tempInterface);
-			classBean.setInterfaceClassFile(tempInterface);
+			classBean.setOriginalClassFile(interfaceClass);
+			classBean.setInterfaceClassFile(interfaceClass);
 			// 分解Method
-			// 服务端
 			methods = classBean.getOriginalClassFile().getDeclaredMethods();
 			for (Method m : methods) {
 				final MethodBean bean = MethodBean.builder(classBean, m);
@@ -161,7 +153,7 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 				// rmiBeanFactory.putMethod(bean.getMd5Code(), bean);
 			}
 			if (LOG.isDebugEnabled())
-				LOG.debug("RmiServer:" + classBean.getProxyClassFile().getName() + "||   register:" + classBean.getRegistrationServiceName());
+				LOG.debug("application:{} || interface:{} || beanName:{} ||  version:{}", classBean.getRegistrationServiceName(), classBean.getInterfaceClassFile().getName(), classBean.getId(), classBean.getVersion());
 		}
 	}
 
@@ -171,7 +163,6 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 		}
 		Map<String, Set<String>> clazzes = scan.doScan(scanModel.getPackagePath());
 		ReferenceGroupModel referenceGroupModel = new ReferenceGroupModel(scanModel.getServiceName(), true);
-		// 过滤
 		Class<?> tempClass;
 		Set<String> classPaths;
 		String className;
@@ -187,9 +178,9 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 					className = it.next();
 					if (className.endsWith("class")) {
 						tempClass = Class.forName(className.replace("/", ".").replace(".class", ""));
-						// 注解/xml
+
 						if (null != (consumer = tempClass.getDeclaredAnnotation(RmiConsumerAnnotation.class))) {
-							// Rmi注解
+
 							referenceModel = new ReferenceModel();
 							referenceModel.setId(converType.isEmpty(consumer.id(), converType.toLowerCaseFirstOne(tempClass.getSimpleName())));
 							referenceModel.setInterfaceName(tempClass.getName());
@@ -218,7 +209,7 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 		Iterator<String> it;
 		RmiProviderAnnotation provider;
 		ServiceModel serviceModel;
-		// 扫描CLASS
+
 		for (Entry<String, Set<String>> en : clazzes.entrySet()) {
 			classPaths = en.getValue();
 			if (null != classPaths) {
@@ -227,9 +218,8 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 					className = it.next();
 					if (className.endsWith("class")) {
 						tempClass = Class.forName(className.replace("/", ".").replace(".class", ""));
-						// 注解/xml
+
 						if (null != (provider = tempClass.getDeclaredAnnotation(RmiProviderAnnotation.class))) {
-							// Rmi注解
 							serviceModel = new ServiceModel();
 							serviceModel.setInterfaceName(provider.interfaceClass().getName());
 							serviceModel.setVersion(converType.isEmpty(provider.version(), scanModel.getVersion()));
@@ -286,7 +276,6 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 							m.getReturnType()));
 			newClass.addMethod(CtNewMethod.make(methodString, newClass));
 		}
-		// newClass.writeFile("D:/Desktop/1");
 
 		return newClass.toClass();
 	}
@@ -322,8 +311,6 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 		else if (null != returnBody)
 			sb.append(returnBody).append(";");
 		sb.append("}");
-		// if (LOG.isDebugEnabled())
-		// LOG.debug(sb.toString());
 		return sb.toString();
 	}
 
@@ -341,8 +328,16 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 			return "((Integer)" + objectName + ").intValue()";
 		else if (("boolean").equals(typeName)) {
 			return "((Boolean)" + objectName + ").booleanValue()";
-		} else if (("float").equals(typeName)) {
-			return "((Float)" + objectName + ").floatValue()";
+		} else if (("short").equals(typeName)) {
+			return "((Short)" + objectName + ").shortValue()";
+		} else if (("byte").equals(typeName)) {
+			return "((Byte)" + objectName + ").byteValue()";
+		} else if (("long").equals(typeName)) {
+			return "((Long)" + objectName + ").longValue()";
+		} else if (("char").equals(typeName)) {
+			return "((Character)" + objectName + ").charValue()";
+		} else if (("double").equals(typeName)) {
+			return "((Double)" + objectName + ").doubleValue()";
 		}
 		return String.format("(%s)%s", t.getName(), objectName);
 	}

@@ -12,6 +12,7 @@ import org.w3c.dom.NodeList;
 
 import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.common.util.conver.CollectionUtil;
+import com.cheuks.bin.original.common.util.conver.ConverType;
 import com.cheuks.bin.original.common.util.pool.ObjectPoolManager;
 import com.cheuks.bin.original.rmi.GenerateRmiBeanFactory;
 import com.cheuks.bin.original.rmi.config.model.ReferenceModel;
@@ -21,6 +22,8 @@ import com.cheuks.bin.original.rmi.net.netty.client.NettyNetworkClient;
 public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 
 	private static final long serialVersionUID = 1L;
+
+	private final ConverType converType = new ConverType();
 
 	@Override
 	public AbstractConfig makeConfig(Element element, ParserContext parserContext) {
@@ -36,13 +39,15 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 		ReferenceModel referenceModel;
 		Node node;
 		Element tempElement;
+		String id;
 		for (int i = 0, len = list.getLength(); i < len; i++) {
 			node = list.item(i);
 			if (RMI_CONFIG_ELEMENT_REFERENCE.equals(node.getNodeName()) || RMI_CONFIG_ELEMENT_REFERENCE.equals(node.getLocalName())) {
 				tempElement = (Element) node;
 				referenceModel = new ReferenceModel();
-				referenceModel.setId(tempElement.getAttribute("id"));
-				referenceModel.setInterfaceName(tempElement.getAttribute("interface"));
+				referenceModel.setInterfaceName(id = tempElement.getAttribute("interface"));
+				id = converType.isEmpty(tempElement.getAttribute("id"), converType.toLowerCaseFirstOne(id.substring(id.lastIndexOf(".") + 1)));
+				referenceModel.setId(id);
 				referenceModel.setVersion(tempElement.getAttribute("version"));
 				referenceModel.setMultiInstance(Boolean.valueOf(element.getAttribute("multiInstance")));
 				referenceGroupModel.getReferenceGroup().put(referenceModel.getId(), referenceModel);
