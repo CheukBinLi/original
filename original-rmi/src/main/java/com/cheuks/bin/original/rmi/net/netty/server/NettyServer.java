@@ -44,13 +44,16 @@ public class NettyServer implements RmiContant {
 	private Thread work;
 
 	public synchronized void start() throws InterruptedException, NullPointerException {
+
 		try {
-			int poolSize = rmiConfigGroup.getProtocolModel().getNetWorkThreads();
-			if (poolSize < 0) {
-				poolSize = Runtime.getRuntime().availableProcessors() * 2;
-				rmiConfigGroup.getProtocolModel().setNetWorkThreads(poolSize);
+			if (rmiConfigGroup.getProtocolModel().getNetWorkThreads() < 0) {
+				rmiConfigGroup.getProtocolModel().setNetWorkThreads(Runtime.getRuntime().availableProcessors() * 2);
 			}
-			init(poolSize);
+			if (rmiConfigGroup.getProtocolModel().getHandleThreads() < 0) {
+				rmiConfigGroup.getProtocolModel().setHandleThreads(Runtime.getRuntime().availableProcessors() * 2);
+			}
+			initInfo();
+			init(rmiConfigGroup.getProtocolModel().getNetWorkThreads());
 		} catch (Throwable e) {
 			LOG.error("NettyServer.class -method: run()", e);
 		}
@@ -58,7 +61,6 @@ public class NettyServer implements RmiContant {
 
 	private void init(final int poolSize) throws Throwable {
 		if (null == work || work.interrupted()) {
-
 			if (LOG.isDebugEnabled())
 				LOG.info("server is start.");
 			if (null == rmiBeanFactory) {
@@ -69,9 +71,6 @@ public class NettyServer implements RmiContant {
 				throw new NullPointerException("cacheSerialize is null");
 			if (null == messageHandleFactory) {
 				messageHandleFactory = new HandleService();
-				if (rmiConfigGroup.getProtocolModel().getHandleThreads() < 0) {
-					rmiConfigGroup.getProtocolModel().setHandleThreads(Runtime.getRuntime().availableProcessors() * 2);
-				}
 				messageHandleFactory.start(rmiConfigGroup.getProtocolModel().getHandleThreads());
 			}
 			// messageHandleFactory = NettyHandleServiceFactory.newInstance(handleThreads);
@@ -172,6 +171,15 @@ public class NettyServer implements RmiContant {
 		synchronized (uploadLoadInfotask) {
 			uploadLoadInfotask.notify();
 		}
+	}
+
+	void initInfo() {
+		LOG.info("rmi server info.");
+		LOG.info("registration center address:{}", rmiConfigGroup.getRegistryModel().getServerAddress());
+		LOG.info("registration name:{}", rmiConfigGroup.getProtocolModel().getLocalName());
+		LOG.info("network address:{}", rmiConfigGroup.getProtocolModel().getLocalAddress());
+		LOG.info("network frame max size:{}", (rmiConfigGroup.getProtocolModel().getFrameLength() / 1024) + "KB");
+		LOG.info("network access thread:{} , message handle thread:{}", rmiConfigGroup.getProtocolModel().getNetWorkThreads(), rmiConfigGroup.getProtocolModel().getHandleThreads());
 	}
 
 	public NettyServer() {

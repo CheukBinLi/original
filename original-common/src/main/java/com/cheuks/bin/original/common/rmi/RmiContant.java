@@ -2,6 +2,8 @@ package com.cheuks.bin.original.common.rmi;
 
 public interface RmiContant {
 
+	String INIT_METHOD = "start";
+	
 	/***
 	 * 私有栈头标签
 	 */
@@ -30,8 +32,8 @@ public interface RmiContant {
 	String RMI_CONFIG_ELEMENT_REFERENCE = "reference";
 	String RMI_CONFIG_ATTRIBUTE_APPLICATION_NAME = "applicationName";
 
-	String BEAN_RMI_SERVICE_INIT="rmiServiceInit";
-	
+	String BEAN_RMI_SERVICE_INIT = "rmiServiceInit";
+
 	String BEAN_RMI_INVOKE_CLIENT = "rmiInvokeClient";
 	/***
 	 * NetworkServer

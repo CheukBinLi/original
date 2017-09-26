@@ -64,17 +64,17 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 
 		// objectPoolManager
 		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_OBJECT_POOL_MANAGER)) {
-			registerBeanDefinition(parserContext, ObjectPoolManager.class, BEAN_OBJECT_POOL_MANAGER, null);
+			registerBeanDefinition(parserContext, ObjectPoolManager.class, BEAN_OBJECT_POOL_MANAGER, null, null);
 		}
 		// RmiNetworkClinet
 		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_NETWORK_CLIENT)) {
 			Map<String, Object> proprety = CollectionUtil.newInstance().toMap(BEAN_OBJECT_POOL_MANAGER, getConfig(parserContext, BEAN_OBJECT_POOL_MANAGER), RMI_CONFIG_BEAN_CONFIG_GROUP, getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP), BEAN_CACHE_SERIALIZE,
 					getConfig(parserContext, BEAN_CACHE_SERIALIZE), BEAN_LOAD_BALANCE_FACTORY, getConfig(parserContext, BEAN_LOAD_BALANCE_FACTORY), RMI_CONFIG_BEAN_CONFIG_GROUP, getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP));
-			registerBeanDefinition(parserContext, NettyNetworkClient.class, BEAN_RMI_NETWORK_CLIENT, proprety);
+			registerBeanDefinition(parserContext, NettyNetworkClient.class, BEAN_RMI_NETWORK_CLIENT, proprety, "start");
 			// NettyRmiInvokeClientImpl
 			if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_INVOKE_CLIENT)) {
 				// Map<String, Object> property = CollectionUtil.newInstance().toMap(BEAN_RMI_NETWORK_CLIENT, rmiMainClient);
-				registerBeanDefinition(parserContext, NettyRmiInvokeClientImpl.class, BEAN_RMI_INVOKE_CLIENT, null);
+				registerBeanDefinition(parserContext, NettyRmiInvokeClientImpl.class, BEAN_RMI_INVOKE_CLIENT, null, null);
 			}
 		}
 
@@ -98,7 +98,7 @@ public class ReferenceGroupConfig extends AbstractConfig implements RmiContant {
 			referenceGroup = (Map<String, ReferenceGroupModel>) beanDefinition.getPropertyValues().get(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP);
 		} else {
 			referenceGroup = new ConcurrentSkipListMap<String, ReferenceGroupModel>();
-			registerBeanDefinition(parserContext, ReferenceGroup.class, RMI_CONFIG_BEAN_REFERENCE_GROUP, CollectionUtil.newInstance().toMap(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP, referenceGroup));
+			registerBeanDefinition(parserContext, ReferenceGroup.class, RMI_CONFIG_BEAN_REFERENCE_GROUP, CollectionUtil.newInstance().toMap(ReferenceGroup.REFERENCE_GROUP_FIELD_REFERENCE_GROUP, referenceGroup), null);
 			// rmiConfigGroup注入
 			BeanDefinition rmiConfigGroup = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_CONFIG_GROUP);
 			rmiConfigGroup.getPropertyValues().add(RMI_CONFIG_BEAN_CONFIG_REFERENCE_GROUP, parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_REFERENCE_GROUP));

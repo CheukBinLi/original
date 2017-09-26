@@ -11,7 +11,6 @@ import com.cheuks.bin.original.cache.FstCacheSerialize;
 import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.common.util.conver.CollectionUtil;
 import com.cheuks.bin.original.rmi.DefaultRmiBeanFactory;
-import com.cheuks.bin.original.rmi.SimpleRmiService;
 import com.cheuks.bin.original.rmi.config.ReferenceGroupConfig.ReferenceGroup;
 import com.cheuks.bin.original.rmi.config.ServiceGroupConfig.ServiceGroup;
 import com.cheuks.bin.original.rmi.config.model.ProtocolModel;
@@ -29,7 +28,7 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 		if (parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_CONFIG_GROUP))
 			return this;
 		RmiConfigGroup rmiConfigGroup = doParser(element, parserContext);
-		registerBeanDefinition(parserContext, RmiConfigGroup.class, RMI_CONFIG_BEAN_CONFIG_GROUP, CollectionUtil.newInstance().toMap("registryModel", rmiConfigGroup.getRegistryModel(), "protocolModel", rmiConfigGroup.getProtocolModel()));
+		registerBeanDefinition(parserContext, RmiConfigGroup.class, RMI_CONFIG_BEAN_CONFIG_GROUP, CollectionUtil.newInstance().toMap("registryModel", rmiConfigGroup.getRegistryModel(), "protocolModel", rmiConfigGroup.getProtocolModel()), null);
 		doGenerate(parserContext, rmiConfigGroup);
 		return this;
 	}
@@ -40,7 +39,7 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 		if (null != (tempValue = rmiConfigGroup.getProtocolModel().getRefSerialize()) && parserContext.getRegistry().containsBeanDefinition(tempValue)) {
 			parserContext.getRegistry().registerBeanDefinition(BEAN_CACHE_SERIALIZE, parserContext.getRegistry().getBeanDefinition(tempValue));
 		} else {
-			registerBeanDefinition(parserContext, FstCacheSerialize.class, BEAN_CACHE_SERIALIZE, null);
+			registerBeanDefinition(parserContext, FstCacheSerialize.class, BEAN_CACHE_SERIALIZE, null, null);
 		}
 		// 调用工厂 rmiBeanFactory
 		if (null != (tempValue = rmiConfigGroup.getProtocolModel().getRefRmiBeanFactory()) && parserContext.getRegistry().containsBeanDefinition(tempValue)) {
@@ -48,7 +47,7 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 			parserContext.getRegistry().registerBeanDefinition(BEAN_RMI_BEAN_FACTORY, parserContext.getRegistry().getBeanDefinition(tempValue));
 		} else {
 			if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_BEAN_FACTORY))
-				registerBeanDefinition(parserContext, DefaultRmiBeanFactory.class, BEAN_RMI_BEAN_FACTORY, null);
+				registerBeanDefinition(parserContext, DefaultRmiBeanFactory.class, BEAN_RMI_BEAN_FACTORY, null, null);
 		}
 		// loadBalanceFactory
 		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_LOAD_BALANCE_FACTORY)) {
@@ -70,12 +69,12 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 				loadBalanceFactory = P2pLoadBalanceFactory.class;
 			}
 			//
-			registerBeanDefinition(parserContext, loadBalanceFactory, BEAN_LOAD_BALANCE_FACTORY, CollectionUtil.newInstance().toMap("url", address));
+			registerBeanDefinition(parserContext, loadBalanceFactory, BEAN_LOAD_BALANCE_FACTORY, CollectionUtil.newInstance().toMap("url", address), null);
 		}
 		// simpleRmiService初始化
-		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_SERVICE_INIT)) {
-			registerBeanDefinition(parserContext, SimpleRmiService.class, BEAN_RMI_SERVICE_INIT, null);
-		}
+		// if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_SERVICE_INIT)) {
+		// registerBeanDefinition(parserContext, SimpleRmiService.class, BEAN_RMI_SERVICE_INIT, null);
+		// }
 	}
 
 	private RmiConfigGroup doParser(Element element, ParserContext parserContext) {
@@ -127,7 +126,7 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 
 				// registerBeanDefinition(parserContext, RegistryModel.class, RMI_CONFIG_BEAN_REGISTRY, property);
 				rmiConfigGroup.setRegistryModel(registryModel);
-			} 
+			}
 		}
 		return rmiConfigGroup;
 	}

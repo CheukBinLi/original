@@ -87,7 +87,7 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 			Map<String, Object> property = CollectionUtil.newInstance().toMap(RMI_CONFIG_BEAN_CONFIG_GROUP, getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP), BEAN_CACHE_SERIALIZE, getConfig(parserContext, BEAN_CACHE_SERIALIZE), BEAN_RMI_BEAN_FACTORY, rmiBeanFactory, BEAN_LOAD_BALANCE_FACTORY,
 					getConfig(parserContext, BEAN_LOAD_BALANCE_FACTORY));
 
-			registerBeanDefinition(parserContext, NettyServer.class, BEAN_RMI_NETWORK_SERVER, property);
+			registerBeanDefinition(parserContext, NettyServer.class, BEAN_RMI_NETWORK_SERVER, property, "start");
 		}
 
 		// 生成注入
@@ -109,7 +109,7 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 			serviceGroups = (Map<String, ServiceGroupModel>) bean.getPropertyValues().get(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG);
 		} else {
 			serviceGroups = new ConcurrentSkipListMap<String, ServiceGroupModel>();
-			registerBeanDefinition(parserContext, ServiceGroup.class, RMI_CONFIG_BEAN_SERVICE_GROUP, CollectionUtil.newInstance().toMap(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG, serviceGroups));
+			registerBeanDefinition(parserContext, ServiceGroup.class, RMI_CONFIG_BEAN_SERVICE_GROUP, CollectionUtil.newInstance().toMap(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG, serviceGroups), null);
 			// rmiConfigGroup注入
 			BeanDefinition rmiConfigGroup = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_CONFIG_GROUP);
 			rmiConfigGroup.getPropertyValues().add(RMI_CONFIG_BEAN_CONFIG_SERVICE_GROUP, parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_SERVICE_GROUP));
