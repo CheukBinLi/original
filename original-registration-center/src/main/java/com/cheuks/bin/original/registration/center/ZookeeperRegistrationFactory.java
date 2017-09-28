@@ -3,7 +3,6 @@ package com.cheuks.bin.original.registration.center;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -26,6 +25,8 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.data.Stat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.cheuks.bin.original.common.registrationcenter.ElectionCallBack;
 import com.cheuks.bin.original.common.registrationcenter.RegistrationEventListener;
@@ -33,6 +34,8 @@ import com.cheuks.bin.original.common.registrationcenter.RegistrationFactory;
 
 @SuppressWarnings("resource")
 public class ZookeeperRegistrationFactory implements RegistrationFactory<CuratorFramework, PathChildrenCacheEvent, NodeCache> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(ZookeeperRegistrationFactory.class);
 
 	private String serverList = "127.0.0.1:2181";// 127.0.0.1:2181,127.0.0.2:2181,192.168.3.12:2181
 
@@ -165,21 +168,21 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 
 			public void takeLeadership(CuratorFramework client) throws Exception {
 				isLeader = true;
-				// System.out.println(Thread.currentThread().getName() + "做了leader");
+//				System.out.println(Thread.currentThread().getName() + "is leader");
 				while (isLeader)
 					synchronized (leaderLock) {
 						electionCallBack.callBack(isLeader);
 						leaderLock.wait();
 						isLeader = false;
-						// System.out.println(Thread.currentThread().getName() + "释放leader");
+//						System.out.println(Thread.currentThread().getName() + "release leader");
 						// client.close();
 					}
-				// System.out.println(Thread.currentThread().getName() + "释放leader");
+//				System.out.println(Thread.currentThread().getName() + "release leader");
 			}
 
 			@Override
 			public void stateChanged(CuratorFramework client, ConnectionState newState) {
-				// System.out.println("重新加入选举");
+//				System.out.println("election state change:" + newState);
 				if ((newState == ConnectionState.SUSPENDED) || (newState == ConnectionState.LOST)) {
 					isLeader = false;
 					electionCallBack.callBack(isLeader);
@@ -215,7 +218,7 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 						try {
 							curatorFramework.getData().usingWatcher(watcher).forPath(path);
 						} catch (Exception e) {
-							e.printStackTrace();
+							LOG.error(null, e);
 						}
 					}
 				}
@@ -252,6 +255,7 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 						} catch (InterruptedException e) {
 							break;
 						} catch (Exception e) {
+							LOG.error(null, e);
 						}
 					}
 				}
@@ -315,54 +319,4 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 	public ZookeeperRegistrationFactory() {
 		super();
 	}
-
-	public static void main(String[] args) {
-		ZookeeperRegistrationFactory zrf = new ZookeeperRegistrationFactory();
-		zrf.serverList = "192.168.3.12:2181";
-		try {
-			zrf.start();
-			String directory = zrf.createService("/service", new RegistrationEventListener<PathChildrenCacheEvent>() {
-
-				public void nodeChanged(PathChildrenCacheEvent params, Object... obj) throws Exception {
-					System.err.println("createService:" + new String(params.getData().getData()));
-				}
-			});
-
-			zrf.register(directory + "/mmx_1", "朋友小红是我的！", new RegistrationEventListener<NodeCache>() {
-
-				public void nodeChanged(NodeCache params, Object... obj) throws Exception {
-					System.err.println("register:" + new String(params.getCurrentData().getData()));
-				}
-			});
-			zrf.register(directory + "/mmx_4", "我是mmx_4", null);
-			// zrf.register(directory + "/mmx_4/temp_node", "我是mmx_4的临时节点字节点", null);
-
-			zrf.setValue(directory + "/mmx_1", "441");
-
-			ElectionCallBack electionCallBack = new ElectionCallBack() {
-
-				public void callBack(boolean isLeader) {
-					while (isLeader) {
-						try {
-							Thread.sleep(5000);
-							System.out.println(Thread.currentThread().getName());
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-
-			};
-
-			zrf.election("/LeaderElection", electionCallBack);
-
-			zrf.reelect();
-
-			CountDownLatch cdl = new CountDownLatch(1);
-			cdl.await();
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-	}
-
 }
