@@ -86,17 +86,18 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 	}
 
 	public String register(String serviceDirectory, String value, final RegistrationEventListener<NodeCache> eventListener) throws Throwable {
-		byte[] valueByte = (null == value ? new byte[0] : value.getBytes());
+		byte[] valueByte = (null == value ? new byte[0] : value.getBytes("UTF-8"));
+
 		if (null == serviceDirectory || !serviceDirectory.startsWith("/"))
 			throw new Throwable("the serviceDirectory must be start with /  ,serviceDirectory:" + serviceDirectory);
-		// if (null == curatorFramework.checkExists().forPath(serviceDirectory))
-		// throw new Throwable("can't found " + serviceDirectory + " service.");
-
+		if (null == curatorFramework.checkExists().forPath(serviceDirectory))
+			throw new Throwable("can't found " + serviceDirectory + " service.");
 		if (null == curatorFramework.checkExists().forPath(serviceDirectory)) {
 			curatorFramework.create().withMode(CreateMode.EPHEMERAL).forPath(serviceDirectory, valueByte);
 		} else {
 			curatorFramework.setData().forPath(serviceDirectory, valueByte);
 		}
+		// curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(serviceDirectory, valueByte);
 
 		if (null != eventListener) {
 			final NodeCache nodeCache = new NodeCache(curatorFramework, serviceDirectory, false);
@@ -168,21 +169,21 @@ public class ZookeeperRegistrationFactory implements RegistrationFactory<Curator
 
 			public void takeLeadership(CuratorFramework client) throws Exception {
 				isLeader = true;
-//				System.out.println(Thread.currentThread().getName() + "is leader");
+				// System.out.println(Thread.currentThread().getName() + "is leader");
 				while (isLeader)
 					synchronized (leaderLock) {
 						electionCallBack.callBack(isLeader);
 						leaderLock.wait();
 						isLeader = false;
-//						System.out.println(Thread.currentThread().getName() + "release leader");
+						// System.out.println(Thread.currentThread().getName() + "release leader");
 						// client.close();
 					}
-//				System.out.println(Thread.currentThread().getName() + "release leader");
+				// System.out.println(Thread.currentThread().getName() + "release leader");
 			}
 
 			@Override
 			public void stateChanged(CuratorFramework client, ConnectionState newState) {
-//				System.out.println("election state change:" + newState);
+				// System.out.println("election state change:" + newState);
 				if ((newState == ConnectionState.SUSPENDED) || (newState == ConnectionState.LOST)) {
 					isLeader = false;
 					electionCallBack.callBack(isLeader);

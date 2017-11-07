@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://cheuks.bin.com/schema/rmi" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tool="http://www.springframework.org/schema/tool" targetNamespace="http://cheuks.bin.com/schema/rmi" elementFormDefault="qualified">
+
+	<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+	<xsd:import namespace="http://www.springframework.org/schema/tool" />
+
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[ Namespace support for the db-manager services provided by original framework.]]></xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:complexType name="serviceType">
+		<xsd:attribute name="id" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[register name|注入名称/唯一ID]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="interface" type="xsd:token" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[interface class|接口类]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="class" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[Implementation class|实现类]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="ref" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[ref Implementation bean|实现引用]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="version" type="xsd:string" default="1.0">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[Interface version|版本]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="multiInstance" type="xsd:boolean" default="false">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[Interface description|多实例模式,默认单例]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="describe" type="xsd:string" default="">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[Interface description|接口说明]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="referenceType" mixed="true">
+		<xsd:attribute name="id" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[register name|注入名称/id]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="interface" type="xsd:string" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[interface|接口类]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="version" type="xsd:string" default="1.0">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[version|版本]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="registryType">
+		<xsd:attribute name="serverAddress" use="required" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[[点对点连接 1]p2p://127.0.0.1:123[点对点连接2]127.0.0.1:123|[zookeeper注册中心地址]zookeeper://192.168.1.1:2181,192,168.1.2:2181|[consul注册中心(末完成，无法启动)]consul://192.168.1.1:8500]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="maxRetries" use="optional" type="xsd:integer" default="20">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[maxRetries max number of times to retry|重试次数]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="annotationDrivenServiceType">
+		<xsd:attribute name="applicationName" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[应用服务名]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="packagePath" use="required" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[描述注解包路径]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="version" type="xsd:string" default="1.0">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[version|版本]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="annotationDrivenReferenceType">
+		<xsd:attribute name="applicationName" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[应用服务名]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="packagePath" use="required" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[描述注解包路径]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="version" type="xsd:string" default="1.0">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[version|版本]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+
+
+	<xsd:complexType name="protocolType">
+		<xsd:attribute name="localName" use="optional" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[current server name|本服务器名称]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="localAddress" use="optional" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[local listen network interface|本地网络卡IP]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="port" use="required" type="xsd:integer">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[listen port|服务侦听端口]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+
+		<xsd:attribute name="netWorkThreads" use="optional" type="xsd:integer" default="-1">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[netWork listen pool size,default cpu * 2|服务侦听线程数]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="handleThreads" use="optional" type="xsd:integer" default="-1">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[handle message pool size,default cpu * 2|消息处理线程数]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="charset" use="optional" type="xsd:string" default="utf-8">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[coding|编码]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="frameLength" use="optional" type="xsd:integer" default="102400">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[network data frame length|数据块大小,默认100K]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="heartbeat" use="optional" type="xsd:integer" default="600">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[heartbeat interval second,default 10mi|心跳包间隔默认10分钟]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="packetSize" use="optional" type="xsd:integer" default="1024">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[data packet max size,default 5M|数据包大小，默认1M]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="callBackTimeOut" use="optional" type="xsd:integer" default="60">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[call back time out interval time,default 1mi|回调超时，默认1分钟]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="refSerialize" use="optional" type="xsd:string" default="">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[The serialized object references|序列化对像]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="refRmiBeanFactory" use="optional" type="xsd:string" default="">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[The remote invocation interface implementation class|rmi工厂]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="refServerMessageHandleFactory" use="optional" type="xsd:string" default="">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[The remote invocation interface implementation class|服务端，消息处理工厂]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="refClientMessageHandleFactory" use="optional" type="xsd:string" default="">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[The remote invocation interface implementation class|客户端，消息处理工厂]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:element name="config">
+		<xsd:complexType>
+			<xsd:all>
+				<xsd:element maxOccurs="1" name="registry" type="registryType"></xsd:element>
+				<xsd:element maxOccurs="1" name="protocol" type="protocolType"></xsd:element>
+			</xsd:all>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="annotation-driven">
+		<xsd:complexType>
+			<xsd:all>
+				<xsd:element name="service" type="annotationDrivenServiceType" minOccurs="0"></xsd:element>
+				<xsd:element name="reference" type="annotationDrivenReferenceType" minOccurs="0"></xsd:element>
+			</xsd:all>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="service-group">
+		<xsd:complexType>
+			<xsd:sequence minOccurs="0">
+				<xsd:element name="service" type="serviceType" maxOccurs="unbounded"></xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="applicationName" use="required"></xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="reference-group">
+		<xsd:complexType mixed="true">
+			<xsd:sequence minOccurs="0">
+				<xsd:element name="reference" type="referenceType" maxOccurs="unbounded"></xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="applicationName" use="required"></xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>
