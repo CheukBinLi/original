@@ -15,7 +15,7 @@
 	">
 
 	<!-- 自动扫描 -->
-	<bean id="scan" class="com.cheuks.bin.original.common.util.ScanSimple">
+	<bean id="scan" class="com.cheuks.bin.original.common.util.scan.ScanSimple">
 		<property name="scanPath" value="${com.cheuks.bin.original.common.util.scan.scanPath:mapper.*query$xml,lua.*$lua}" />
 	</bean>
 	<!-- 配置管理器 -->
