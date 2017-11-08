@@ -23,9 +23,9 @@ import java.util.Map;
  */
 public interface DBAdapter<Session> {
 
-	public DBAdapter<Session> setSessionFactory(String name);
+	DBAdapter<Session> setSessionFactory(String name);
 
-	public Session getSession();
+	Session getSession();
 
 	/***
 	 * 列表
@@ -35,7 +35,7 @@ public interface DBAdapter<Session> {
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getList(Class<?> c) throws Throwable;
+	<T> List<T> getList(Class<?> c) throws Throwable;
 
 	/***
 	 * 带分页列表
@@ -46,107 +46,7 @@ public interface DBAdapter<Session> {
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getList(Class<?> c, int page, int size) throws Throwable;
-
-	/***
-	 * HQL列表查询
-	 * 
-	 * @param hql
-	 *            hql
-	 * @param params
-	 *            参数(?)
-	 * @return
-	 * @throws Throwable
-	 */
-	public <T> List<T> getListByCustomSQL(String hql, Object... params) throws Throwable;
-
-	/***
-	 * 
-	 * 带分页HQL列表查询
-	 * 
-	 * @param hql
-	 *            hql
-	 * @param page
-	 *            页码
-	 * @param size
-	 *            条目
-	 * @param params
-	 *            参数( ? )
-	 * @return
-	 * @throws Throwable
-	 */
-	public <T> List<T> getListByCustomSQL(String hql, int page, int size, Object... params) throws Throwable;
-
-	/***
-	 * SQL列表查询
-	 * 
-	 * @param sql
-	 *            sql
-	 * @param params
-	 *            参数( ? )
-	 * @return
-	 * @throws Throwable
-	 */
-	public <T> List<T> getListBySQL(String sql, Object... params) throws Throwable;
-
-	/***
-	 * 
-	 * 带分页SQL列表查询
-	 * 
-	 * @param ql
-	 *            sql
-	 * @param page
-	 *            页码
-	 * @param size
-	 *            条目
-	 * @param params
-	 *            参数( ? )
-	 * @return
-	 * @throws Throwable
-	 */
-	public <T> List<T> getListBySQL(String sql, int page, int size, Object... params) throws Throwable;
-
-	public Object uniqueResult(String xql, boolean isCustomSQL, Object... params) throws Throwable;
-
-	public Object uniqueResult(String queryName, boolean isCustomSQL, boolean isFormat, Map<String, Object> params) throws Throwable;
-
-	/***
-	 * query模板查询
-	 * 
-	 * @param queryName
-	 *            查询语句名
-	 * @param params
-	 *            参数( :name )
-	 * @return
-	 * @throws Throwable
-	 */
-	public <T> List<T> getListByXqlQueryName(String queryName, boolean isCustomSQL, boolean isFormat, Map<String, Object> params) throws Throwable;
-
-	/***
-	 * 
-	 * @param queryName
-	 *            模板查询
-	 * @param params
-	 *            参数( 问题号 ? :数组传入 )
-	 * @return
-	 * @throws Throwable
-	 */
-	public <T> List<T> getListByXqlQueryName(String queryName, boolean isCustomSQL, Object... params) throws Throwable;
-
-	public <T> List<T> getListByXqlQueryName(String queryName, boolean isCustomSQL, int page, int size, Object... params) throws Throwable;
-
-	/***
-	 * 
-	 * query模板查询 * @param queryName 查询语句名
-	 * 
-	 * @param params
-	 *            参数( :name )
-	 * @param page
-	 * @param size
-	 * @return
-	 * @throws Throwable
-	 */
-	public <T> List<T> getListByXqlQueryName(String queryName, boolean isCustomSQL, boolean isFormat, Map<String, Object> params, int page, int size) throws Throwable;
+	<T> List<T> getList(Class<?> c, int page, int size) throws Throwable;
 
 	/***
 	 * 通过ID查询
@@ -156,7 +56,7 @@ public interface DBAdapter<Session> {
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> T get(Class<T> clazz, Serializable id) throws Throwable;
+	<T> T get(Class<T> clazz, Serializable id) throws Throwable;
 
 	/***
 	 * 通过ID查询
@@ -166,7 +66,7 @@ public interface DBAdapter<Session> {
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> T load(Class<T> clazz, Serializable id) throws Throwable;
+	<T> T load(Class<T> clazz, Serializable id) throws Throwable;
 
 	/***
 	 * 通过ID删除
@@ -174,7 +74,7 @@ public interface DBAdapter<Session> {
 	 * @param obj
 	 * @throws Throwable
 	 */
-	public void delete(Object obj) throws Throwable;
+	void delete(Object obj) throws Throwable;
 
 	/***
 	 * 批量删除
@@ -183,7 +83,7 @@ public interface DBAdapter<Session> {
 	 * @return
 	 * @throws Throwable
 	 */
-	public int deleteList(List<?> list) throws Throwable;
+	int deleteList(List<?> list) throws Throwable;
 
 	/***
 	 * 更新
@@ -191,7 +91,7 @@ public interface DBAdapter<Session> {
 	 * @param o
 	 * @throws Throwable
 	 */
-	public void update(Object o) throws Throwable;
+	void update(Object o) throws Throwable;
 
 	/***
 	 * 批量更新
@@ -199,7 +99,7 @@ public interface DBAdapter<Session> {
 	 * @param o
 	 * @throws Throwable
 	 */
-	public int updateList(List<?> list) throws Throwable;
+	int updateList(List<?> list) throws Throwable;
 
 	/***
 	 * 批量插入
@@ -208,7 +108,7 @@ public interface DBAdapter<Session> {
 	 * @return
 	 * @throws Throwable
 	 */
-	public int saveList(List<?> list) throws Throwable;
+	int saveList(List<?> list) throws Throwable;
 
 	/***
 	 * 插入
@@ -217,7 +117,7 @@ public interface DBAdapter<Session> {
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> T save(T t) throws Throwable;
+	<T> T save(T t) throws Throwable;
 
 	/***
 	 * 插入

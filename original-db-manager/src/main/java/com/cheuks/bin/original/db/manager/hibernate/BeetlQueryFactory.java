@@ -9,7 +9,6 @@ import javax.annotation.PostConstruct;
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
-import org.beetl.core.resource.StringTemplateResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

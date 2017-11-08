@@ -77,7 +77,7 @@ public class ScanSimple extends AbstractScan {
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
 		final String pathPattern = "^(/.*/|.*/)?" + path.replace("*", "(.*)?").replace("(.*)?(.*)?", "(.*)?").replace("(.*)?/(.*)?", "(/.*|.*/)?").replace("/.*/.*", "/.*") + "(/.*)?$";
 		// packageName
-//		final int startIndex = (new File(Thread.currentThread().getContextClassLoader().getResource("").getPath())).getPath().replace(File.separator, "/").length() + 1;
+		// final int startIndex = (new File(Thread.currentThread().getContextClassLoader().getResource("").getPath())).getPath().replace(File.separator, "/").length() + 1;
 		Set<URL> jarClassPaths = new HashSet<URL>();
 		Set<URL> fileClassPaths = new HashSet<URL>();
 		Set<String> result = new HashSet<String>();
@@ -109,6 +109,11 @@ public class ScanSimple extends AbstractScan {
 				return result;
 			}
 		}));
+		if (jarClassPaths.isEmpty())
+			countDownLatch.countDown();
+		if (fileClassPaths.isEmpty())
+			countDownLatch.countDown();
+		
 		countDownLatch.await();
 
 		result.addAll(futures.get(0).get());
@@ -147,7 +152,7 @@ public class ScanSimple extends AbstractScan {
 		try {
 			String filePath;
 			if (file.isFile()) {
-				if ((filePath=file.getPath().replace(File.separator, "/")).matches(pathPattern)) {
+				if ((filePath = file.getPath().replace(File.separator, "/")).matches(pathPattern)) {
 					// 文件添加返回
 					result.add(filePath.substring(filePath.indexOf(startIndex)));
 				}
@@ -208,7 +213,7 @@ public class ScanSimple extends AbstractScan {
 		Set<String> result3 = scan.getResource("org.springframework.orm.*");
 		// Set<String> result = scan.getResource("org.apache.*.spi.*Root*$class");
 		// Set<String> result = scan.getResource("mapper.*query$xml*");
-		 Set<String> result6 = scan.getResource("META-INF.maven.*xml");
+		Set<String> result6 = scan.getResource("META-INF.maven.*xml");
 		// Map<String, Set<String>> result1 = scan.resource;
 		System.out.println(result);
 		System.out.println(result2);

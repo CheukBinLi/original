@@ -30,18 +30,8 @@ public abstract class AbstractQueryFactory implements QueryType, QueryFactory {
 	private String index;
 	private Scan scan;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.cheuks.bin.original.db.manager.aa#put(java.lang.String, java.lang.String, java.lang.Object)
-	 */
 	public abstract void put(String name, String XQL, Object additional) throws Throwable;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.cheuks.bin.original.db.manager.aa#get(java.lang.String, java.util.Map, java.lang.Object)
-	 */
 	public abstract String get(String name, Map<String, Object> params, Object additional) throws Throwable;
 
 	protected void scan() {
@@ -52,7 +42,7 @@ public abstract class AbstractQueryFactory implements QueryType, QueryFactory {
 				return;
 			xmlExplain(o);
 		} catch (Throwable e) {
-			log().error("扫描文件失败", e);
+			log().error("fial by scan", e);
 		}
 	}
 

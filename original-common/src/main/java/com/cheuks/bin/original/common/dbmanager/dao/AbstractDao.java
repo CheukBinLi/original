@@ -36,22 +36,22 @@ public abstract class AbstractDao<entity extends BaseEntity, ID extends Serializ
         return getDBAdapter().getList(getEntityClass(), page, size);
     }
 
-    public List<entity> getList(Map<String, Object> params, int page, int size) throws Throwable {
-        return getDBAdapter().getListByXqlQueryName(createQueryName("list"), true, true, params, page, size);
-    }
+//    public List<entity> getList(Map<String, Object> params, int page, int size) throws Throwable {
+//        return getDBAdapter().getListByXqlQueryName(createQueryName("list"), true, true, params, page, size);
+//    }
 
-    public int getCount(Map<String, Object> params) throws Throwable {
-        Object o = getDBAdapter().uniqueResult(createQueryName("count"), true, true, params);
-        return Integer.valueOf(o.toString());
-    }
+//    public int getCount(Map<String, Object> params) throws Throwable {
+//        Object o = getDBAdapter().uniqueResult(createQueryName("count"), true, true, params);
+//        return Integer.valueOf(o.toString());
+//    }
 
-    public <T> List<T> getList(String queryName, Map<String, Object> params, boolean isFromat, int page, int size) throws Throwable {
-        return getDBAdapter().getListByXqlQueryName(createQueryName(queryName), true, isFromat, params, page, size);
-    }
+//    public <T> List<T> getList(String queryName, Map<String, Object> params, boolean isFromat, int page, int size) throws Throwable {
+//        return getDBAdapter().getListByXqlQueryName(createQueryName(queryName), true, isFromat, params, page, size);
+//    }
 
-    public List<entity> getListEntity(String queryName, Map<String, Object> params, boolean isFromat, int page, int size) throws Throwable {
-        return getDBAdapter().getListByXqlQueryName(createQueryName(queryName), true, isFromat, params, page, size);
-    }
+//    public List<entity> getListEntity(String queryName, Map<String, Object> params, boolean isFromat, int page, int size) throws Throwable {
+//        return getDBAdapter().getListByXqlQueryName(createQueryName(queryName), true, isFromat, params, page, size);
+//    }
 
     public entity save(entity o) throws Throwable {
         return getDBAdapter().save(o);
@@ -97,9 +97,9 @@ public abstract class AbstractDao<entity extends BaseEntity, ID extends Serializ
         return true;
     }
 
-    public Object uniqueResult(String queryName, boolean isFormat, Map<String, Object> params) throws Throwable {
-        return getDBAdapter().uniqueResult(createQueryName(queryName), true, isFormat, params);
-    }
+//    public Object uniqueResult(String queryName, boolean isFormat, Map<String, Object> params) throws Throwable {
+//        return getDBAdapter().uniqueResult(createQueryName(queryName), true, isFormat, params);
+//    }
 
     public int executeUpdate(String queryName, Map<String, Object> params, boolean isHql, boolean isFromat) throws Throwable {
         return getDBAdapter().executeUpdate(createQueryName(queryName), params, isHql, isFromat);
