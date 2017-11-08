@@ -217,6 +217,12 @@
 			<artifactId>hystrix-core</artifactId>
 			<version>1.5.12</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.cheuks.bin</groupId>
+			<artifactId>original-prototype-remote-jar-inf</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
