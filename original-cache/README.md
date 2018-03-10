@@ -5,7 +5,8 @@
 #### 开始：
 ````
 1:redis集群最少需要要6个服务器端，因此先搞6台虚拟机 我用 centOS-7 mini 每台给最少内存
-  IP固定为:200、201、202、203、204、205、206
+或者用docker 运行6个centos:latest,用--link 来互联即可。
+  IP固定为:200、201、202、203、204、205、206
   Vi  /etc/sysconfig/network-scripts/ifcfg-XXX  里修改
 一般只修改 
 BOOTPROTO=static
