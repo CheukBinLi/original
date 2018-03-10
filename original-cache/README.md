@@ -75,5 +75,6 @@ requirepass 123456
 或者用客户端设置
 config set requirepass 123456
 注意：能过客户端设置的密码，在重启后消失。
-redis-trib.rb 有比较多的功能，添加节点、删除节点等等。还要有就集群后  redis-cli 单机客户端 基上每次get/set 操作都会返回 [err]move …. 的跳转信息，这是正常的。
+redis-trib.rb 有比较多的功能，添加节点、删除节点等等。还要有就集群后  redis-cli 单机客户端 基上每次get/set 操作都会返回 
+[err]move …. 的跳转信息，这是正常的。
 ````
