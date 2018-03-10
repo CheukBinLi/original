@@ -17,7 +17,8 @@ GATEWAY=192.168.1.1 #网关
 DNS1=192.168.1.1  #写路由地址
 
 安装ruby、zlib、rubygems (一般安装ruby会同时安装其它两个组件)
-注意：最好不要去下载 ruby.gz来安装。试过安装完后会出现找不到zlib的错误信息，试了网上很多方法都不行。有兴趣折腾的可以玩玩，也可能是我手贱
+注意：最好不要去下载 ruby.gz来安装。试过安装完后会出现找不到zlib的错误信息，
+试了网上很多方法都不行。有兴趣折腾的可以玩玩，也可能是我手贱
 Yum install –y ruby
 下载ruby redis 接口(可以gem install redis 直接安装但速度奇慢)
 自选择要下载的版本  https://rubygems.org/gems/redis
