@@ -23,7 +23,9 @@ Yum install –y ruby
 自选择要下载的版本  https://rubygems.org/gems/redis
 安装 gem install  redis-XX.gem   (redis-XX.gem上面网址下载的gem脚本)
 
-下载安装redis (说起安装这东东，试过一次去面试被问这东东会安装吗？回答会。面试官很豪爽的叫，去给我安装来看看。怎么不问这个在开发上用在什么地方？为什么要用？觉是被看成是去应聘做管理员的公司的名字还很叼不公开了自己猜猜吧广州番禺的一家公司是奥园地产的子公司叫:O  MY GOD)
+下载安装redis (说起安装这东东，试过一次去面试被问这东东会安装吗？回答会。面试官很豪爽的叫，去给我安装来看看。
+怎么不问这个在开发上用在什么地方？为什么要用？觉是被看成是去应聘做管理员的公司的名字还很
+叼不公开了自己猜猜吧广州番禺的一家公司是奥园地产的子公司叫:O  MY GOD)
 官方安装教程：先安装  yum install gcc
 $ wget http://download.redis.io/releases/redis-3.2.1.tar.gz
 $ tar xzf redis-3.2.1.tar.gz
