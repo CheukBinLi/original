@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -16,8 +15,6 @@ import org.w3c.dom.Element;
 public abstract class AbstractConfig implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
-
-	protected final static Map<String, String> PROPERTIES = new ConcurrentSkipListMap<String, String>();
 
 	public abstract AbstractConfig makeConfig(Element element, ParserContext parserContext);
 

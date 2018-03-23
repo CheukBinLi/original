@@ -2,7 +2,10 @@ package com.cheuks.bin.original.test;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import com.alibaba.fastjson.JSON;
 
 public class x {
 
@@ -19,7 +22,16 @@ public class x {
 		System.out.println(a.substring(0, a.lastIndexOf(".")));
 
 		BigDecimal axxx = (BigDecimal) null;
+		
+		
+		System.err.println(new BigDecimal("99".toString()).compareTo(new BigDecimal(0))>0);
+		
+		String json="{\"is_instalments_pay\": \"N\",\"pay_amount\": 99}";
+		Map<String, Object>o=JSON.parseObject(json, Map.class);
+		
+		System.err.println(new BigDecimal(o.get("pay_amount").toString()).compareTo(new BigDecimal(0))>0);
 
+		System.out.println(new BigDecimal("0E-45").compareTo(BigDecimal.ZERO)==0);
 	}
 
 }

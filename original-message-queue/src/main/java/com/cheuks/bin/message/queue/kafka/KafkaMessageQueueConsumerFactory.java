@@ -32,8 +32,7 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 	 */
 	private String topicList;
 	/***
-	 * 用来唯一标识consumer进程所在组的字符串，如果设置同样的group id，表示这些processes都是属于同一个consumer
-	 * group
+	 * 用来唯一标识consumer进程所在组的字符串，如果设置同样的group id，表示这些processes都是属于同一个consumer group
 	 */
 	private String groupId;
 	/***
@@ -127,15 +126,20 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 						for (TopicPartition partition : records.partitions()) {
 							List<ConsumerRecord<String, String>> partitionRecords = records.records(partition);
 							for (ConsumerRecord<String, String> record : partitionRecords) {
+								System.err.println("topic:" + record.topic() + "\nkey" + record.key() + "\nvalue:" + record.value());
 								if (LOG.isDebugEnabled()) {
 									LOG.debug("topic:{}\nkey{}\nvalue:{}", record.topic(), record.key(), record.value());
 								}
-								//all
+								// all
 								iterador(HANDLER_POOL.get(ALL_TOPIC), record);
-								//过滤的topic
+								// 过滤的topic
 								iterador(HANDLER_POOL.get(record.topic()), record);
 							}
-							consumer.commitSync();// 同步
+							try {
+								consumer.commitSync();// 同步
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
 					}
 				} finally {

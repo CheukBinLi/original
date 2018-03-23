@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://cheuks.bin.com/schema/db" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tool="http://www.springframework.org/schema/tool" targetNamespace="http://cheuks.bin.com/schema/rmi" elementFormDefault="qualified">
+<xsd:schema xmlns="http://cheuks.bin.com/schema/db" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tool="http://www.springframework.org/schema/tool" targetNamespace="http://cheuks.bin.com/schema/db" elementFormDefault="qualified">
 
 	<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
@@ -15,58 +15,406 @@
 				<xsd:documentation><![CDATA[扫描注解目录(查询com[正则]下所有.xml的文件) 例：com.ben,com.*.a,query,com.*$xml]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="id" />
+		<xsd:attribute name="ref" />
+		<xsd:attribute name="class" />
 	</xsd:complexType>
 
-	<xsd:complexType name="mapperType">
+	<xsd:complexType name="resourceType">
 		<xsd:attribute name="resource" use="required" type="xsd:string">
 			<xsd:annotation>
-				<xsd:documentation><![CDATA[扫描注解目录(查询com[正则]下所有.xml的文件) 例：mapper.*$xml]]></xsd:documentation>
+				<xsd:documentation><![CDATA[文件完整路径]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:complexType>
 
-	<xsd:complexType name="mappersType">
-		<xsd:all>
-			<xsd:element maxOccurs="1" name="packagesToScan" type="annotationPackagesToScanType"></xsd:element>
-			<xsd:element minOccurs="0" name="mapper" type="mapperType"></xsd:element>
-		</xsd:all>
-	</xsd:complexType>
-
-	<xsd:complexType name="hibernateSessionFactoryType">
-		<xsd:attribute id="class" use="optional" default="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
-			<xsd:annotation><![CDATA[sessionFactory适配器]]></xsd:annotation>
+	<xsd:complexType name="referenceType" mixed="true">
+		<xsd:attribute name="id" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[register name|注入名称/id]]></xsd:documentation>
+			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="interface" type="xsd:string" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[interface|接口类]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="version" type="xsd:string" default="1.0">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[version|版本]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:simpleType name="hibernateDialectType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="org.hibernate.dialect.MySQLDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.MySQLInnoDBDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.MySQLMyISAMDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.DB2Dialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.DB2400Dialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.DB2390Dialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.PostgreSQLDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.OracleDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.Oracle9Dialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.SybaseDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.SybaseAnywhereDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.SQLServerDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.SAPDBDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.InformixDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.HSQLDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.IngresDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.ProgressDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.MckoiDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.InterbaseDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.PointbaseDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.FrontbaseDialect"></xsd:enumeration>
+			<xsd:enumeration value="org.hibernate.dialect.FirebirdDialect"></xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="booleanType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="true"></xsd:enumeration>
+			<xsd:enumeration value="false"></xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="hibernateSessionFactory">
 		<xsd:all>
-			<xsd:element maxOccurs="1" name="dataSource" type="xsd:string"></xsd:element>
-			<xsd:element maxOccurs="1" name="packagesToScan" type="xsd:string">
-				<xsd:annotation><![CDATA[扫描实体类]]></xsd:annotation>
+			<xsd:element name="resource" maxOccurs="1">
+				<!-- 扫描、文件映射配置 -->
+				<xsd:complexType>
+					<xsd:all>
+						<xsd:element name="entitys" maxOccurs="1">
+							<xsd:complexType>
+								<xsd:all>
+									<xsd:element minOccurs="0" maxOccurs="1" name="entityToScan" type="packagesToScanType"></xsd:element>
+									<xsd:element maxOccurs="1" minOccurs="1" name="datasource"></xsd:element>
+									<!-- <xsd:element minOccurs="0" name="entity" type="resourceType"></xsd:element> -->
+								</xsd:all>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element maxOccurs="1" name="mappers">
+							<xsd:complexType>
+								<xsd:all>
+									<xsd:element minOccurs="0" maxOccurs="1" name="mapperToScan" type="packagesToScanType"></xsd:element>
+									<xsd:element minOccurs="0" name="mapper" type="resourceType"></xsd:element>
+								</xsd:all>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:all>
+				</xsd:complexType>
 			</xsd:element>
-			<xsd:element maxOccurs="1" name="hibernate.current_session_context_class" default="org.springframework.orm.hibernate5.SpringSessionContext" type="xsd:string">
-				<xsd:annotation><![CDATA[]]>
-				</xsd:annotation>
+			<xsd:element minOccurs="0" name="javax.persistence.validation.mode">
+				<xsd:complexType>
+					<xsd:attribute name="value" use="optional" default="none">
+					</xsd:attribute>
+				</xsd:complexType>
 			</xsd:element>
-			<xsd:element maxOccurs="1" name="javax.persistence.validation.mode" type="xsd:string" default="none"></xsd:element>
-			<xsd:element maxOccurs="1" name="hibernate.dialect" type="xsd:string" fixed="MySQLDialect|MySQLInnoDBDialect|MySQLMyISAMDialect|OracleDialect|Oracle9Dialect|SybaseDialect|SybaseAnywhereDialect|SQLServerDialect|SAPDBDialect|	InformixDialect|HSQLDialect|IngresDialect|ProgressDialect|MckoiDialect|InterbaseDialect|PointbaseDialect|FrontbaseDialect|FirebirdDialect|PostgreSQLDialect|DB2390Dialect|DB2400Dialect|DB2Dialect"></xsd:element>
-			<xsd:element maxOccurs="1" name="hibernate.autoReconnect" type="xsd:string" fixed="false|true"></xsd:element>
-			<xsd:element maxOccurs="1" name="hibernate.show_sql" type="xsd:string" fixed="false|true"></xsd:element>
-			<xsd:element maxOccurs="1" name="hibernate.format_sql" type="xsd:string" fixed="false|true"></xsd:element>
-			<xsd:element maxOccurs="1" name="hibernate.hbm2ddl.auto" type="xsd:string" fixed="none|update|create"></xsd:element>
+			<xsd:element maxOccurs="1" name="hibernate.dialect">
+				<xsd:complexType>
+					<xsd:attribute name="value" use="required">
+						<xsd:simpleType>
+							<xsd:list itemType="hibernateDialectType"></xsd:list>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="hibernate.autoReconnect">
+				<xsd:complexType>
+					<xsd:attribute name="value" use="optional" default="false">
+						<xsd:simpleType>
+							<xsd:list itemType="booleanType"></xsd:list>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="hibernate.show_sql">
+				<xsd:complexType>
+					<xsd:attribute name="value" use="optional" default="false">
+						<xsd:simpleType>
+							<xsd:list itemType="booleanType"></xsd:list>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="hibernate.format_sql">
+				<xsd:complexType>
+					<xsd:attribute name="value" use="optional" default="false">
+						<xsd:simpleType>
+							<xsd:list itemType="booleanType"></xsd:list>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="hibernate.hbm2ddl.auto">
+				<xsd:complexType>
+					<xsd:attribute name="value" use="optional" default="none">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="none"></xsd:enumeration>
+								<xsd:enumeration value="update"></xsd:enumeration>
+								<xsd:enumeration value="create"></xsd:enumeration>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
 			<!-- 缓存 -->
-			<xsd:element maxOccurs="1" name="hibernate.cache.region.factory_class" type="xsd:string" default="org.hibernate.cache.ehcache.EhCacheRegionFactory"></xsd:element>
-			<xsd:element maxOccurs="1" name="cache.use_second_level_cache" type="xsd:string" fixed="true|false"></xsd:element>
-			<xsd:element maxOccurs="1" name="hibernate.cache.use_query_cache" type="xsd:string" fixed="true|false"></xsd:element>
-			<xsd:element maxOccurs="1" name="hibernate.cache.provider_configuration_file_resource_path" type="xsd:string" default="META-INF/ehcache.xml"></xsd:element>
+			<xsd:element minOccurs="0" name="hibernate.cache.region.factory_class">
+				<xsd:complexType>
+					<xsd:attribute name="value" use="optional" default="org.hibernate.cache.ehcache.EhCacheRegionFactory">
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="cache.use_second_level_cache">
+				<xsd:complexType>
+					<xsd:attribute name="value" use="optional" default="true">
+						<xsd:simpleType>
+							<xsd:list itemType="booleanType"></xsd:list>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="hibernate.cache.use_query_cache">
+				<xsd:complexType>
+					<xsd:attribute name="value" use="optional" default="true">
+						<xsd:simpleType>
+							<xsd:list itemType="booleanType"></xsd:list>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="hibernate.cache.provider_configuration_file_resource_path">
+				<xsd:complexType>
+					<xsd:attribute name="value" use="optional" default="META-INF/ehcache.xml">
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
 		</xsd:all>
+		<xsd:attribute name="id" use="optional" type="xsd:string" default="sessionFactory">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[bean id]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="class" use="optional" default="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[sessionFactory适配器]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="ref" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[引用sessionFactory适配器]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 	</xsd:complexType>
 
 
+	<xsd:attributeGroup name="bean">
+		<xsd:attribute name="id" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[bean id]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="class" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[类路径]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="ref" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[bean引用]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
 
+	<xsd:complexType name="dynamicRoutingDataSource">
+		<xsd:all>
+			<xsd:element name="handler" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:all>
+						<xsd:element name="filter" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation><![CDATA[拦截器]]></xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:attribute name="id" default="defaultFilterMethodName"></xsd:attribute>
+								<xsd:attribute name="expression" use="required">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[例：execution(* com..*.service..*.*(..))]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:all>
+					<xsd:attribute name="class" use="optional" default="com.cheuks.bin.original.db.manager.DynamicRoutingDataSourceHandler" />
+					<xsd:attribute name="ref" use="optional" />
+					<xsd:attribute name="enable" default="true">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[是否启用,默认启用。停用时默认使用第一个数据源]]></xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:list itemType="booleanType"></xsd:list>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="dataSources">
+				<xsd:complexType>
+					<xsd:all>
+						<xsd:element name="dataSource">
+							<xsd:complexType>
+								<xsd:attribute name="pattern" use="required">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[正则过滤方法名]]></xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+								<xsd:attribute name="dataSource" use="required">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[数据源bean id]]></xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:all>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:all>
+		<xsd:attribute name="id" use="optional" />
+		<xsd:attribute name="class" use="optional" default="com.cheuks.bin.original.db.manager.DynamicRoutingDataSource" />
+		<xsd:attribute name="ref" use="optional" />
+	</xsd:complexType>
 
-	<xsd:element name="config">
+	<xsd:complexType name="transactionManager">
+		<xsd:all>
+			<xsd:element name="sessionFactory" minOccurs="1">
+				<xsd:complexType>
+					<xsd:attribute name="name"></xsd:attribute>
+					<xsd:attribute name="ref" default="sessionFactory"></xsd:attribute>
+					<xsd:attribute name="class"></xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="patterns" minOccurs="0">
+				<xsd:complexType>
+					<xsd:attribute name="pattern" use="required" />
+					<xsd:attribute name="propagation" default="REQUIRED">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="MANDATORY">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[如果没有，就抛出异常；如果有，就使用当前事务。]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:enumeration>
+								<xsd:enumeration value="NESTED">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[如果没有，就新建一个事务；如果有，就在当前事务中嵌套其他事务。]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:enumeration>
+								<xsd:enumeration value="NEVER">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[如果没有，就以非事务方式执行；如果有，就抛出异常。]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:enumeration>
+								<xsd:enumeration value="NOT_SUPPORTED">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[如果没有，就以非事务方式执行；如果有，就将当前事务挂起。即无论如何不支持事务。]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:enumeration>
+								<xsd:enumeration value="REQUIRED">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[默认事务类型，如果没有，就新建一个事务；如果有，就加入当前事务。适合绝大多数情况。]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:enumeration>
+								<xsd:enumeration value="REQUIRES_NEW">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[如果没有，就新建一个事务；如果有，就将当前事务挂起。]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:enumeration>
+								<xsd:enumeration value="SUPPORTS">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[如果没有，就以非事务方式执行；如果有，就使用当前事务。]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:enumeration>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>
+					<xsd:attribute name="isolation" default="DEFAULT">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="DEFAULT">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[是一个PlatfromTransactionManager默认的隔离级别，使用数据库默认的事务隔离级别。]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:enumeration>
+								<xsd:enumeration value="READ_COMMITTED">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[保证一个事务修改的数据提交后才能被另外一个事务读取。另外一个事务不能读取该事务未提交的数据。这种事务隔离级别可以避免脏读出现，但是可能会出现不可重复读和幻像读。]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:enumeration>
+								<xsd:enumeration value="READ_UNCOMMITTED">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[这是事务最低的隔离级别，它充许别外一个事务可以看到这个事务未提交的数据。这种隔离级别会产生脏读，不可重复读和幻像读。(大部分数据库缺省的事物隔离级别都不会出现这种状况)]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:enumeration>
+								<xsd:enumeration value="REPEATABLE_READ">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[这种事务隔离级别可以防止脏读，不可重复读。但是可能出现幻像读。]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:enumeration>
+								<xsd:enumeration value="SERIALIZABLE">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[这是花费最高代价但是最可靠的事务隔离级别。事务被处理为顺序执行。除了防止脏读，不可重复读外，还避免了幻读。]]>
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:enumeration>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>
+					<xsd:attribute name="read-only">
+						<xsd:simpleType>
+							<xsd:restriction base="booleanType" />
+						</xsd:simpleType>
+					</xsd:attribute>
+					<xsd:attribute name="no-rollback-for">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[例：java.lang.RuntimeException]]>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="rollback-for">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[例：java.lang.Throwable]]>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="timeout" default="-1" />
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:all>
+		<xsd:attribute name="id" use="optional" />
+		<xsd:attribute name="class" use="optional" default="org.springframework.orm.hibernate5.HibernateTransactionManager" />
+		<xsd:attribute name="ref" use="optional" />
+	</xsd:complexType>
+
+	<xsd:element name="db-manager">
 		<xsd:complexType>
 			<xsd:all>
-				<xsd:element minOccurs="0" maxOccurs="1" name="packagesToScanType" type="annotationPackagesToScanType"></xsd:element>
-				<xsd:element minOccurs="0" maxOccurs="1" name="mappers" type="mappersType"></xsd:element>
+				<xsd:element name="hibernateSessionFactory" type="hibernateSessionFactory" maxOccurs="1" minOccurs="0"></xsd:element>
+				<xsd:element name="dynamicRoutingDataSource" type="dynamicRoutingDataSource" maxOccurs="1" minOccurs="0"></xsd:element>
+				<xsd:element name="transactionManager" type="transactionManager" maxOccurs="1" minOccurs="0"></xsd:element>
 			</xsd:all>
 		</xsd:complexType>
 	</xsd:element>

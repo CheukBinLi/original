@@ -28,5 +28,6 @@
     <module>original-prototype-quartz</module>
     <module>original-prototype-elastic-job</module>
     <module>original-prototype-mesos</module>
+    <module>original-prototype.spring.cloud</module>
   </modules>
 </project>

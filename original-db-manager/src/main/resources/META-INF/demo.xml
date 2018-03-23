@@ -1,13 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cheuks.bin.com/schema/rmi http://cheuks.bin.com/schema/rmi.xsd " > -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans
-	http://www.springframework.org/schema/beans/spring-beans.xsd
-  	http://cheuks.bin.com/schema/rmi
-	http://cheuks.bin.com/schema/rmi.xsd 
-	">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:db="http://cheuks.bin.com/schema/db" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cheuks.bin.com/schema/rmi http://cheuks.bin.com/schema/rmi.xsd ">
+	<!-- <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/rmi" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cheuks.bin.com/schema/db http://cheuks.bin.com/schema/db.xsd "> -->
 
-<!-- 	<rmi:config>
-		<rmi:registry address="localhost:2181" />
-		<rmi:protocol port="" />
-	</rmi:config> -->
+	<db:db-manager>
+		<db:hibernateSessionFactory id="sessionFactory" ref="" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+			<db:resource>
+				<db:entitys>
+					<db:entity resource="" />
+					<db:entityToScan packagesToScan="" />
+				</db:entitys>
+				<db:mappers>
+					<db:mapper resource="" />
+					<db:mapperToScan packagesToScan="" />
+				</db:mappers>
+			</db:resource>
+			<db:hibernate.dialect value="org.hibernate.dialect.DB2Dialect" />
+			<db:cache.use_second_level_cache />
+			<db:hibernate.autoReconnect />
+			<db:hibernate.cache.provider_configuration_file_resource_path />
+			<db:hibernate.cache.region.factory_class />
+			<db:hibernate.cache.use_query_cache />
+			<db:hibernate.format_sql />
+			<db:hibernate.hbm2ddl.auto />
+			<db:hibernate.show_sql />
+			<db:javax.persistence.validation.mode />
+		</db:hibernateSessionFactory>
+
+
+		<db:dynamicRoutingDataSource ref="" id="dbDynamicRoutingDataSoure" class="com.cheuks.bin.original.db.manager.DynamicRoutingDataSource">
+			<db:handler>
+				<db:filter expression="execution(* com..*.service..*.*(..))" />
+			</db:handler>
+			<db:dataSources>
+				<db:dataSource pattern="get*|load*" dataSource="mysql" />
+			</db:dataSources>
+		</db:dynamicRoutingDataSource>
+
+
+		<db:transactionManager id="" ref="" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+			<db:sessionFactory class="" name="" ref="sessionFactory" />
+			<db:patterns pattern="" isolation="DEFAULT" no-rollback-for="" timeout="-1" rollback-for="" read-only="true" propagation="REQUIRED" />
+		</db:transactionManager>
+	</db:db-manager>
 </beans>

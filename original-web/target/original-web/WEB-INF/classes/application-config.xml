@@ -43,6 +43,7 @@
 			</list>
 		</property>
 	</bean>
+	
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 		<property name="defaultEncoding" value="utf-8"></property>
 		<property name="maxUploadSize" value="10485760000"></property>
@@ -87,6 +88,7 @@
 	<import resource="HibernateDB.xml" />
 	<import resource="resource.xml" />
 	<import resource="beans.xml" />
-	<import resource="security.xml" />
-	<import resource="original.xml" />
+	<!-- <import resource="security.xml" /> -->
+	<import resource="rmi.xml" />
+	<!-- <import resource="original.xml" /> -->
 </beans>

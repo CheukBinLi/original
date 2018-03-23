@@ -1,5 +1,6 @@
 package com.cheuks.bin.message.queue.kafka;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -7,6 +8,7 @@ import java.util.Properties;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 
 public class ComsunerDemo {
@@ -16,8 +18,8 @@ public class ComsunerDemo {
 	void a() {
 
 		Properties props = new Properties();
-		props.put("bootstrap.servers", "10.73.11.117:9092");// 该地址是集群的子集，用来探测集群。
-//		props.put("bootstrap.servers", "10.17.38.12:9089");// 该地址是集群的子集，用来探测集群。
+		props.put("bootstrap.servers", "10.16.90.163:9089");// 该地址是集群的子集，用来探测集群。
+		// props.put("zookeeper.connect", "10.17.38.12:9089");// 该地址是集群的子集，用来探测集群。
 		props.put("group.id", "test_MBA_AAAAA_10");// 不同ID 可以同时订阅消息
 		props.put("enable.auto.commit", "false");// 自动提交offsets
 		props.put("auto.commit.interval.ms", "1000");// 每隔1s，自动提交offsets
@@ -25,7 +27,9 @@ public class ComsunerDemo {
 		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
-		consumer.subscribe(Arrays.asList("foo", "bar", "my-topic"));// 订阅TOPIC
+		consumer.subscribe(Arrays.asList("foo", "bar", "my-topic", "ddorders"));// 订阅TOPIC
+		System.err.println(new ArrayList<String>(consumer.listTopics().keySet()));
+//		consumer.subscribe(new ArrayList<String>(consumer.listTopics().keySet()));// 订阅所有TOPIC
 		try {
 			while (RUNNING) {// 轮询
 				ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);

@@ -35,10 +35,11 @@ public abstract class AbstractScan implements Scan {
 	private Set<String> getResource(String path, int count) throws Throwable {
 		if (count < 0)
 			return null;
-		if (!isInit) {
+		if (!isInit || !resource.containsKey(path)) {
 			if (lock.tryLock()) {
 				isInit = true;
 				try {
+					setScanPath(!isInit ? getScanPath() + "," + path : path);
 					Map<String, Set<String>> scan = doScan(getScanPath());
 					synchronized (resource) {
 						// for (Entry<String, Set<String>> en : scan.entrySet())

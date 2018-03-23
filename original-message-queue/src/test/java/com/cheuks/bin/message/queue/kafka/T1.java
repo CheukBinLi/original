@@ -23,7 +23,8 @@ public class T1 {
 			CountDownLatch countDownLatch = new CountDownLatch(1);
 			//			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("10.73.11.117:9091,10.73.11.117:9092", "T1_TOPIC,T2_TOPIC", "CCTV_1").init(null);
 			//			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("192.168.3.27:9092", "T1_TOPIC,T2_TOPIC", "CCTV_1").init(null);
-			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("10.17.38.13:9089", "*,afterSale,jdorders", "Y9").init(null);
+//			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("10.16.90.163:9089,10.16.90.164:9090,10.16.90.165:9091", "flightorders,*,afterSale,jdorders", "Y911").init(null);
+			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("10.17.149.62:9092,10.17.149.63:9092,10.17.149.64:9092", "flightorders,*,afterSale,jdorders", "Y911").init(null);
 			//all
 			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
 
@@ -32,7 +33,7 @@ public class T1 {
 				}
 
 				public Object getQueueInfo() {
-					return "jdorders";
+					return "flightorders";
 				}
 			});
 			//all
@@ -44,6 +45,16 @@ public class T1 {
 
 				public Object getQueueInfo() {
 					return "afterSale";
+				}
+			});
+			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
+				
+				public void doProcess(String value, Object originalObject) {
+					System.out.println("topic:jdorders : " + value);
+				}
+				
+				public Object getQueueInfo() {
+					return "jdorders";
 				}
 			});
 			//topic_1
@@ -91,7 +102,7 @@ public class T1 {
 			final CountDownLatch countDownLatch = new CountDownLatch(1);
 			//			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("192.168.3.27:9092,10.17.38.12:9089,10.73.11.117:9091,10.73.11.117:9092").init(null);
 			//			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("192.168.3.27:9092").init(null);
-			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("10.17.38.13:9089").init(null);
+			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("10.17.149.62:9092,10.17.149.63:9092,10.17.149.64:9092").init(null);
 			ExecutorService executorService = Executors.newCachedThreadPool();
 			executorService.execute(new Runnable() {
 				public void run() {
@@ -106,6 +117,7 @@ public class T1 {
 						}
 					}
 					messageQueueProducerFactory.makeMessage("T1_TOPIC", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
+					messageQueueProducerFactory.makeMessage("flightorders", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
 					countDownLatch.countDown();
 				}
 			});

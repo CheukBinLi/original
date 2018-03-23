@@ -145,6 +145,14 @@ public interface DBAdapter<Session> {
 
 	int executeUpdate(String queryName, Map<String, Object> params, boolean isCustomSQL, boolean isFromat) throws Throwable;
 
+	<T> T execute(String xql, Map<String, Object> params, boolean isCustomSQL, boolean isFromat) throws Throwable;
+
+	<T> T execute(String xql, List<Object> params, boolean isCustomSQL, boolean isFromat) throws Throwable;
+
+	<T> List<T> getList(String xql, Map<String, Object> params, boolean isCustomSQL, boolean isFromat) throws Throwable;
+
+	<T> List<T> getList(String xql, List<Object> params, boolean isCustomSQL, boolean isFromat) throws Throwable;
+
 	public int generateInsertSQL(Serializable entity) throws Throwable;
 
 	public String queryNameFormat(Class<?> entry, String queryName);

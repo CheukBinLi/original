@@ -218,11 +218,31 @@
 			<version>1.5.12</version>
 		</dependency>
 
-		<dependency>
+<!-- 		<dependency>
 			<groupId>com.cheuks.bin</groupId>
 			<artifactId>original-prototype-remote-jar-inf</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+		</dependency> -->
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.12</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.16.18</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>1.1.6</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

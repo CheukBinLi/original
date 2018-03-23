@@ -12,7 +12,7 @@ public class T1 {
 
 	public static void main(String[] args) throws Throwable {
 //		org.springframework.orm.hibernate5.LocalSessionFactoryBean
-		org.springframework.orm.hibernate5.HibernateTransactionManager
+//		org.springframework.orm.hibernate5.HibernateTransactionManager
 		PropertyConfigurator.configure(T1.class.getResource("/").getPath() + "log4j.properties");
 		Scan scan = new ScanSimple();
 		Map<String, Set<String>> s=scan.doScan("rmi.*$xml,com.*.binxx.*.test");
