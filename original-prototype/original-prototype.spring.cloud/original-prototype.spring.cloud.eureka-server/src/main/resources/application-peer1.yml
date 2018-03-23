@@ -1,0 +1,18 @@
+server:
+  port: 8761
+spring:
+  application:
+    name: eureka-server
+eureka:
+  server:
+    enableSelfPreservation: true
+  instance:
+    hostname: peer1
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    registry-fetch-interval-seconds: 30
+    serviceUrl:
+      defaultZone: http://192.168.2.1:8761/eureka/

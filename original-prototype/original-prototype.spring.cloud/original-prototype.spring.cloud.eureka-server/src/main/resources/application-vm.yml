@@ -1,0 +1,15 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: eureka-server
+
+eureka:
+  instance:
+    hostname: vm
+  client:
+    #加速检测
+    leaseRenewalIntervalInSeconds: 5
+    serviceUrl:
+      defaultZone: http://10.73.18.107:8761/eureka/
