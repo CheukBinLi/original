@@ -1,0 +1,6 @@
+projectKey=com.cheuks.bin:original-anything-test-sql-parser
+serverUrl=http://10.17.149.36:9000
+serverVersion=7.0.0.36138
+dashboardUrl=http://10.17.149.36:9000/dashboard/index/com.cheuks.bin:original-anything-test-sql-parser
+ceTaskId=AWHa3yYHlwVHbZh9jvpP
+ceTaskUrl=http://10.17.149.36:9000/api/ce/task?id=AWHa3yYHlwVHbZh9jvpP
