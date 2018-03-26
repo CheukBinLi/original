@@ -2,6 +2,7 @@ package com.cheuks.bin.original.prototype.spring.cloud.eureka.provider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,11 @@ public class ProviderController {
 
 	@RequestMapping(value = "/info", method = RequestMethod.GET)
 	public String info() {
+		return "success";
+	}
+
+	@GetMapping("/health")
+	public String health() {
 		return "success";
 	}
 }

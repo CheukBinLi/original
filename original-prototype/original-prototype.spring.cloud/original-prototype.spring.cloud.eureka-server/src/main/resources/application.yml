@@ -24,6 +24,9 @@ eureka:
     fetchRegistry: false
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    #关闭自我保护
+    enable-self-preservation: false 
 #      defaultZone: http://192.168.2.1:8761/eureka/
 #  server:
 #    waitTimeInMsWhenSyncEmpty: 0

@@ -7,5 +7,3 @@ eureka:
   client:
     service-url:
       defaultZone: http://192.168.2.1:8761/eureka/
-  instance:
-    hostname: provider-0

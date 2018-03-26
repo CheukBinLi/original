@@ -16,3 +16,5 @@ eureka:
     registry-fetch-interval-seconds: 30
     serviceUrl:
       defaultZone: http://192.168.2.1:8761/eureka/
+    healthcheck:
+      enable: true

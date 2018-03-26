@@ -5,14 +5,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.0.RELEASE</version>
+		<groupId>com.cheuks.bin</groupId>
+		<artifactId>original-prototype.spring.cloud</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>com.cheuks.bin</groupId>
-	<artifactId>original.prototype.spring.cloud.eureka-comsumer</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>original.prototype.spring.cloud.eureka-comsumer</name>
+	<artifactId>original.prototype.spring.cloud.hystrix-server</artifactId>
+	<name>original.prototype.spring.cloud.hystrix-server</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,18 +29,16 @@
 				<artifactId>spring-cloud-netflix-dependencies</artifactId>
 				<version>2.0.0.M7</version>
 				<type>pom</type>
-				<scope>import</scope>
+				<scope>compile</scope>
 			</dependency>
-			<!-- <dependency> <groupId>org.springframework.cloud</groupId> <artifactId>spring-cloud-netflix</artifactId> 
-				<version>2.0.0.M7</version> <type>pom</type> <scope>import</scope> </dependency> -->
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-			<!-- <artifactId>spring-cloud-netflix-eureka-server</artifactId> -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-actuator</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<!-- <artifactId>spring-cloud-netflix-ribbon</artifactId> -->
@@ -52,10 +48,12 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+			<artifactId>spring-cloud-netflix-hystrix-dashboard</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
@@ -63,14 +61,6 @@
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
-	<repositories>
-		<repository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/libs-milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+
+
 </project>
