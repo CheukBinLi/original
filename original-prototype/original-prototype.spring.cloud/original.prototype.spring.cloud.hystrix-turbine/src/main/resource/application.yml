@@ -1,0 +1,10 @@
+server:
+  port: 9000
+eureka:
+  client:
+    service-url:
+      defaultZone: http://192.168.2.1:8761/eureka/
+turbine:
+  aggregator:
+    cluster-config:
+    - consumer-service-0

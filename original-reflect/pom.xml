@@ -44,10 +44,10 @@
 			<artifactId>original-cache</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
+<!-- 		<dependency>
 			<groupId>com.cheuks.bin</groupId>
 			<artifactId>original-registration-center</artifactId>
 			<version>${project.version}</version>
-		</dependency>
+		</dependency> -->
 	</dependencies>
 </project>
