@@ -1,6 +1,7 @@
 package com.cheuks.bin.original.prototype.spring.cloud.eureka.comsumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +32,17 @@ public class ConsumerController {
 	@GetMapping("/health")
 	public String health() {
 		return "success";
+	}
+
+	@Value("${comsumer.username:nil}")
+	private String users;
+
+	@Value("${mp.post.create.QrCode:nil}")
+	private String qrCodeUrl;
+
+	@GetMapping("/users")
+	public String users() {
+		return this.users + "  qrCodeUrl: " + qrCodeUrl;
 	}
 
 	@HystrixCommand(fallbackMethod = "getName", groupKey = "mmx", commandProperties = {
