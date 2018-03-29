@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: consumer-service-0
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: true
+    config:
+#      label: master
+      name: weixin,users,comsumer,weixinurl
+      discovery:
+        enabled: true
+        service-id: config-server
+      profile: dev
+server:
+  port: 5001
+eureka:
+  client:
+    service-url:
+      defaultZone: http://192.168.2.1:8761/eureka/

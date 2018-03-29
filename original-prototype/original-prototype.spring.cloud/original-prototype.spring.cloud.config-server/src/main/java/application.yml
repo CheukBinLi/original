@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        health:
+          enabled: true
+        git:
+          uri: https://github.com/CheukBinLi/spring-cloud
+          search-paths:
+          - config
+server:
+  port: 10010
+eureka:
+  client:
+    service-url:
+      defaultZone: http://192.168.2.1:8761/eureka/
+management:
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
