@@ -12,6 +12,7 @@ spring:
         enabled: true
         service-id: config-server
       profile: dev
+      fail-fast: true
 server:
   port: 5001
 eureka:
