@@ -1,20 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ori="http://cheuks.bin.com/schema/original"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rmi="http://cheuks.bin.com/schema/original" xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans.xsd
-	http://www.springframework.org/schema/context
-	http://www.springframework.org/schema/context/spring-context-4.1.xsd
-	http://www.springframework.org/schema/aop
-	http://www.springframework.org/schema/aop/spring-aop-4.1.xsd						
-	http://www.springframework.org/schema/tx
-	http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
-	http://www.springframework.org/schema/mvc
-	http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
-	http://www.springframework.org/schema/task
-	http://www.springframework.org/schema/task/spring-task-4.1.xsd
+    	http://cheuks.bin.com/schema/original
+	http://cheuks.bin.com/schema/original/original.xsd
 	">
-	<ori:service interface="INTERFACE_1" class="CLASS_1" />
-	<ori:service interface="INTERFACE_2" class="CLASS_2" />
-	<ori:service interface="INTERFACE_3" class="CLASS_3" />
 
+	<rmi:protocol port="10086" host="10.73.11.80" />
+	<rmi:registry address="10.73.11.83:2181" />
+	<rmi:service interface="com.cheuks.bin.original.reflect.test2I" class="com.cheuks.bin.original.reflect.test2" id="testiiii" />
+	<rmi:reference interface="com.cheuks.bin.original.reflect.test2I" id="testllllll"/>
 </beans>

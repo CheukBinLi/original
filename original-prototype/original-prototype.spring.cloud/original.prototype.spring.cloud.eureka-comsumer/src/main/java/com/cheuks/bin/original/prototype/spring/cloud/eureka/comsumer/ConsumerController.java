@@ -1,8 +1,10 @@
 package com.cheuks.bin.original.prototype.spring.cloud.eureka.comsumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -10,7 +12,9 @@ import org.springframework.web.client.RestTemplate;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
+@Configurable
 @RestController
+@RefreshScope
 public class ConsumerController {
 
 	@Autowired
@@ -24,15 +28,15 @@ public class ConsumerController {
 		return "homePage";
 	}
 
-	@GetMapping("/info")
-	public String info() {
-		return "success";
-	}
-
-	@GetMapping("/health")
-	public String health() {
-		return "success";
-	}
+	// @GetMapping("/info")
+	// public String info() {
+	// return "success";
+	// }
+	//
+	// @GetMapping("/health")
+	// public String health() {
+	// return "success";
+	// }
 
 	@Value("${comsumer.username:nil}")
 	private String users;

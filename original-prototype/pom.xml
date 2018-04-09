@@ -29,5 +29,7 @@
     <module>original-prototype-elastic-job</module>
     <module>original-prototype-mesos</module>
     <module>original-prototype.spring.cloud</module>
+    <module>original-prototype-spring-boot</module>
+    <module>original-prototype-classloader</module>
   </modules>
 </project>

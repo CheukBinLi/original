@@ -6,7 +6,6 @@ spring:
       retry:
         enabled: true
     config:
-#      label: master
       name: weixin,users,comsumer,weixinurl
       discovery:
         enabled: true
@@ -19,3 +18,20 @@ eureka:
   client:
     service-url:
       defaultZone: http://192.168.2.1:8761/eureka/
+management:
+  scurity:
+    enabled: false
+  server:
+    port: 5002
+#  endpoint:
+#    health:
+#      enabled: true
+#    refresh:
+#      enabled: true
+#    heapdump:
+#      enabled: true
+#  server:
+#    port: 9931
+  health:
+    mail:
+      enabled: true

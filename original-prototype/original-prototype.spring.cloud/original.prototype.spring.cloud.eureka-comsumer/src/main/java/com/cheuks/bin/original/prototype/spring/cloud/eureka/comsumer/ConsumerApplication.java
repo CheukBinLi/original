@@ -22,7 +22,6 @@ import com.netflix.hystrix.contrib.metrics.eventstream.HystrixMetricsStreamServl
 @BootstrapConfiguration
 @EnableHystrixDashboard
 @EnableHystrix
-@RefreshScope
 public class ConsumerApplication {
 
 	public static void main(String[] args) {

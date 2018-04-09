@@ -16,8 +16,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://192.168.2.1:8761/eureka/
-management:
-  endpoint:
-    health:
-      enabled: true
-      show-details: always
+#management:
+#  endpoint:
+#    health:
+#      enabled: true
+#      show-details: always
