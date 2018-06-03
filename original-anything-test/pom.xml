@@ -20,6 +20,7 @@
 		<module>original-anything-test-jdbc-test</module>
     <module>original-anything-test-sql-parser</module>
     <module>original-anything-test-net</module>
+    <module>original-anything-test-x-to-html</module>
   </modules>
 	<dependencies>
 		<dependency>
