@@ -4,6 +4,8 @@ import com.cheuks.bin.original.common.cache.CacheSerialize;
 
 public interface RedisFactory extends RedisBinary, RedisCommand, RedisObject, RedisOO {
 
+	CacheSerialize getCacheSerialize();
+	
     void setCacheSerialize(CacheSerialize cacheSerialize);
 
     void setHost(String serverList);
