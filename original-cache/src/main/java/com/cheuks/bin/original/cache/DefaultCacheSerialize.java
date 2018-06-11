@@ -47,6 +47,11 @@ public class DefaultCacheSerialize implements CacheSerialize {
 
 	@SuppressWarnings("unchecked")
 	public <T> T decodeT(byte[] o) throws CacheException {
+		return (T) decodeT(o, null);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T decodeT(byte[] o, Class<T> t) throws CacheException {
 		return (T) decode(o);
 	}
 

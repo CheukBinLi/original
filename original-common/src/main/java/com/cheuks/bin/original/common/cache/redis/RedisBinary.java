@@ -127,4 +127,8 @@ public interface RedisBinary {
 
 	public Object eval(byte[] script, List<byte[]> keys, List<byte[]> params) throws RedisExcecption;
 
+	public Object evalSha(byte[] script, List<byte[]> keys, List<byte[]> params) throws RedisExcecption;
+
+	public Object evalSha(byte[] script, int keysCount, byte[]... params) throws RedisExcecption;
+
 }

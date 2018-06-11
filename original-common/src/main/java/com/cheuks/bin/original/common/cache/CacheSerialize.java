@@ -8,4 +8,6 @@ public interface CacheSerialize {
 
 	<T> T decodeT(byte[] o) throws CacheException;
 
+	<T> T decodeT(byte[] o, Class<T> t) throws CacheException;
+
 }

@@ -31,6 +31,10 @@ public class KryoCacheSerialize implements CacheSerialize {
 	}
 
 	public <T> T decodeT(byte[] o) throws CacheException {
+		return decodeT(o, null);
+	}
+
+	public <T> T decodeT(byte[] o, Class<T> t) throws CacheException {
 		Object result = decode(o);
 		return null == result ? null : (T) result;
 	}

@@ -1,5 +1,8 @@
 package com.cheuks.bin.original.db.manager.hibernate;
 
+import java.util.List;
+import java.util.Map;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -43,6 +46,25 @@ public class HibernateDBAdapter extends AbstractHibernateDBAdapter {
 	public HibernateDBAdapter setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 		return this;
+	}
+
+	public <T> T execute(String xql, Map<String, Object> params, boolean isCustomSQL, boolean isFromat)
+			throws Throwable {
+		return execute(xql, params, isCustomSQL, isFromat);
+	}
+
+	public <T> T execute(String xql, List<Object> params, boolean isCustomSQL, boolean isFromat) throws Throwable {
+		return execute(xql, params, isCustomSQL, isFromat);
+	}
+
+	public <T> List<T> getList(String xql, Map<String, Object> params, boolean isCustomSQL, boolean isFromat)
+			throws Throwable {
+		return getList(xql, params, isCustomSQL, isFromat);
+	}
+
+	public <T> List<T> getList(String xql, List<Object> params, boolean isCustomSQL, boolean isFromat)
+			throws Throwable {
+		return getList(xql, params, isCustomSQL, isFromat);
 	}
 
 }
