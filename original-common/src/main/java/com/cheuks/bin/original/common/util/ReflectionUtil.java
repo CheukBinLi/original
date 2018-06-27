@@ -24,7 +24,8 @@ public class ReflectionUtil {
 
 	protected final Set<Class<?>> WrapperClass = new HashSet<Class<?>>(Arrays.asList(String.class, Integer.class, Boolean.class, Character.class, Short.class, Long.class, Float.class, Byte.class));
 
-	protected final List<?> CollectionType = Arrays.asList(Collection.class, List.class, Set.class, Integer.class, int.class, Long.class, long.class, Float.class, float.class, Byte.class, byte.class, Character.class, char.class, String.class, Boolean.class, boolean.class, Double.class, double.class, Short.class, short.class);
+	//	protected final List<?> CollectionType = Arrays.asList(Collection.class, List.class, Set.class, Integer.class, int.class, Long.class, long.class, Float.class, float.class, Byte.class, byte.class, Character.class, char.class, String.class, Boolean.class, boolean.class, Double.class, double.class, Short.class, short.class);
+	protected final List<?> CollectionType = Arrays.asList(Collection.class, List.class, Set.class);
 
 	public static final ReflectionUtil instance() {
 		if (null == INSTANCE) {
@@ -196,5 +197,19 @@ public class ReflectionUtil {
 				result.addAll(scanClassField4List((Class<?>) t, isAccessible, true));
 		}
 		return result;
+	}
+
+	public boolean isCollection(Object o) {
+		List<Class<?>> interfaces = Arrays.asList(o.getClass().getInterfaces());
+		for (Object item : CollectionType) {
+			if (interfaces.contains(item)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isMap(Object o) {
+		return Arrays.asList(o.getClass().getInterfaces()).contains(Map.class);
 	}
 }
