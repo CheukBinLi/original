@@ -2,6 +2,7 @@ package com.cheuks.bin.original.common.util.scan;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -20,9 +21,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
+import java.util.zip.ZipEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.cheuks.bin.original.common.util.conver.StringUtil;
 
 /***
  * scanPath="mapper.*query$xml*"
@@ -77,7 +82,9 @@ public class ScanSimple extends AbstractScan {
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
 		final String pathPattern = "^(/.*/|.*/)?" + path.replace("*", "(.*)?").replace("(.*)?(.*)?", "(.*)?").replace("(.*)?/(.*)?", "(/.*|.*/)?").replace("/.*/.*", "/.*") + "(/.*)?$";
 		// packageName
-		// final int startIndex = (new File(Thread.currentThread().getContextClassLoader().getResource("").getPath())).getPath().replace(File.separator, "/").length() + 1;
+		// final int startIndex = (new
+		// File(Thread.currentThread().getContextClassLoader().getResource("").getPath())).getPath().replace(File.separator,
+		// "/").length() + 1;
 		Set<URL> jarClassPaths = new HashSet<URL>();
 		Set<URL> fileClassPaths = new HashSet<URL>();
 		Set<String> result = new HashSet<String>();
@@ -113,12 +120,11 @@ public class ScanSimple extends AbstractScan {
 			countDownLatch.countDown();
 		if (fileClassPaths.isEmpty())
 			countDownLatch.countDown();
-		
+
 		countDownLatch.await();
 
 		result.addAll(futures.get(0).get());
 		result.addAll(futures.get(1).get());
-
 		try {
 			return result;
 		} finally {
@@ -131,19 +137,61 @@ public class ScanSimple extends AbstractScan {
 		Set<String> result = new HashSet<String>();
 		Iterator<URL> it = urls.iterator();
 		URL u;
+		String jarPath;
+		String[] jarPaths;
+		String name;
 		while (it.hasNext()) {
 			u = it.next();
-			JarFile jarFile = new JarFile(new File(u.getPath().substring(0, u.getPath().lastIndexOf("!")).replaceAll("file:", "")));
-			Enumeration<JarEntry> jars = jarFile.entries();
-			while (jars.hasMoreElements()) {
-				JarEntry jarEntry = jars.nextElement();
-				if (jarEntry.getName().matches(pathPattern)) {
-					// result.add(jarEntry.getName().replace("/", "."));
-					result.add(jarEntry.getName());
+
+			if (StringUtil.newInstance().concatCount(jarPath = u.getPath(), ".jar!") == 2) {
+				jarPaths = jarPath.split("!");
+				JarFile jarFile = new JarFile(new File(jarPaths[0].replaceAll("file:/", "").replaceAll("file:", "")));
+				JarInputStream jarInputStream = new JarInputStream(jarFile.getInputStream(jarFile.getJarEntry(jarPaths[1].substring(1))));
+				ZipEntry zipEntry = null;
+				while (null != (zipEntry = jarInputStream.getNextEntry())) {
+					if (!zipEntry.isDirectory() && (name = zipEntry.getName()).matches(pathPattern)) {
+						result.add(name);
+					}
+				}
+			} else {
+
+				JarFile jarFile = new JarFile(new File(u.getPath().substring(0, u.getPath().lastIndexOf("!")).replaceAll("file:", "")));
+				Enumeration<JarEntry> jars = jarFile.entries();
+				while (jars.hasMoreElements()) {
+					JarEntry jarEntry = jars.nextElement();
+					// if ((name =
+					// jarEntry.getName()).toLowerCase().endsWith("jar")) {
+					// jarInJar(result, pathPattern,
+					// jarFile.getInputStream(jarEntry));
+					// }
+					if ((name = jarEntry.getName()).matches(pathPattern)) {
+						// result.add(jarEntry.getName().replace("/", "."));
+						result.add(name);
+					}
 				}
 			}
 		}
 		return result;
+	}
+
+	@SuppressWarnings("resource")
+	@Deprecated
+	protected final void jarInJar(final Set<String> result, String pathPattern, InputStream in) throws IOException {
+		ZipEntry jarEntry = null;
+		String name;
+		JarInputStream jarInputStream = new JarInputStream(in);
+		while (null != (jarEntry = jarInputStream.getNextEntry())) {
+			if (jarEntry.isDirectory())
+				continue;
+			if ((name = jarEntry.getName()).toLowerCase().endsWith("jar")) {
+				// 末实现
+				continue;
+			}
+			if (name.matches(pathPattern)) {
+				result.add(jarEntry.getName());
+			}
+		}
+
 	}
 
 	protected final Set<String> fileTypeFilter(File file, String pathPattern, String startIndex) {
@@ -205,13 +253,15 @@ public class ScanSimple extends AbstractScan {
 
 	public static void main(String[] args) throws Throwable {
 
-		// Map<String, Set<String>> result = new ScanSimple().doScan("META-INF.maven.*xml,com.cheuks.*");
+		// Map<String, Set<String>> result = new
+		// ScanSimple().doScan("META-INF.maven.*xml,com.cheuks.*");
 		AbstractScan scan = new ScanSimple();
 		scan.setScanPath("META-INF.maven.*xml,com.cheuks.*,mapper.*query$xml*,org/apache/*/spi/**Root*$class,com.cheuks.*,org.springframework.orm.*");
 		Set<String> result = scan.getResource("org/apache/*/spi/*/*Root*$class");
 		Set<String> result2 = scan.getResource("com.cheuks.*");
 		Set<String> result3 = scan.getResource("org.springframework.orm.*");
-		// Set<String> result = scan.getResource("org.apache.*.spi.*Root*$class");
+		// Set<String> result =
+		// scan.getResource("org.apache.*.spi.*Root*$class");
 		// Set<String> result = scan.getResource("mapper.*query$xml*");
 		Set<String> result6 = scan.getResource("META-INF.maven.*xml");
 		// Map<String, Set<String>> result1 = scan.resource;

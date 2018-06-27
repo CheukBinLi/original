@@ -1,5 +1,9 @@
 package com.cheuks.bin.original.common.util.conver;
 
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /***
  * 
  * @Title: original-common
@@ -47,5 +51,27 @@ public class StringUtil extends ConverType {
 		result = result.replaceAll("\\.\\*", "\\*");
 		result = result.replaceAll("\\*|\\*\\*", "(\\.*)?");
 		return result;
+	}
+
+	public int concatCount(String content, String regex) {
+		Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+		Matcher m = p.matcher(content);
+		int count = 0;
+		while (m.find()) {
+			count++;
+		}
+		return count;
+	}
+
+	public static void main(String[] args) {
+		System.out.println(StringUtil.newInstance().concatCount(
+				"file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua",
+				".jar!"));
+
+		String a = "file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua";
+		String[] as = a.split("!");
+		System.err.println(Arrays.toString(as));
+		System.out.println(a.substring(a.lastIndexOf(".jar!") + 5));
+
 	}
 }
