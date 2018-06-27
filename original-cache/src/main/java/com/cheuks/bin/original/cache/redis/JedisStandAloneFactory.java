@@ -4,8 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +15,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-@SuppressWarnings({ "unchecked", "restriction" })
+@SuppressWarnings({ "unchecked" })
 public class JedisStandAloneFactory implements RedisFactory {
 
 	private static transient final Logger LOG = LoggerFactory.getLogger(JedisStandAloneFactory.class);
@@ -64,7 +62,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		jedis.close();
 	}
 
-	@PostConstruct
+	//	@PostConstruct
 	synchronized void init() {
 		if (isInit)
 			return;
@@ -75,8 +73,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 		config = new JedisPoolConfig();
 		config.setTestOnBorrow(testOnBorrow);
-		pool = ((null != password && password.length() > 1) ? new JedisPool(config, host, port, timeOut, password)
-				: new JedisPool(config, host, port, timeOut));
+		pool = ((null != password && password.length() > 1) ? new JedisPool(config, host, port, timeOut, password) : new JedisPool(config, host, port, timeOut));
 	}
 
 	public void delete(byte[] key) throws RedisExcecption {
@@ -1024,8 +1021,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 
 	public boolean setMapObject(String key, Object mapKey, Object value) throws RedisExcecption {
 		try {
-			return this.setMap(key.getBytes(getEncoding()), getCacheSerialize().encode(mapKey),
-					getCacheSerialize().encode(value));
+			return this.setMap(key.getBytes(getEncoding()), getCacheSerialize().encode(mapKey), getCacheSerialize().encode(value));
 		} catch (Throwable e) {
 			throw new RedisExcecption(e);
 		}
@@ -1160,8 +1156,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 
 	public boolean setMapOO(Object key, Object mapKey, Object value) throws RedisExcecption {
 		try {
-			return this.setMap(getCacheSerialize().encode(key), getCacheSerialize().encode(mapKey),
-					getCacheSerialize().encode(value));
+			return this.setMap(getCacheSerialize().encode(key), getCacheSerialize().encode(mapKey), getCacheSerialize().encode(value));
 		} catch (Throwable e) {
 			throw new RedisExcecption(e);
 		}
