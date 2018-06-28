@@ -25,6 +25,36 @@ public class ObjectToJson {
 
 	private volatile SimpleDateFormat defaultFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+	private volatile DefaultPropertyInclusion defaultPropertyInclusion = DefaultPropertyInclusion.ALWAYS;
+
+	public static enum DefaultPropertyInclusion {
+		/**
+		 * Value that indicates that properties are to be always included, independent of value
+		 */
+		ALWAYS,
+
+		/**
+		 * Value that indicates that only properties with non-null values are to be included.
+		 */
+		NON_NULL,
+
+		/**
+		 * Value that indicates that only properties that have values that differ from default settings (meaning values they have when Bean is constructed with its no-arguments constructor) are to be included. Value is generally not useful with {@link java.util.Map}s, since they have no default values; and if used, works same as {@link #ALWAYS}.
+		 */
+		NON_DEFAULT,
+
+		/**
+		 * Value that indicates that only properties that have values that values that are null or what is considered empty are not to be included. Emptiness is defined for following type:
+		 * <ul>
+		 * <li>For {@link java.util.Collection}s and {@link java.util.Map}s, method <code>isEmpty()</code> is called;</li>
+		 * <li>For Java arrays, empty arrays are ones with length of 0</li>
+		 * <li>For Java {@link java.lang.String}s, <code>length()</code> is called, and return value of 0 indicates empty String</li>
+		 * </ul>
+		 * For other types, non-null values are to be included.
+		 */
+		NON_EMPTY
+	}
+
 	public SimpleDateFormat getDefaultFormat() {
 		return defaultFormat;
 	}
@@ -32,6 +62,19 @@ public class ObjectToJson {
 	public ObjectToJson setDefaultFormat(String format) {
 		this.defaultFormat = new SimpleDateFormat(format);
 		return this;
+	}
+
+	public DefaultPropertyInclusion getDefaultPropertyInclusion() {
+		return defaultPropertyInclusion;
+	}
+
+	public ObjectToJson setDefaultPropertyInclusion(DefaultPropertyInclusion defaultPropertyInclusion) {
+		this.defaultPropertyInclusion = defaultPropertyInclusion;
+		return this;
+	}
+
+	public void setDefaultFormat(SimpleDateFormat defaultFormat) {
+		this.defaultFormat = defaultFormat;
 	}
 
 	protected ObjectToJson() {
@@ -67,10 +110,28 @@ public class ObjectToJson {
 				continue;
 			}
 			tempValue = field.get(o);
-			if (null != field && !field.getType().isPrimitive() && !reflectionUtil.isWrapperClass(tempValue.getClass())) {
-				recursionSub(field.getName(), tempValue, result, null, filterProvider);
+			if (null != tempValue && null != field && !field.getType().isPrimitive() && !reflectionUtil.isWrapperClass(tempValue.getClass()) && Date.class != tempValue.getClass()) {
+				if (reflectionUtil.isMap(tempValue) || reflectionUtil.isCollection(tempValue)) {
+					recursionSub(field.getName(), tempValue, result, null, filterProvider);
+				} else {
+					result.append("\"").append(tagName).append("\":");
+					recursion(tempValue, null, filterProvider, result);
+				}
 			} else if (null != tempValue) {
 				result.append("\"").append(tagName).append("\"").append(":\"").append(Date.class == tempValue.getClass() ? defaultFormat.format(tempValue) : tempValue.toString()).append("\"");
+			} else {
+				switch (this.defaultPropertyInclusion) {
+				case ALWAYS:
+					result.append("\"").append(tagName).append("\"").append(":\"null\"");
+					break;
+				case NON_NULL:
+					break;
+				case NON_EMPTY:
+					result.append("\"").append(tagName).append("\"").append(":\"\"");
+					break;
+				default:
+					break;
+				}
 			}
 			result.append(",");
 		}
@@ -81,6 +142,7 @@ public class ObjectToJson {
 
 	private void recursionSub(final String name, final Object value, final StringBuilder result, final List<Field> fieldData, FilterProvider filterProvider) throws Exception {
 		boolean isMap;
+		boolean isCollection = false;
 		Map<?, ?> map = null;
 		List<Field> subField;
 		Object tempSubValue;
@@ -91,13 +153,13 @@ public class ObjectToJson {
 		boolean isDate;
 		Filter currentClazz = null == filterProvider ? null : filterProvider.getFilterByClass(value.getClass());
 		Filter filterAll = null == filterProvider ? null : filterProvider.getFilterByClass(null);
-		if ((isMap = reflectionUtil.isMap(value)) || reflectionUtil.isCollection(value)) {
+		if ((isMap = reflectionUtil.isMap(value)) || (isCollection = reflectionUtil.isCollection(value))) {
 			if (isMap) {
 				map = (Map<?, ?>) value;
 				if (map.isEmpty()) {
 					return;
 				}
-			} else {
+			} else if (isCollection) {
 				collection = (Collection<?>) value;
 				if (collection.isEmpty()) {
 					return;
@@ -223,6 +285,8 @@ public class ObjectToJson {
 		//		System.out.println(new ObjectToJson().writeToString(result, new FilterProvider(new Filter(Result.class, "msg"), new Filter(null, "abc"))));
 		//
 		//		System.out.println(new ObjectToJson().writeToString(new Result<Object>("11", "xxx", a), new FilterProvider(new Filter(Result.class, "msg"), new Filter(null, "abc1"))));
+		//
+		//		System.out.println(new ObjectToJson().writeToString(new Result<>("111", "xxxxxx", new TagEntity(1L, 2L, "31", null, 1)), new FilterProvider(new Filter(null, "msg"), new Filter(null, "abc1"))));
 
 	}
 
