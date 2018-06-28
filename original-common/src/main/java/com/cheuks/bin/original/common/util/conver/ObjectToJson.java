@@ -110,7 +110,7 @@ public class ObjectToJson {
 				continue;
 			}
 			tempValue = field.get(o);
-			if (null != tempValue && null != field && !field.getType().isPrimitive() && !reflectionUtil.isWrapperClass(tempValue.getClass()) && Date.class != tempValue.getClass()) {
+			if (null != tempValue && null != field && !field.getType().isPrimitive() && !reflectionUtil.isWrapperClass(tempValue.getClass()) && !Date.class.equals(field.getType())) {
 				if (reflectionUtil.isMap(tempValue) || reflectionUtil.isCollection(tempValue)) {
 					recursionSub(field.getName(), tempValue, result, null, filterProvider);
 				} else {
@@ -118,7 +118,7 @@ public class ObjectToJson {
 					recursion(tempValue, null, filterProvider, result);
 				}
 			} else if (null != tempValue) {
-				result.append("\"").append(tagName).append("\"").append(":\"").append(Date.class == tempValue.getClass() ? defaultFormat.format(tempValue) : tempValue.toString()).append("\"");
+				result.append("\"").append(tagName).append("\"").append(":\"").append(Date.class.equals(field.getType()) ? defaultFormat.format(tempValue) : tempValue.toString()).append("\"");
 			} else {
 				switch (this.defaultPropertyInclusion) {
 				case ALWAYS:
@@ -150,7 +150,7 @@ public class ObjectToJson {
 		Collection<?> collection = null;
 		Iterator<?> it;
 		Entry<?, ?> en;
-		boolean isDate;
+		boolean isDate = false;
 		Filter currentClazz = null == filterProvider ? null : filterProvider.getFilterByClass(value.getClass());
 		Filter filterAll = null == filterProvider ? null : filterProvider.getFilterByClass(null);
 		if ((isMap = reflectionUtil.isMap(value)) || (isCollection = reflectionUtil.isCollection(value))) {
@@ -179,7 +179,21 @@ public class ObjectToJson {
 						result.append(",");
 						continue;
 					}
-					if ((isDate = Date.class == tempSubValue.getClass()) || tempSubValue.getClass().isPrimitive() || reflectionUtil.isWrapperClass(tempSubValue.getClass())) {
+					if (null == tempSubValue) {
+						switch (this.defaultPropertyInclusion) {
+						case ALWAYS:
+							result.append("\"").append(tempSubKey).append("\"").append(":\"null\"");
+							break;
+						case NON_NULL:
+							break;
+						case NON_EMPTY:
+							result.append("\"").append(tempSubKey).append("\"").append(":\"\"");
+							break;
+						default:
+							break;
+						}
+						result.append(",");
+					} else if ((isDate = Date.class.equals(tempSubValue.getClass())) || tempSubValue.getClass().isPrimitive() || reflectionUtil.isWrapperClass(tempSubValue.getClass())) {
 						//						result.append(writeToString(tempSubValue, subField)).append(",");
 						result.append("{\"").append(tempSubKey.toString()).append("\":\"").append(isDate ? defaultFormat.format(tempSubValue) : tempSubValue).append("\"},");
 					} else {
