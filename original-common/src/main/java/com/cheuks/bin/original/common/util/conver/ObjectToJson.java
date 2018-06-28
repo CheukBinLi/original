@@ -1,8 +1,10 @@
 package com.cheuks.bin.original.common.util.conver;
 
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +22,17 @@ public class ObjectToJson {
 	private ReflectionUtil reflectionUtil = ReflectionUtil.instance();
 
 	private static ObjectToJson INSTANCE;
+
+	private volatile SimpleDateFormat defaultFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+	public SimpleDateFormat getDefaultFormat() {
+		return defaultFormat;
+	}
+
+	public ObjectToJson setDefaultFormat(String format) {
+		this.defaultFormat = new SimpleDateFormat(format);
+		return this;
+	}
 
 	protected ObjectToJson() {
 	}
@@ -57,7 +70,7 @@ public class ObjectToJson {
 			if (null != field && !field.getType().isPrimitive() && !reflectionUtil.isWrapperClass(tempValue.getClass())) {
 				recursionSub(field.getName(), tempValue, result, null, filterProvider);
 			} else if (null != tempValue) {
-				result.append("\"").append(tagName).append("\"").append(":\"").append(tempValue).append("\"");
+				result.append("\"").append(tagName).append("\"").append(":\"").append(Date.class == tempValue.getClass() ? defaultFormat.format(tempValue) : tempValue.toString()).append("\"");
 			}
 			result.append(",");
 		}
@@ -75,6 +88,7 @@ public class ObjectToJson {
 		Collection<?> collection = null;
 		Iterator<?> it;
 		Entry<?, ?> en;
+		boolean isDate;
 		Filter currentClazz = null == filterProvider ? null : filterProvider.getFilterByClass(value.getClass());
 		Filter filterAll = null == filterProvider ? null : filterProvider.getFilterByClass(null);
 		if ((isMap = reflectionUtil.isMap(value)) || reflectionUtil.isCollection(value)) {
@@ -99,13 +113,13 @@ public class ObjectToJson {
 					en = (Entry<?, ?>) tempSubValue;
 					tempSubValue = en.getValue();
 					tempSubKey = en.getKey();
-					if ((null != currentClazz && currentClazz.excepts.contains(tempSubKey)) || (null != filterAll && filterAll.getExcepts().contains(tempSubKey))) {
+					if (null == tempSubKey || (null != currentClazz && currentClazz.excepts.contains(tempSubKey)) || (null != filterAll && filterAll.getExcepts().contains(tempSubKey))) {
 						result.append(",");
 						continue;
 					}
-					if (tempSubValue.getClass().isPrimitive() || reflectionUtil.isWrapperClass(tempSubValue.getClass())) {
+					if ((isDate = Date.class == tempSubValue.getClass()) || tempSubValue.getClass().isPrimitive() || reflectionUtil.isWrapperClass(tempSubValue.getClass())) {
 						//						result.append(writeToString(tempSubValue, subField)).append(",");
-						result.append("{\"").append(tempSubKey.toString()).append("\":\"").append(tempSubValue.toString()).append("\"},");
+						result.append("{\"").append(tempSubKey.toString()).append("\":\"").append(isDate ? defaultFormat.format(tempSubValue) : tempSubValue).append("\"},");
 					} else {
 						result.append("{");
 						recursionSub(tempSubKey.toString(), tempSubValue, result, null, filterProvider);
@@ -115,8 +129,8 @@ public class ObjectToJson {
 					if (null == subField) {
 						subField = null == fieldData ? reflectionCache.getFields4List(tempSubValue.getClass(), true) : fieldData;
 					}
-					if (tempSubValue.getClass().isPrimitive() || reflectionUtil.isWrapperClass(tempSubValue.getClass())) {
-						result.append("\"").append(tempSubValue).append("\",");
+					if ((isDate = Date.class == tempSubValue.getClass()) || tempSubValue.getClass().isPrimitive() || reflectionUtil.isWrapperClass(tempSubValue.getClass())) {
+						result.append("\"").append(isDate ? defaultFormat.format(tempSubValue) : tempSubValue).append("\",");
 					} else {
 						recursion(tempSubValue, subField, filterProvider, result);
 						result.append(",");
@@ -198,16 +212,17 @@ public class ObjectToJson {
 		//		mmx.put("D", "D");
 		//		Result<Map<String, String>> result = new Result<Map<String, String>>("20", "哇哈哈", mmx);
 		//
-		//		Map<String, List<String>> a = new HashMap<>();
-		//		List<String> list = new ArrayList<>();
+		//		Map<String, List<Object>> a = new HashMap<>();
+		//		List<Object> list = new ArrayList<>();
 		//		list.add("z");
 		//		list.add("x");
 		//		list.add("c");
 		//		list.add("v");
+		//		list.add(new Date());
 		//		a.put("abc", list);
-		//		System.out.println(new ObjectToJson().writeToString(result, null, new FilterProvider(new Filter(Result.class, "msg"), new Filter(null, "abc"))));
+		//		System.out.println(new ObjectToJson().writeToString(result, new FilterProvider(new Filter(Result.class, "msg"), new Filter(null, "abc"))));
 		//
-		//		System.out.println(new ObjectToJson().writeToString(new Result<Object>("11", "xxx", a), null, new FilterProvider(new Filter(Result.class, "msg"), new Filter(null, "abc"))));
+		//		System.out.println(new ObjectToJson().writeToString(new Result<Object>("11", "xxx", a), new FilterProvider(new Filter(Result.class, "msg"), new Filter(null, "abc1"))));
 
 	}
 
