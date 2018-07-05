@@ -98,7 +98,7 @@ public class ObjectToJson {
 	}
 
 	private void recursion(Object o, final List<Field> fieldData, FilterProvider filterProvider, final StringBuilder result) throws Exception {
-		List<Field> fields = null == fieldData ? reflectionCache.getFields4List(o.getClass(), true) : fieldData;
+		List<Field> fields = null == fieldData ? reflectionCache.getFields4List(o.getClass(), true, false) : fieldData;
 		String tagName;
 		Object tempValue;
 		result.append("{");
@@ -106,7 +106,7 @@ public class ObjectToJson {
 		Filter filterAll = null == filterProvider ? null : filterProvider.getFilterByClass(null);
 		for (Field field : fields) {
 			tagName = field.getName();
-			if ((null != currentClazz && currentClazz.excepts.contains(tagName)) || (null != filterAll && filterAll.getExcepts().contains(tagName))) {
+			if ((null != currentClazz && currentClazz.getExcepts().contains(tagName)) || (null != filterAll && filterAll.getExcepts().contains(tagName))) {
 				continue;
 			}
 			tempValue = field.get(o);
@@ -122,7 +122,7 @@ public class ObjectToJson {
 			} else {
 				switch (this.defaultPropertyInclusion) {
 				case ALWAYS:
-					result.append("\"").append(tagName).append("\"").append(":\"null\"");
+					result.append("\"").append(tagName).append("\"").append(":null");
 					break;
 				case NON_NULL:
 					break;
@@ -151,22 +151,30 @@ public class ObjectToJson {
 		Iterator<?> it;
 		Entry<?, ?> en;
 		boolean isDate = false;
+		String end = "]";
 		Filter currentClazz = null == filterProvider ? null : filterProvider.getFilterByClass(value.getClass());
 		Filter filterAll = null == filterProvider ? null : filterProvider.getFilterByClass(null);
+		result.append("\"").append(name).append("\"").append(":");
 		if ((isMap = reflectionUtil.isMap(value)) || (isCollection = reflectionUtil.isCollection(value))) {
 			if (isMap) {
 				map = (Map<?, ?>) value;
 				if (map.isEmpty()) {
+					result.setLength(result.length() - 1);
+					result.append(":null");
 					return;
 				}
+				result.append("{");
+				end = "}";
 			} else if (isCollection) {
 				collection = (Collection<?>) value;
 				if (collection.isEmpty()) {
+					result.setLength(result.length() - 1);
+					result.append(":null");
 					return;
 				}
+				result.append("[");
 			}
 
-			result.append("\"").append(name).append("\"").append(":[");
 			it = isMap ? map.entrySet().iterator() : collection.iterator();
 			subField = null;
 			while (it.hasNext()) {
@@ -175,14 +183,14 @@ public class ObjectToJson {
 					en = (Entry<?, ?>) tempSubValue;
 					tempSubValue = en.getValue();
 					tempSubKey = en.getKey();
-					if (null == tempSubKey || (null != currentClazz && currentClazz.excepts.contains(tempSubKey)) || (null != filterAll && filterAll.getExcepts().contains(tempSubKey))) {
+					if (null == tempSubKey || (null != currentClazz && currentClazz.getExcepts().contains(tempSubKey)) || (null != filterAll && filterAll.getExcepts().contains(tempSubKey))) {
 						result.append(",");
 						continue;
 					}
 					if (null == tempSubValue) {
 						switch (this.defaultPropertyInclusion) {
 						case ALWAYS:
-							result.append("\"").append(tempSubKey).append("\"").append(":\"null\"");
+							result.append("\"").append(tempSubKey).append("\"").append(":null");
 							break;
 						case NON_NULL:
 							break;
@@ -194,16 +202,14 @@ public class ObjectToJson {
 						}
 						result.append(",");
 					} else if ((isDate = Date.class.equals(tempSubValue.getClass())) || tempSubValue.getClass().isPrimitive() || reflectionUtil.isWrapperClass(tempSubValue.getClass())) {
-						//						result.append(writeToString(tempSubValue, subField)).append(",");
-						result.append("{\"").append(tempSubKey.toString()).append("\":\"").append(isDate ? defaultFormat.format(tempSubValue) : tempSubValue).append("\"},");
+						result.append("\"").append(tempSubKey.toString()).append("\":\"").append(isDate ? defaultFormat.format(tempSubValue) : tempSubValue).append("\",");
 					} else {
-						result.append("{");
 						recursionSub(tempSubKey.toString(), tempSubValue, result, null, filterProvider);
-						result.append("},");
+						result.append(",");
 					}
 				} else {
 					if (null == subField) {
-						subField = null == fieldData ? reflectionCache.getFields4List(tempSubValue.getClass(), true) : fieldData;
+						subField = null == fieldData ? reflectionCache.getFields4List(tempSubValue.getClass(), true, false) : fieldData;
 					}
 					if ((isDate = Date.class == tempSubValue.getClass()) || tempSubValue.getClass().isPrimitive() || reflectionUtil.isWrapperClass(tempSubValue.getClass())) {
 						result.append("\"").append(isDate ? defaultFormat.format(tempSubValue) : tempSubValue).append("\",");
@@ -215,7 +221,7 @@ public class ObjectToJson {
 			}
 			result.setLength(result.length() - 1);
 
-			result.append("]");
+			result.append(end);
 		} else if (null != value) {
 			result.append("\"").append(name).append("\"").append(":\"").append(value).append("\"");
 		}

@@ -83,17 +83,27 @@ public class ReflectionCache {
 	 * @throws NoSuchFieldException
 	 * @throws SecurityException
 	 */
-	public List<Field> getFields4List(Class<?> c, boolean hasSetting, Class... ignore) throws NoSuchFieldException, SecurityException {
+	public List<Field> getFields4List(Class<?> c, boolean hasSetting, boolean filterTransient, Class... ignore) throws NoSuchFieldException, SecurityException {
 		List<Field> fields = FIELD_LIST_CACHE.get(c.getName());
 		if (null == fields) {
 			synchronized (this) {
 				if (null == fields) {
-					fields = ReflectionUtil.instance().scanClassField4List(c, true, hasSetting, ignore);
-					FIELD_LIST_CACHE.put(c.getName(), fields);
+					fields = ReflectionUtil.instance().scanClassField4List(c, true, hasSetting, filterTransient, ignore);
+					FIELD_LIST_CACHE.put(getName(c.getName(), true, hasSetting, filterTransient), fields);
 				}
 			}
 		}
 		return fields;
+	}
+
+	protected String getName(Object... names) {
+		if (null == names || names.length < 1)
+			return null;
+		StringBuilder result = new StringBuilder();
+		for (Object name : names)
+			result.append(name.toString()).append("_");
+		result.setLength(result.length() - 1);
+		return result.toString();
 	}
 
 	/***

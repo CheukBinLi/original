@@ -24,7 +24,7 @@ public class ObjectFill {
 	public void scanClass(Class<?> c) {
 		// FIELDS.put(c, fieldsConvertMap(c.getDeclaredFields()));
 		try {
-			FIELDS.put(c.getName(), ReflectionUtil.instance().scanClassField4Map(c, true, false, false));
+			FIELDS.put(c.getName(), ReflectionUtil.instance().scanClassField4Map(c, true, false, false, true));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

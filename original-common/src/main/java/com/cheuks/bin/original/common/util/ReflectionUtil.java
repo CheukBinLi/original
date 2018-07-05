@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.RandomAccess;
 import java.util.Set;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
@@ -25,7 +26,7 @@ public class ReflectionUtil {
 	protected final Set<Class<?>> WrapperClass = new HashSet<Class<?>>(Arrays.asList(String.class, Integer.class, Boolean.class, Character.class, Short.class, Long.class, Float.class, Byte.class));
 
 	//	protected final List<?> CollectionType = Arrays.asList(Collection.class, List.class, Set.class, Integer.class, int.class, Long.class, long.class, Float.class, float.class, Byte.class, byte.class, Character.class, char.class, String.class, Boolean.class, boolean.class, Double.class, double.class, Short.class, short.class);
-	protected final List<?> CollectionType = Arrays.asList(Collection.class, List.class, Set.class);
+	protected final List<?> CollectionType = Arrays.asList(RandomAccess.class, Collection.class, List.class, Set.class);
 
 	public static final ReflectionUtil instance() {
 		if (null == INSTANCE) {
@@ -48,8 +49,8 @@ public class ReflectionUtil {
 		return WrapperClass.contains(type);
 	}
 
-	public Map<String, Field> scanClassField4Map(Class<?> clazz, boolean isAccessible, boolean hasSetting, boolean hasAliasAnnotation, Class... ignore) throws NoSuchFieldException, SecurityException {
-		return scanClassField4Map(clazz, isAccessible, hasSetting, hasAliasAnnotation, true, ignore);
+	public Map<String, Field> scanClassField4Map(Class<?> clazz, boolean isAccessible, boolean hasSetting, boolean hasAliasAnnotation, boolean filterTransient, Class... ignore) throws NoSuchFieldException, SecurityException {
+		return scanClassField4Map(clazz, isAccessible, hasSetting, hasAliasAnnotation, true, filterTransient, ignore);
 	}
 
 	/***
@@ -66,7 +67,7 @@ public class ReflectionUtil {
 	 * @throws NoSuchFieldException
 	 * @throws SecurityException
 	 */
-	public Map<String, Field> scanClassField4Map(Class<?> clazz, boolean isAccessible, boolean hasSetting, boolean hasAliasAnnotation, boolean keepBoth, Class... ignore) throws NoSuchFieldException, SecurityException {
+	public Map<String, Field> scanClassField4Map(Class<?> clazz, boolean isAccessible, boolean hasSetting, boolean filterTransient, boolean hasAliasAnnotation, boolean keepBoth, Class... ignore) throws NoSuchFieldException, SecurityException {
 		if (null == clazz)
 			return null;
 
@@ -96,13 +97,20 @@ public class ReflectionUtil {
 		Set<String> settingMethodName = null;
 		settingMethodName = new HashSet<String>();
 		for (Method m : methods) {
-			if (m.getName().startsWith("set")) {
+			if (!Modifier.isPublic(m.getModifiers()))
+				continue;
+			if (m.getName().startsWith("set") || m.getName().startsWith("get")) {
 				settingMethodName.add(m.getName().substring(3).toLowerCase());
+			} else if (m.getName().startsWith("is")) {
+				settingMethodName.add(m.getName().substring(2).toLowerCase());
 			}
 		}
 		for (Field f : fields) {
-			if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers()))
+			if (Modifier.isStatic(f.getModifiers()))
 				continue;
+			if (filterTransient)
+				if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers()))
+					continue;
 			if (null != ignore && isIn(f, ignore)) {
 				continue;
 			}
@@ -132,7 +140,7 @@ public class ReflectionUtil {
 		return false;
 	}
 
-	public List<Field> scanClassField4List(Class<?> clazz, boolean isAccessible, boolean hasSetting, Class... ignore) throws NoSuchFieldException, SecurityException {
+	public List<Field> scanClassField4List(Class<?> clazz, boolean isAccessible, boolean hasSetting, boolean filterTransient, Class... ignore) throws NoSuchFieldException, SecurityException {
 		if (null == clazz)
 			return null;
 
@@ -162,14 +170,21 @@ public class ReflectionUtil {
 		if (hasSetting) {
 			settingMethodName = new HashSet<String>();
 			for (Method m : methods) {
-				if (m.getName().startsWith("set")) {
+				if (!Modifier.isPublic(m.getModifiers()))
+					continue;
+				if (m.getName().startsWith("set") || m.getName().startsWith("get")) {
 					settingMethodName.add(m.getName().substring(3).toLowerCase());
+				} else if (m.getName().startsWith("is")) {
+					settingMethodName.add(m.getName().substring(2).toLowerCase());
 				}
 			}
 		}
 		for (Field f : fields) {
-			if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers()))
+			if (Modifier.isStatic(f.getModifiers()))
 				continue;
+			if (filterTransient)
+				if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers()))
+					continue;
 			if (null != ignore && isIn(f, ignore)) {
 				continue;
 			}
@@ -194,7 +209,7 @@ public class ReflectionUtil {
 			}
 			result = new ArrayList<Field>();
 			for (Type t : type.getActualTypeArguments())
-				result.addAll(scanClassField4List((Class<?>) t, isAccessible, true));
+				result.addAll(scanClassField4List((Class<?>) t, isAccessible, true, true));
 		}
 		return result;
 	}
