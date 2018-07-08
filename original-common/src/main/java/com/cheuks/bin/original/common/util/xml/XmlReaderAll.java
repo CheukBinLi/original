@@ -14,9 +14,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.cheuks.bin.original.common.util.ReflectionCache;
-import com.cheuks.bin.original.common.util.ReflectionUtil;
 import com.cheuks.bin.original.common.util.conver.ObjectFill;
+import com.cheuks.bin.original.common.util.reflection.ReflectionCache;
+import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 
 /***
  * xml数据填充

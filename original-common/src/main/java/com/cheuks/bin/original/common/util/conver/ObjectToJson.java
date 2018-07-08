@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.cheuks.bin.original.common.util.ReflectionCache;
-import com.cheuks.bin.original.common.util.ReflectionUtil;
+import com.cheuks.bin.original.common.util.reflection.ReflectionCache;
+import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 
 public class ObjectToJson {
 

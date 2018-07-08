@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.common.util;
+package com.cheuks.bin.original.common.util.reflection;
 
 import java.lang.reflect.Field;
 import java.util.List;

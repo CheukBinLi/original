@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
-import com.cheuks.bin.original.common.util.ReflectionUtil;
+import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 
 public class ObjectFill {
 
