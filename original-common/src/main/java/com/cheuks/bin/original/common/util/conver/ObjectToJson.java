@@ -2,15 +2,12 @@ package com.cheuks.bin.original.common.util.conver;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.cheuks.bin.original.common.util.reflection.ReflectionCache;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
@@ -25,35 +22,7 @@ public class ObjectToJson {
 
 	private volatile SimpleDateFormat defaultFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	private volatile DefaultPropertyInclusion defaultPropertyInclusion = DefaultPropertyInclusion.ALWAYS;
-
-	public static enum DefaultPropertyInclusion {
-		/**
-		 * Value that indicates that properties are to be always included, independent of value
-		 */
-		ALWAYS,
-
-		/**
-		 * Value that indicates that only properties with non-null values are to be included.
-		 */
-		NON_NULL,
-
-		/**
-		 * Value that indicates that only properties that have values that differ from default settings (meaning values they have when Bean is constructed with its no-arguments constructor) are to be included. Value is generally not useful with {@link java.util.Map}s, since they have no default values; and if used, works same as {@link #ALWAYS}.
-		 */
-		NON_DEFAULT,
-
-		/**
-		 * Value that indicates that only properties that have values that values that are null or what is considered empty are not to be included. Emptiness is defined for following type:
-		 * <ul>
-		 * <li>For {@link java.util.Collection}s and {@link java.util.Map}s, method <code>isEmpty()</code> is called;</li>
-		 * <li>For Java arrays, empty arrays are ones with length of 0</li>
-		 * <li>For Java {@link java.lang.String}s, <code>length()</code> is called, and return value of 0 indicates empty String</li>
-		 * </ul>
-		 * For other types, non-null values are to be included.
-		 */
-		NON_EMPTY
-	}
+	private volatile JsonMapperPropertyInclusion defaultPropertyInclusion = JsonMapperPropertyInclusion.ALWAYS;
 
 	public SimpleDateFormat getDefaultFormat() {
 		return defaultFormat;
@@ -64,11 +33,11 @@ public class ObjectToJson {
 		return this;
 	}
 
-	public DefaultPropertyInclusion getDefaultPropertyInclusion() {
+	public JsonMapperPropertyInclusion getDefaultPropertyInclusion() {
 		return defaultPropertyInclusion;
 	}
 
-	public ObjectToJson setDefaultPropertyInclusion(DefaultPropertyInclusion defaultPropertyInclusion) {
+	public ObjectToJson setDefaultPropertyInclusion(JsonMapperPropertyInclusion defaultPropertyInclusion) {
 		this.defaultPropertyInclusion = defaultPropertyInclusion;
 		return this;
 	}
@@ -225,65 +194,6 @@ public class ObjectToJson {
 		} else if (null != value) {
 			result.append("\"").append(name).append("\"").append(":\"").append(value).append("\"");
 		}
-	}
-
-	public static class FilterProvider {
-		private final Map<String, Filter> filters;
-
-		public FilterProvider(Filter... filters) {
-			super();
-			if (null == filters) {
-				this.filters = new ConcurrentHashMap<String, Filter>(0);
-				return;
-			}
-			this.filters = new ConcurrentHashMap<String, Filter>(filters.length);
-			for (Filter filter : filters) {
-				this.filters.put(null == filter.getClazz() ? "*" : filter.getClazz().getName(), filter);
-			}
-		}
-
-		public Filter getFilterByClass(Class<?> clazz) {
-			return getFilter(null == clazz ? "*" : clazz.getName());
-		}
-
-		public Filter getFilter(String clazz) {
-			return filters.get(null == clazz ? "*" : clazz);
-		}
-
-	}
-
-	public static class Filter {
-		private Class<?> clazz;
-		private List<String> excepts;
-
-		public Filter() {
-			super();
-		}
-
-		public Filter(Class<?> clazz, String... excepts) {
-			super();
-			this.clazz = clazz;
-			this.excepts = new LinkedList<String>(Arrays.asList(excepts));
-		}
-
-		public Class<?> getClazz() {
-			return clazz;
-		}
-
-		public Filter setClazz(Class<?> clazz) {
-			this.clazz = clazz;
-			return this;
-		}
-
-		public List<String> getExcepts() {
-			return excepts;
-		}
-
-		public Filter setExcepts(List<String> excepts) {
-			this.excepts = excepts;
-			return this;
-		}
-
 	}
 
 	public static void main(String[] args) throws Throwable {

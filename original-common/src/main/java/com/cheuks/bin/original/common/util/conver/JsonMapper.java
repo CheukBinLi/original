@@ -2,21 +2,17 @@ package com.cheuks.bin.original.common.util.conver;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.cheuks.bin.original.common.util.reflection.ClassInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 import com.cheuks.bin.original.common.util.reflection.Type;
 
-public class JsonMapper {
+public class JsonMapper extends ObjectToJson {
 
 	private ReflectionUtil reflectionUtil = ReflectionUtil.instance();
 
@@ -24,14 +20,7 @@ public class JsonMapper {
 
 	private volatile SimpleDateFormat defaultFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	private volatile DefaultPropertyInclusion defaultPropertyInclusion = DefaultPropertyInclusion.ALWAYS;
-
-	public static enum DefaultPropertyInclusion {
-													ALWAYS,
-													NON_NULL,
-													NON_DEFAULT,
-													NON_EMPTY
-	}
+	private volatile JsonMapperPropertyInclusion defaultPropertyInclusion = JsonMapperPropertyInclusion.ALWAYS;
 
 	public SimpleDateFormat getDefaultFormat() {
 		return defaultFormat;
@@ -42,11 +31,11 @@ public class JsonMapper {
 		return this;
 	}
 
-	public DefaultPropertyInclusion getDefaultPropertyInclusion() {
+	public JsonMapperPropertyInclusion getDefaultPropertyInclusion() {
 		return defaultPropertyInclusion;
 	}
 
-	public JsonMapper setDefaultPropertyInclusion(DefaultPropertyInclusion defaultPropertyInclusion) {
+	public JsonMapper setDefaultPropertyInclusion(JsonMapperPropertyInclusion defaultPropertyInclusion) {
 		this.defaultPropertyInclusion = defaultPropertyInclusion;
 		return this;
 	}
@@ -58,15 +47,18 @@ public class JsonMapper {
 	protected JsonMapper() {
 	}
 
-	public static JsonMapper newInstance() {
-		if (null == INSTANCE) {
-			synchronized (JsonMapper.class) {
-				if (null == INSTANCE) {
-					INSTANCE = new JsonMapper();
+	public static JsonMapper newInstance(boolean isSingle) {
+		if (isSingle) {
+			if (null == INSTANCE) {
+				synchronized (JsonMapper.class) {
+					if (null == INSTANCE) {
+						INSTANCE = new JsonMapper();
+					}
 				}
 			}
+			return INSTANCE;
 		}
-		return INSTANCE;
+		return new JsonMapper();
 	}
 
 	@SuppressWarnings("unused")
@@ -134,7 +126,9 @@ public class JsonMapper {
 				} else if (Date.class.equals(tempValue.getClass())) {
 					result.append("\"").append(field.getName()).append("\":\"").append(defaultFormat.format(tempValue)).append("\"");
 				} else {
+					result.append("\"").append(tagName).append("\":").append("{");
 					recursion(tempValue, filterProvider, result);
+					result.append("}");
 				}
 				result.append(",");
 			}
@@ -204,7 +198,7 @@ public class JsonMapper {
 				recursionSub(hasTagName ? null : subTagName, tempSubValue, result, filterProvider);
 			} else if (subClassInfo.isBasicOrArrays()) {
 				//				result.append(Type.valueToJson(subTagName, tempSubValue, subClassInfo));
-				result.append(Type.valueToString4Json(tempSubValue, subClassInfo));
+				result.append(Type.valueToJson(subTagName, tempSubValue, subClassInfo));
 			} else if (Date.class.equals(tempSubValue.getClass())) {
 				result.append("\"").append(currentClassInfo.getName()).append("\":\"").append(defaultFormat.format(tempSubValue)).append("\"");
 			} else {
@@ -215,101 +209,45 @@ public class JsonMapper {
 			result.append(",");
 		}
 		result.setLength(result.length() - 1);
-
 		result.append(end);
 	}
 
-	public static class FilterProvider {
-		private final Map<String, Filter> filters;
-
-		public FilterProvider(Filter... filters) {
-			super();
-			if (null == filters) {
-				this.filters = new ConcurrentHashMap<String, Filter>(0);
-				return;
-			}
-			this.filters = new ConcurrentHashMap<String, Filter>(filters.length);
-			for (Filter filter : filters) {
-				this.filters.put(null == filter.getClazz() ? "*" : filter.getClazz().getName(), filter);
-			}
-		}
-
-		public Filter getFilterByClass(Class<?> clazz) {
-			return getFilter(null == clazz ? "*" : clazz.getName());
-		}
-
-		public Filter getFilter(String clazz) {
-			return filters.get(null == clazz ? "*" : clazz);
-		}
-
-	}
-
-	public static class Filter {
-		private Class<?> clazz;
-		private List<String> excepts;
-
-		public Filter() {
-			super();
-		}
-
-		public Filter(Class<?> clazz, String... excepts) {
-			super();
-			this.clazz = clazz;
-			this.excepts = new LinkedList<String>(Arrays.asList(excepts));
-		}
-
-		public Class<?> getClazz() {
-			return clazz;
-		}
-
-		public Filter setClazz(Class<?> clazz) {
-			this.clazz = clazz;
-			return this;
-		}
-
-		public List<String> getExcepts() {
-			return excepts;
-		}
-
-		public Filter setExcepts(List<String> excepts) {
-			this.excepts = excepts;
-			return this;
-		}
-
+	protected String dateFormat(Date date) {
+		return defaultFormat.format(date);
 	}
 
 	public static void main(String[] args) throws Throwable {
-//		long now = System.currentTimeMillis();
-//		Filter f = new Filter(ClassInfo.class, "a", "b", "c", "e", "f", "g");
-//		List<Filter> list = new LinkedList<>();
-//		list.add(f);
-//
-//		//		System.out.println(INSTANCE.writeToString("xxxxxxxxxxx", null));
-//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
-//		now = System.currentTimeMillis();
-//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
-//
-//		List<Integer> ii = new LinkedList<>(Arrays.asList(1, 3, 4, 56, 76, 6, 54, 2));
-//		Map<String, Object> x = new HashMap<>();
-//		x.put("oh shit", ii);
-//		List<Map<String, Object>> p = new ArrayList<>();
-//		p.add(x);
-//		BasePage<Map<String, Object>> page = new BasePage<>(p, 1, 1, 1, 1);
-//		now = System.currentTimeMillis();
-//		System.out.println(INSTANCE.writeToString(page, null) + " 1  " + (System.currentTimeMillis() - now));
-//		now = System.currentTimeMillis();
-//		System.out.println(INSTANCE.writeToString(page, null) + " 2  " + (System.currentTimeMillis() - now));
-//
-//		com.cheuks.bin.original.common.util.conver.ObjectToJson j = com.cheuks.bin.original.common.util.conver.ObjectToJson.newInstance();
-//
-//		now = System.currentTimeMillis();
-//		System.out.println(j.writeToString(page, null) + " 1  " + (System.currentTimeMillis() - now));
-//		now = System.currentTimeMillis();
-//		System.out.println(j.writeToString(page, null) + " 2  " + (System.currentTimeMillis() - now));
-//
-//		String a = "1896a7242805f2b72b9d94631aae6ed0.tomcat.tar";
-//		System.err.println(a.substring(a.lastIndexOf(".") + 1));
-//		System.err.println(ClassInfo.class.toString());
+		//		long now = System.currentTimeMillis();
+		//		Filter f = new Filter(ClassInfo.class, "a", "b", "c", "e", "f", "g");
+		//		List<Filter> list = new LinkedList<>();
+		//		list.add(f);
+		//
+		//		//		System.out.println(INSTANCE.writeToString("xxxxxxxxxxx", null));
+		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
+		//		now = System.currentTimeMillis();
+		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
+		//
+		//		List<Integer> ii = new LinkedList<>(Arrays.asList(1, 3, 4, 56, 76, 6, 54, 2));
+		//		Map<String, Object> x = new HashMap<>();
+		//		x.put("oh shit", ii);
+		//		List<Map<String, Object>> p = new ArrayList<>();
+		//		p.add(x);
+		//		BasePage<Map<String, Object>> page = new BasePage<>(p, 1, 1, 1, 1);
+		//		now = System.currentTimeMillis();
+		//		System.out.println(INSTANCE.writeToString(page, null) + " 1  " + (System.currentTimeMillis() - now));
+		//		now = System.currentTimeMillis();
+		//		System.out.println(INSTANCE.writeToString(page, null) + " 2  " + (System.currentTimeMillis() - now));
+		//
+		//		com.cheuks.bin.original.common.util.conver.ObjectToJson j = com.cheuks.bin.original.common.util.conver.ObjectToJson.newInstance();
+		//
+		//		now = System.currentTimeMillis();
+		//		System.out.println(j.writeToString(page, null) + " 1  " + (System.currentTimeMillis() - now));
+		//		now = System.currentTimeMillis();
+		//		System.out.println(j.writeToString(page, null) + " 2  " + (System.currentTimeMillis() - now));
+		//
+		//		String a = "1896a7242805f2b72b9d94631aae6ed0.tomcat.tar";
+		//		System.err.println(a.substring(a.lastIndexOf(".") + 1));
+		//		System.err.println(ClassInfo.class.toString());
 	}
 
 }

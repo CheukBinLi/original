@@ -8,8 +8,11 @@ import java.util.concurrent.ConcurrentSkipListMap;
 public class ClassInfo {
 
 	protected final static Map<String, ClassInfo> CLASS_INFOS = new ConcurrentSkipListMap<String, ClassInfo>();
+	protected final static ClassInfo ARRAYS_CLASS_INFO_TYPE = new ClassInfo().setType(Type.Array);
 	protected final static Map<String, ClassInfo> BASIC_TYPE_CLASS_INFO = new ConcurrentSkipListMap<String, ClassInfo>();
 	static {
+		ARRAYS_CLASS_INFO_TYPE.isArrays = true;
+
 		BASIC_TYPE_CLASS_INFO.put(String.class.getName(), new ClassInfo(String.class));
 		BASIC_TYPE_CLASS_INFO.put(int.class.getName(), new ClassInfo(int.class));
 		BASIC_TYPE_CLASS_INFO.put(boolean.class.getName(), new ClassInfo());
@@ -122,6 +125,8 @@ public class ClassInfo {
 		if (null == clazz) {
 			return null;
 		}
+		if (clazz.isArray())
+			return ARRAYS_CLASS_INFO_TYPE;
 		ClassInfo result = BASIC_TYPE_CLASS_INFO.get(clazz.getName());
 		if (null != result)
 			return result;
