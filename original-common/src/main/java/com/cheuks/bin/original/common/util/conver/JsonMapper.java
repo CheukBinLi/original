@@ -12,7 +12,7 @@ import com.cheuks.bin.original.common.util.reflection.ClassInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 import com.cheuks.bin.original.common.util.reflection.Type;
 
-public class JsonMapper extends ObjectToJson {
+public class JsonMapper {
 
 	private ReflectionUtil reflectionUtil = ReflectionUtil.instance();
 
