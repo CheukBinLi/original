@@ -31,6 +31,8 @@ public class ClassInfo {
 		BASIC_TYPE_CLASS_INFO.put(Float.class.getName(), new ClassInfo(Float.class));
 		BASIC_TYPE_CLASS_INFO.put(Byte.class.getName(), new ClassInfo(Byte.class));
 		BASIC_TYPE_CLASS_INFO.put(Double.class.getName(), new ClassInfo(Double.class));
+		BASIC_TYPE_CLASS_INFO.put(java.util.Date.class.getName(), new ClassInfo(java.util.Date.class));
+		BASIC_TYPE_CLASS_INFO.put(java.sql.Date.class.getName(), new ClassInfo(java.sql.Date.class));
 	}
 
 	private String name;
@@ -40,6 +42,7 @@ public class ClassInfo {
 	private boolean isBasic;//基础类型+封装类
 	private boolean isArrays;
 	private boolean isMap;
+	private boolean isDate;
 	private boolean isCollection = false;
 
 	public ClassInfo(Class<?> clazz) {
@@ -52,10 +55,12 @@ public class ClassInfo {
 		if (null == this.clazz)
 			return;
 		this.isArrays = clazz.isArray();
-		this.isMap = Type.isMapByClass(clazz);
-		this.isCollection = isMap ? false : Type.isCollectionByClass(clazz);
+		this.isDate = isArrays ? false : Type.isDate(clazz);
+		this.isMap = isArrays ? false : isDate ? false : Type.isMapByClass(clazz);
+		this.isCollection = isDate ? false : isMap ? false : Type.isCollectionByClass(clazz);
 		this.type = isArrays ? Type.Array : isMap ? Type.Map : isCollection ? Type.Collection : Type.getTypeByClass(clazz);
-		this.isBasic = isMap ? false : isCollection ? false : isArrays ? false : (clazz.isPrimitive() | Type.isWrapper(clazz));
+		this.isBasic = isDate ? false : isMap ? false : isCollection ? false : isArrays ? false : (clazz.isPrimitive() | Type.isWrapper(clazz));
+
 	}
 
 	public ClassInfo() {
@@ -119,6 +124,10 @@ public class ClassInfo {
 	public final static void addClassInfo(ClassInfo classInfo) {
 		if (!classInfo.isMapOrCollection() && !classInfo.isBasicOrArrays())
 			CLASS_INFOS.put(classInfo.getClazz().getName(), classInfo);
+	}
+
+	public boolean isDate() {
+		return isDate;
 	}
 
 	public final static ClassInfo getClassInfo(Class<?> clazz) {

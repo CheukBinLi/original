@@ -28,11 +28,14 @@ public enum Type {
 					PackageDouble(Double.class),
 					Array(Arrays.class),
 					Map(Map.class),
+					Date(java.util.Date.class),
+					SqlDate(java.sql.Date.class),
 					Collection(RandomAccess.class, Collection.class, List.class, Set.class);
 
 	Class<?>[] types;
 
 	static final List<Class<?>> COLLECTION = Arrays.asList(RandomAccess.class, Collection.class, List.class, Set.class);
+	static final List<Class<?>> DATE = Arrays.asList(java.util.Date.class, java.sql.Date.class);
 	static final Set<Class<?>> WRAPPER = new HashSet<Class<?>>(Arrays.asList(String.class, Integer.class, Boolean.class, Character.class, Short.class, Long.class, Float.class, Byte.class));
 
 	Type(Class<?>... clazz) {
@@ -52,6 +55,17 @@ public enum Type {
 			}
 		}
 		return null;
+	}
+
+	public static boolean isDate(final Class<?> clazz) {
+		List<Class<?>> interfaces = Arrays.asList(clazz.getInterfaces());
+		if (DATE.contains(clazz))
+			return true;
+		for (Class<?> c : interfaces) {
+			if (DATE.contains(c))
+				return true;
+		}
+		return false;
 	}
 
 	public static boolean isWrapper(final Class<?> clazz) {

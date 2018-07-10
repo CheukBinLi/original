@@ -3,7 +3,6 @@ package com.cheuks.bin.original.common.util.conver;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -70,7 +69,7 @@ public class JsonMapper {
 		} else if (classInfo.isBasicOrArrays()) {
 			/** 基本类型 */
 			return "{\"" + Type.valueToString(o, classInfo) + "\"}";
-		} else if (Date.class.equals(o.getClass())) {
+		} else if (classInfo.isDate()) {
 			/** 日期 */
 			return "{\"" + defaultFormat.format(o) + "\"}";
 		} else if (classInfo.isMapOrCollection()) {
@@ -96,7 +95,7 @@ public class JsonMapper {
 			/** 基本类型 */
 			result.append(Type.valueToString(o, currentClassInfo));
 			return;
-		} else if (Date.class.equals(o.getClass())) {
+		} else if (currentClassInfo.isDate()) {
 			/** 日期 */
 			result.append(defaultFormat.format(o));
 		} else if (currentClassInfo.isMapOrCollection()) {
@@ -123,8 +122,10 @@ public class JsonMapper {
 					recursionSub(field.getName(), tempValue, result, filterProvider);
 				} else if (subClassInfo.isBasicOrArrays()) {
 					result.append(Type.valueToJson(field.getName(), tempValue, subClassInfo));
-				} else if (Date.class.equals(tempValue.getClass())) {
+				} else if (subClassInfo.isDate()) {
+					
 					result.append("\"").append(field.getName()).append("\":\"").append(defaultFormat.format(tempValue)).append("\"");
+					
 				} else {
 					result.append("\"").append(tagName).append("\":").append("{");
 					recursion(tempValue, filterProvider, result);
@@ -199,7 +200,7 @@ public class JsonMapper {
 			} else if (subClassInfo.isBasicOrArrays()) {
 				//				result.append(Type.valueToJson(subTagName, tempSubValue, subClassInfo));
 				result.append(Type.valueToJson(subTagName, tempSubValue, subClassInfo));
-			} else if (Date.class.equals(tempSubValue.getClass())) {
+			} else if (subClassInfo.isDate()) {
 				result.append("\"").append(currentClassInfo.getName()).append("\":\"").append(defaultFormat.format(tempSubValue)).append("\"");
 			} else {
 				result.append("{");
@@ -210,10 +211,6 @@ public class JsonMapper {
 		}
 		result.setLength(result.length() - 1);
 		result.append(end);
-	}
-
-	protected String dateFormat(Date date) {
-		return defaultFormat.format(date);
 	}
 
 	public static void main(String[] args) throws Throwable {
