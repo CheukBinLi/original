@@ -1,17 +1,22 @@
 package com.cheuks.bin.original.common.util.conver;
 
-import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.cheuks.bin.original.common.util.reflection.ClassInfo;
+import com.cheuks.bin.original.common.util.reflection.FieldInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 import com.cheuks.bin.original.common.util.reflection.Type;
 
 public class JsonMapper {
+
+	final static Logger LOG = LoggerFactory.getLogger(JsonMapper.class);
 
 	private ReflectionUtil reflectionUtil = ReflectionUtil.instance();
 
@@ -60,8 +65,27 @@ public class JsonMapper {
 		return new JsonMapper();
 	}
 
-	@SuppressWarnings("unused")
+	public String writeToStringWithAlias(final Object o, FilterProvider filterProvider) throws Exception {
+		return writer(o, filterProvider, true);
+	}
+
 	public String writeToString(final Object o, FilterProvider filterProvider) throws Exception {
+		return writer(o, filterProvider, false);
+	}
+
+//	public <T> T readToObject(Class<T> type, byte[] data) throws Exception {
+//		T result = type.newInstance();
+//
+//		ClassInfo current = ClassInfo.getClassInfo(result.getClass());		
+//		
+//		
+//		
+//		
+//		return result;
+//	}
+
+	@SuppressWarnings("unused")
+	private String writer(final Object o, FilterProvider filterProvider, boolean withAlias) throws Exception {
 		ClassInfo classInfo = ClassInfo.getClassInfo(o.getClass());
 		StringBuilder result;
 		if (null == o) {
@@ -74,16 +98,16 @@ public class JsonMapper {
 			return "{\"" + defaultFormat.format(o) + "\"}";
 		} else if (classInfo.isMapOrCollection()) {
 			/** 集合 */
-			recursionSub(null, o, result = new StringBuilder(), filterProvider);
+			recursionSub(null, o, result = new StringBuilder(), filterProvider, withAlias);
 		} else {
 			result = new StringBuilder("{");
-			recursion(o, filterProvider, result);
+			recursion(o, filterProvider, result, withAlias);
 			result.append("}");
 		}
 		return result.toString();
 	}
 
-	private void recursion(Object o, FilterProvider filterProvider, final StringBuilder result) throws Exception {
+	private void recursion(Object o, FilterProvider filterProvider, final StringBuilder result, boolean withAlias) throws Exception {
 		ClassInfo currentClassInfo = ClassInfo.getClassInfo(o.getClass());
 		ClassInfo subClassInfo;
 		String tagName;
@@ -100,14 +124,14 @@ public class JsonMapper {
 			result.append(defaultFormat.format(o));
 		} else if (currentClassInfo.isMapOrCollection()) {
 			/** 集合 */
-			recursionSub(null, o, result, filterProvider);
+			recursionSub(null, o, result, filterProvider, withAlias);
 		} else {
 			/** 特殊对象 */
 			if (null == currentClassInfo.getFields())
-				currentClassInfo.setFields(reflectionUtil.scanClassField4List(currentClassInfo.getClazz(), true, true, false));
-			for (Field field : currentClassInfo.getFields()) {
-				tempValue = field.get(o);
-				tagName = field.getName();
+				currentClassInfo.setFields(reflectionUtil.scanClassFieldInfo4List(currentClassInfo.getClazz(), true, true, false));
+			for (FieldInfo fieldInfo : currentClassInfo.getFields()) {
+				tempValue = fieldInfo.getField().get(o);
+				tagName = withAlias ? fieldInfo.getAliasOrFieldName() : fieldInfo.getField().getName();
 				//1-过滤
 				//2-空校验
 				//3-建模
@@ -118,17 +142,19 @@ public class JsonMapper {
 					continue;
 				}
 				subClassInfo = ClassInfo.getClassInfo(tempValue.getClass());
+				if (LOG.isDebugEnabled())
+					LOG.debug("field:{} type:{}", tagName, subClassInfo.getClazz().getName());
 				if (subClassInfo.isMapOrCollection()) {
-					recursionSub(field.getName(), tempValue, result, filterProvider);
+					recursionSub(tagName, tempValue, result, filterProvider, withAlias);
 				} else if (subClassInfo.isBasicOrArrays()) {
-					result.append(Type.valueToJson(field.getName(), tempValue, subClassInfo));
+					result.append(Type.valueToJson(tagName, tempValue, subClassInfo));
 				} else if (subClassInfo.isDate()) {
-					
-					result.append("\"").append(field.getName()).append("\":\"").append(defaultFormat.format(tempValue)).append("\"");
-					
+
+					result.append("\"").append(tagName).append("\":\"").append(defaultFormat.format(tempValue)).append("\"");
+
 				} else {
 					result.append("\"").append(tagName).append("\":").append("{");
-					recursion(tempValue, filterProvider, result);
+					recursion(tempValue, filterProvider, result, withAlias);
 					result.append("}");
 				}
 				result.append(",");
@@ -138,7 +164,7 @@ public class JsonMapper {
 			result.setLength(result.length() - 1);
 	}
 
-	private void recursionSub(final String tagName, final Object value, final StringBuilder result, FilterProvider filterProvider) throws Exception {
+	private void recursionSub(final String tagName, final Object value, final StringBuilder result, FilterProvider filterProvider, boolean withAlias) throws Exception {
 		boolean hasTagName = null != tagName;
 		Map<?, ?> map = null;
 		Object tempSubValue;
@@ -196,15 +222,15 @@ public class JsonMapper {
 			subClassInfo = ClassInfo.getClassInfo(tempSubValue.getClass());
 
 			if (subClassInfo.isMapOrCollection()) {
-				recursionSub(hasTagName ? null : subTagName, tempSubValue, result, filterProvider);
+				recursionSub(hasTagName ? null : subTagName, tempSubValue, result, filterProvider, withAlias);
 			} else if (subClassInfo.isBasicOrArrays()) {
 				//				result.append(Type.valueToJson(subTagName, tempSubValue, subClassInfo));
-				result.append(Type.valueToJson(subTagName, tempSubValue, subClassInfo));
+				result.append(Type.valueToString4Json(tempSubValue, subClassInfo));
 			} else if (subClassInfo.isDate()) {
 				result.append("\"").append(currentClassInfo.getName()).append("\":\"").append(defaultFormat.format(tempSubValue)).append("\"");
 			} else {
 				result.append("{");
-				recursion(tempSubValue, filterProvider, result);
+				recursion(tempSubValue, filterProvider, result, withAlias);
 				result.append("}");
 			}
 			result.append(",");
@@ -219,7 +245,7 @@ public class JsonMapper {
 		//		List<Filter> list = new LinkedList<>();
 		//		list.add(f);
 		//
-		//		//		System.out.println(INSTANCE.writeToString("xxxxxxxxxxx", null));
+		//		System.out.println(INSTANCE.writeToString("xxxxxxxxxxx", null));
 		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
 		//		now = System.currentTimeMillis();
 		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
@@ -231,7 +257,7 @@ public class JsonMapper {
 		//		p.add(x);
 		//		BasePage<Map<String, Object>> page = new BasePage<>(p, 1, 1, 1, 1);
 		//		now = System.currentTimeMillis();
-		//		System.out.println(INSTANCE.writeToString(page, null) + " 1  " + (System.currentTimeMillis() - now));
+		//		System.out.println(INSTANCE.writeToStringWithAlias(page, null) + " 1  " + (System.currentTimeMillis() - now));
 		//		now = System.currentTimeMillis();
 		//		System.out.println(INSTANCE.writeToString(page, null) + " 2  " + (System.currentTimeMillis() - now));
 		//

@@ -28,14 +28,13 @@ public enum Type {
 					PackageDouble(Double.class),
 					Array(Arrays.class),
 					Map(Map.class),
-					Date(java.util.Date.class),
-					SqlDate(java.sql.Date.class),
+					Date(java.util.Date.class, java.sql.Date.class, java.sql.Timestamp.class, java.sql.Time.class),
 					Collection(RandomAccess.class, Collection.class, List.class, Set.class);
 
 	Class<?>[] types;
 
 	static final List<Class<?>> COLLECTION = Arrays.asList(RandomAccess.class, Collection.class, List.class, Set.class);
-	static final List<Class<?>> DATE = Arrays.asList(java.util.Date.class, java.sql.Date.class);
+	static final List<Class<?>> DATE = Arrays.asList(java.util.Date.class, java.sql.Date.class, java.sql.Timestamp.class, java.sql.Time.class);
 	static final Set<Class<?>> WRAPPER = new HashSet<Class<?>>(Arrays.asList(String.class, Integer.class, Boolean.class, Character.class, Short.class, Long.class, Float.class, Byte.class));
 
 	Type(Class<?>... clazz) {

@@ -197,6 +197,63 @@ public class ReflectionUtil {
 		return result;
 	}
 
+	public List<FieldInfo> scanClassFieldInfo4List(Class<?> clazz, boolean isAccessible, boolean hasSetting, boolean filterTransient, Class... ignore) throws NoSuchFieldException, SecurityException {
+		if (null == clazz)
+			return null;
+
+		LinkedList<Class<?>> classes = new LinkedList<Class<?>>();
+		classes.add(clazz);
+		Class<?> tempClass;
+		Class<?> currentClass = clazz;
+		List<Field> fields = new ArrayList<Field>();
+		List<Method> methods = new ArrayList<Method>();
+
+		// 向上遍历父类
+		while (true) {
+			if (null == (tempClass = clazz.getSuperclass()) || tempClass == currentClass)
+				break;
+			classes.addLast(currentClass = tempClass);
+		}
+		for (int i = 0, len = classes.size(); i < len; i++) {
+			tempClass = classes.removeLast();
+			fields.addAll(Arrays.asList(tempClass.getDeclaredFields()));
+			if (hasSetting) {
+				methods.addAll(Arrays.asList(tempClass.getDeclaredMethods()));
+			}
+		}
+
+		List<FieldInfo> result = new ArrayList<FieldInfo>();
+		Set<String> settingMethodName = null;
+		if (hasSetting) {
+			settingMethodName = new HashSet<String>();
+			for (Method m : methods) {
+				if (!Modifier.isPublic(m.getModifiers()))
+					continue;
+				if (m.getName().startsWith("set") || m.getName().startsWith("get")) {
+					settingMethodName.add(m.getName().substring(3).toLowerCase());
+				} else if (m.getName().startsWith("is")) {
+					settingMethodName.add(m.getName().substring(2).toLowerCase());
+				}
+			}
+		}
+		for (Field f : fields) {
+			if (Modifier.isStatic(f.getModifiers()))
+				continue;
+			if (filterTransient)
+				if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers()))
+					continue;
+			if (null != ignore && isIn(f, ignore)) {
+				continue;
+			}
+			if (!hasSetting || settingMethodName.contains(f.getName().toLowerCase())) {
+				if (isAccessible)
+					f.setAccessible(true);
+				result.add(new FieldInfo(f));
+			}
+		}
+		return result;
+	}
+
 	public List<Field> searchCollection(Field field, boolean isAccessible) throws NoSuchFieldException, SecurityException {
 		List<Class<?>> interfaces = Arrays.asList(field.getType().getInterfaces());
 		List<Field> result = null;

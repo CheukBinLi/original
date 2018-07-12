@@ -1,18 +1,17 @@
 package com.cheuks.bin.original.common.util.reflection;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-public class ClassInfo {
+public class ClassInfo implements Cloneable{
 
 	protected final static Map<String, ClassInfo> CLASS_INFOS = new ConcurrentSkipListMap<String, ClassInfo>();
 	protected final static ClassInfo ARRAYS_CLASS_INFO_TYPE = new ClassInfo().setType(Type.Array);
 	protected final static Map<String, ClassInfo> BASIC_TYPE_CLASS_INFO = new ConcurrentSkipListMap<String, ClassInfo>();
 	static {
 		ARRAYS_CLASS_INFO_TYPE.isArrays = true;
-
+		
 		BASIC_TYPE_CLASS_INFO.put(String.class.getName(), new ClassInfo(String.class));
 		BASIC_TYPE_CLASS_INFO.put(int.class.getName(), new ClassInfo(int.class));
 		BASIC_TYPE_CLASS_INFO.put(boolean.class.getName(), new ClassInfo());
@@ -32,13 +31,14 @@ public class ClassInfo {
 		BASIC_TYPE_CLASS_INFO.put(Byte.class.getName(), new ClassInfo(Byte.class));
 		BASIC_TYPE_CLASS_INFO.put(Double.class.getName(), new ClassInfo(Double.class));
 		BASIC_TYPE_CLASS_INFO.put(java.util.Date.class.getName(), new ClassInfo(java.util.Date.class));
-		BASIC_TYPE_CLASS_INFO.put(java.sql.Date.class.getName(), new ClassInfo(java.sql.Date.class));
+		BASIC_TYPE_CLASS_INFO.put(java.sql.Timestamp.class.getName(), new ClassInfo(java.sql.Timestamp.class));
+		BASIC_TYPE_CLASS_INFO.put(java.sql.Time.class.getName(), new ClassInfo(java.sql.Time.class));
 	}
 
 	private String name;
 	private Type type;
 	private Class<?> clazz;
-	private List<Field> fields;
+	private List<FieldInfo> fields;
 	private boolean isBasic;//基础类型+封装类
 	private boolean isArrays;
 	private boolean isMap;
@@ -113,11 +113,11 @@ public class ClassInfo {
 		return isArrays;
 	}
 
-	public List<Field> getFields() {
+	public List<FieldInfo> getFields() {
 		return fields;
 	}
 
-	public void setFields(List<Field> fields) {
+	public void setFields(List<FieldInfo> fields) {
 		this.fields = fields;
 	}
 
@@ -144,6 +144,11 @@ public class ClassInfo {
 			addClassInfo(result = new ClassInfo(clazz));
 		}
 		return result;
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 
 }
