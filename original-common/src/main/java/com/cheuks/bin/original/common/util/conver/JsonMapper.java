@@ -73,16 +73,16 @@ public class JsonMapper {
 		return writer(o, filterProvider, false);
 	}
 
-//	public <T> T readToObject(Class<T> type, byte[] data) throws Exception {
-//		T result = type.newInstance();
-//
-//		ClassInfo current = ClassInfo.getClassInfo(result.getClass());		
-//		
-//		
-//		
-//		
-//		return result;
-//	}
+	//	public <T> T readToObject(Class<T> type, byte[] data) throws Exception {
+	//		T result = type.newInstance();
+	//
+	//		ClassInfo current = ClassInfo.getClassInfo(result.getClass());		
+	//		
+	//		
+	//		
+	//		
+	//		return result;
+	//	}
 
 	@SuppressWarnings("unused")
 	private String writer(final Object o, FilterProvider filterProvider, boolean withAlias) throws Exception {
@@ -224,8 +224,7 @@ public class JsonMapper {
 			if (subClassInfo.isMapOrCollection()) {
 				recursionSub(hasTagName ? null : subTagName, tempSubValue, result, filterProvider, withAlias);
 			} else if (subClassInfo.isBasicOrArrays()) {
-				//				result.append(Type.valueToJson(subTagName, tempSubValue, subClassInfo));
-				result.append(Type.valueToString4Json(tempSubValue, subClassInfo));
+				result.append(currentClassInfo.isMap() ? Type.valueToJson(subTagName, tempSubValue, subClassInfo) : Type.valueToString4Json(tempSubValue, subClassInfo));
 			} else if (subClassInfo.isDate()) {
 				result.append("\"").append(currentClassInfo.getName()).append("\":\"").append(defaultFormat.format(tempSubValue)).append("\"");
 			} else {
