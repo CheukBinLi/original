@@ -38,11 +38,14 @@ public class HttpClientUtil {
 	 * @param inputStream
 	 * @throws Exception
 	 */
-	public ByteArrayOutputStream sendFile(String url, String fileName, InputStream inputStream) throws Exception {return sendFile(url, fileName, inputStream, null);}
+	public ByteArrayOutputStream sendFile(String url, String fileName, InputStream inputStream) throws Exception {
+		return sendFile(url, fileName, inputStream, null);
+	}
+
 	public ByteArrayOutputStream sendFile(String url, String fileName, InputStream inputStream, Map<String, String> header) throws Exception {
 		ByteArrayOutputStream result = new ByteArrayOutputStream();
 		URL urlObj = new URL(url);
-		boolean isHttps = url.contains("https:");
+		boolean isHttps = url.toLowerCase().contains("https:");
 		HttpURLConnection con = null;
 		InputStream in;
 		try {
@@ -104,13 +107,17 @@ public class HttpClientUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public ByteArrayOutputStream GET(String urlPath, int timeOut, boolean onlyRequest) throws IOException {return GET(urlPath, timeOut, onlyRequest,null);}
-	public ByteArrayOutputStream GET(String urlPath, int timeOut, boolean onlyRequest, Map<String, String> header) throws IOException {
+	public HttpResponseModel GET(String urlPath, int timeOut, boolean onlyRequest, boolean onlyResponseData) throws IOException {
+		return GET(urlPath, timeOut, onlyRequest, onlyResponseData, null);
+	}
+
+	public HttpResponseModel GET(String urlPath, int timeOut, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws IOException {
 		HttpURLConnection con = null;
 		URL url = null;
 		InputStream in = null;
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		boolean isHttps = urlPath.contains("https:");
+		ByteArrayOutputStream out;
+		HttpResponseModel result;
+		boolean isHttps = urlPath.toLowerCase().contains("https:");
 		try {
 			url = new URL(urlPath);
 			if (isHttps)
@@ -130,6 +137,7 @@ public class HttpClientUtil {
 			con.connect();
 			if (onlyRequest)
 				return null;
+			result = new HttpResponseModel(con.getResponseCode(), onlyResponseData ? null : con.getHeaderFields(), out = new ByteArrayOutputStream());
 			in = con.getInputStream();
 			byte[] buffer = new byte[512];
 			int length;
@@ -141,7 +149,7 @@ public class HttpClientUtil {
 			if (null != con)
 				con.disconnect();
 		}
-		return out;
+		return result;
 	}
 
 	/***
@@ -154,14 +162,18 @@ public class HttpClientUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public ByteArrayOutputStream POST(String urlPath, String parameterStr, int timeOut, boolean onlyRequest) throws IOException {return POST(urlPath, parameterStr, timeOut, onlyRequest, null);}
-	public ByteArrayOutputStream POST(String urlPath, String parameterStr, int timeOut, boolean onlyRequest, Map<String, String> header) throws IOException {
+	public HttpResponseModel POST(String urlPath, String parameterStr, int timeOut, boolean onlyRequest, boolean onlyResponseData) throws IOException {
+		return POST(urlPath, parameterStr, timeOut, onlyRequest, onlyResponseData, null);
+	}
+
+	public HttpResponseModel POST(String urlPath, String parameterStr, int timeOut, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws IOException {
 		HttpURLConnection con = null;
 		URL url = null;
 		InputStream in = null;
 		OutputStream out = null;
-		ByteArrayOutputStream result;
-		boolean isHttps = urlPath.contains("https:");
+		ByteArrayOutputStream data;
+		HttpResponseModel result;
+		boolean isHttps = urlPath.toLowerCase().contains("https:");
 		try {
 			url = new URL(urlPath);
 			if (isHttps)
@@ -184,12 +196,12 @@ public class HttpClientUtil {
 			out.flush();
 			if (onlyRequest)
 				return null;
-			result = new ByteArrayOutputStream();
+			result = new HttpResponseModel(con.getResponseCode(), onlyResponseData ? null : con.getHeaderFields(), data = new ByteArrayOutputStream());
 			in = con.getInputStream();
 			byte[] buffer = new byte[512];
 			int length;
 			while ((length = in.read(buffer)) != -1) {
-				result.write(buffer, 0, length);
+				data.write(buffer, 0, length);
 			}
 			in.close();
 		} finally {
