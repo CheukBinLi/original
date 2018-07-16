@@ -128,7 +128,7 @@ public class JsonMapper {
 		} else {
 			/** 特殊对象 */
 			if (null == currentClassInfo.getFields())
-				currentClassInfo.setFields(reflectionUtil.scanClassFieldInfo4List(currentClassInfo.getClazz(), true, true, false));
+				currentClassInfo.setFields(reflectionUtil.scanClassFieldInfo4List(currentClassInfo.getClazz(), true, true, true));
 			for (FieldInfo fieldInfo : currentClassInfo.getFields()) {
 				tempValue = fieldInfo.getField().get(o);
 				tagName = withAlias ? fieldInfo.getAliasOrFieldName() : fieldInfo.getField().getName();
