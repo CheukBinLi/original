@@ -28,7 +28,7 @@ public class CollectionUtil {
 	public Map<String, Object> toMap(Object... params) {
 		if (null == params || 0 != (params.length % 2))
 			return null;
-		Map<String, Object> map = new WeakHashMap<String, Object>();
+		Map<String, Object> map = new WeakHashMap<String, Object>(params.length * 2);
 		for (int i = 0, len = params.length; i < len; i++) {
 			map.put((String) params[i++], params[i]);
 		}
@@ -39,7 +39,7 @@ public class CollectionUtil {
 	public <K> Map<K, Object> toMap(boolean isWeak, Object... params) {
 		if (null == params || 0 != (params.length % 2))
 			return null;
-		Map<K, Object> result = isWeak ? new WeakHashMap<K, Object>() : new HashMap<K, Object>();
+		Map<K, Object> result = isWeak ? new WeakHashMap<K, Object>(params.length * 2) : new HashMap<K, Object>(params.length * 2);
 		for (int i = 0, len = params.length; i < len; i++) {
 			result.put((K) params[i++], params[i]);
 		}
