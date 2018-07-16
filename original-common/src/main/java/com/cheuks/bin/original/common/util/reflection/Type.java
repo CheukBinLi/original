@@ -221,7 +221,7 @@ public enum Type {
 				StringBuilder b = new StringBuilder();
 				b.append(name + "[");
 				for (int i = 0;; i++) {
-					b.append(String.valueOf(a[i]));
+					b.append("\"").append(String.valueOf(a[i])).append("\"");
 					if (i == iMax)
 						return b.append(']').toString();
 					b.append(", ");
