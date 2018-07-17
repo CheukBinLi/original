@@ -13,41 +13,54 @@ public class GeneratedIDService implements Serializable {
 	}
 
 	private long lastTime;
+
+	private int timeBits = 22;
+	private volatile int machineID;
+	private int machineBits = 12;
 	private long sequence;
-	private final long workerIdBits = 4L;
-	private final long machineIdBits = 2L;
-	private final long sequenceBits = 8L;
-	private final long sequenceMask = -1L ^ -1L << sequenceBits;
-	private final long timestampLeftShift = workerIdBits + machineIdBits + sequenceBits;
+	private long maxSequence = -1L ^ (-1L << (timeBits - machineBits));//1024
 
 	public synchronized long nextID() {
-		long thisTime = timeGen();
-		if (thisTime == lastTime) {
-			this.sequence = (this.sequence + 1) & sequenceMask;
-			if (sequence == 0)
-				while (thisTime < lastTime)
-					thisTime = timeGen();
-		} else
-			this.sequence = 0;
-		lastTime = thisTime;
-		return ((serialVersionUID - thisTime) << timestampLeftShift) | (workerIdBits << sequenceBits) | this.sequence;
+		long currentTime = timeGen();
+		if (currentTime == lastTime) {
+			sequence = ++sequence & maxSequence;
+			if (sequence == 0L) {
+				currentTime = nextSecond(currentTime);
+			}
+		} else {
+			sequence = 0L;
+		}
+		lastTime = currentTime;
+		return currentTime << timeBits | machineID << machineBits | sequence;
 	}
 
 	public synchronized long nextID(long machineId) {
-		long thisTime = timeGen();
-		if (thisTime == lastTime) {
-			this.sequence = (this.sequence + 1) & sequenceMask;
-			if (sequence == 0)
-				while (thisTime < lastTime)
-					thisTime = timeGen();
-		} else
-			this.sequence = 0;
-		lastTime = thisTime;
-		return ((serialVersionUID - thisTime) << timestampLeftShift) | (workerIdBits << sequenceBits) | machineId << sequenceBits | this.sequence;
+		long currentTime = timeGen();
+		if (currentTime == lastTime) {
+			sequence = ++sequence & maxSequence;
+			if (sequence == 0L) {
+				currentTime = nextSecond(currentTime);
+			}
+		} else {
+			sequence = 0L;
+		}
+		lastTime = currentTime;
+		return currentTime << timeBits | machineID << machineBits | sequence;
+	}
+
+	long nextSecond(long currentTime) {
+		long newTime;
+		while ((newTime = timeGen()) == currentTime) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+		}
+		return newTime;
 	}
 
 	private long timeGen() {
-		return System.currentTimeMillis();
+		return System.currentTimeMillis() / 1000;
 	}
 
 	private GeneratedIDService() {
@@ -55,8 +68,16 @@ public class GeneratedIDService implements Serializable {
 	}
 
 	public static void main(String[] args) {
-		System.err.println(System.currentTimeMillis());
-		System.err.println(new GeneratedIDService().nextID(9));
-		System.err.println(System.currentTimeMillis());
+		//		System.out.println(System.currentTimeMillis());
+		//		System.out.println((System.currentTimeMillis() & 0x1FFFFFFF));
+		//		System.out.println((99975801 & 0xfFFFFFFF));
+		//		System.err.println(GeneratedIDService.newInstance.maxSequence);
+		int i = 0;
+		while (i < 10000) {
+			System.err.println(GeneratedIDService.newInstance.nextID(9));
+			i++;
+		}
+		//		System.err.println(GeneratedIDService.newInstance.nextID(9));
+		//		System.err.println(GeneratedIDService.newInstance.nextID(9));
 	}
 }

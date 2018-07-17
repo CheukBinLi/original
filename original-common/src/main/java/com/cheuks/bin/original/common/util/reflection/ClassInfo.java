@@ -1,6 +1,5 @@
 package com.cheuks.bin.original.common.util.reflection;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -38,7 +37,8 @@ public class ClassInfo implements Cloneable{
 	private String name;
 	private Type type;
 	private Class<?> clazz;
-	private List<FieldInfo> fields;
+//	private List<FieldInfo> fields;
+	private Map<String,FieldInfo> fields;
 	private boolean isBasic;//基础类型+封装类
 	private boolean isArrays;
 	private boolean isMap;
@@ -113,11 +113,11 @@ public class ClassInfo implements Cloneable{
 		return isArrays;
 	}
 
-	public List<FieldInfo> getFields() {
+	public Map<String,FieldInfo> getFields() {
 		return fields;
 	}
 
-	public void setFields(List<FieldInfo> fields) {
+	public void setFields(Map<String,FieldInfo> fields) {
 		this.fields = fields;
 	}
 

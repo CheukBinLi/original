@@ -135,9 +135,9 @@ public class HttpClientUtil {
 				}
 			}
 			con.connect();
-			if (onlyRequest)
-				return null;
 			result = new HttpResponseModel(con.getResponseCode(), onlyResponseData ? null : con.getHeaderFields(), out = new ByteArrayOutputStream());
+			if (onlyRequest)
+				return result;
 			in = con.getInputStream();
 			byte[] buffer = new byte[512];
 			int length;
@@ -194,9 +194,9 @@ public class HttpClientUtil {
 			out = con.getOutputStream();
 			out.write(parameterStr.getBytes("UTF-8"));
 			out.flush();
-			if (onlyRequest)
-				return null;
 			result = new HttpResponseModel(con.getResponseCode(), onlyResponseData ? null : con.getHeaderFields(), data = new ByteArrayOutputStream());
+			if (onlyRequest)
+				return result;
 			in = con.getInputStream();
 			byte[] buffer = new byte[512];
 			int length;

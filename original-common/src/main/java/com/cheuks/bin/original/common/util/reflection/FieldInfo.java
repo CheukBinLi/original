@@ -7,6 +7,7 @@ import com.cheuks.bin.original.common.annotation.reflect.Alias;
 public class FieldInfo {
 
 	private Field field;
+	private boolean isAlias;
 	private Alias alias;
 
 	public String getAliasOrFieldName() {
@@ -20,7 +21,14 @@ public class FieldInfo {
 	public FieldInfo(Field field) {
 		super();
 		this.field = field;
-		alias = field.getDeclaredAnnotation(Alias.class);
+		this.alias = field.getDeclaredAnnotation(Alias.class);
+	}
+
+	public FieldInfo(Field field, boolean isAlias) {
+		super();
+		this.field = field;
+		this.isAlias = isAlias;
+		this.alias = field.getDeclaredAnnotation(Alias.class);
 	}
 
 	public Field getField() {
@@ -39,6 +47,14 @@ public class FieldInfo {
 	public FieldInfo setAlias(Alias alias) {
 		this.alias = alias;
 		return this;
+	}
+
+	public boolean isAlias() {
+		return isAlias;
+	}
+
+	public void setAlias(boolean isAlias) {
+		this.isAlias = isAlias;
 	}
 
 }

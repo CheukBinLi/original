@@ -1,14 +1,20 @@
 package com.cheuks.bin.original.common.util.conver;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.cheuks.bin.original.common.dbmanager.BasePage;
 import com.cheuks.bin.original.common.util.reflection.ClassInfo;
 import com.cheuks.bin.original.common.util.reflection.FieldInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
@@ -73,17 +79,6 @@ public class JsonMapper {
 		return writer(o, filterProvider, false);
 	}
 
-	//	public <T> T readToObject(Class<T> type, byte[] data) throws Exception {
-	//		T result = type.newInstance();
-	//
-	//		ClassInfo current = ClassInfo.getClassInfo(result.getClass());		
-	//		
-	//		
-	//		
-	//		
-	//		return result;
-	//	}
-
 	@SuppressWarnings("unused")
 	private String writer(final Object o, FilterProvider filterProvider, boolean withAlias) throws Exception {
 		ClassInfo classInfo = ClassInfo.getClassInfo(o.getClass());
@@ -112,6 +107,7 @@ public class JsonMapper {
 		ClassInfo subClassInfo;
 		String tagName;
 		Object tempValue;
+		FieldInfo fieldInfo;
 		Filter currentClazz = null == filterProvider ? null : filterProvider.getFilterByClass(o.getClass());
 		Filter filterAll = null == filterProvider ? null : filterProvider.getFilterByClass(null);
 
@@ -128,8 +124,12 @@ public class JsonMapper {
 		} else {
 			/** 特殊对象 */
 			if (null == currentClassInfo.getFields())
-				currentClassInfo.setFields(reflectionUtil.scanClassFieldInfo4List(currentClassInfo.getClazz(), true, true, true));
-			for (FieldInfo fieldInfo : currentClassInfo.getFields()) {
+				//				currentClassInfo.setFields(reflectionUtil.scanClassFieldInfo4List(currentClassInfo.getClazz(), true, true, true));
+				currentClassInfo.setFields(reflectionUtil.scanClassFieldInfo4Map(currentClassInfo.getClazz(), true, true, true, true));
+			for (Entry<String, FieldInfo> en : currentClassInfo.getFields().entrySet()) {
+				if (en.getValue().isAlias())
+					continue;
+				fieldInfo = en.getValue();
 				tempValue = fieldInfo.getField().get(o);
 				tagName = withAlias ? fieldInfo.getAliasOrFieldName() : fieldInfo.getField().getName();
 				//1-过滤
@@ -239,37 +239,37 @@ public class JsonMapper {
 	}
 
 	public static void main(String[] args) throws Throwable {
-		//		long now = System.currentTimeMillis();
-		//		Filter f = new Filter(ClassInfo.class, "a", "b", "c", "e", "f", "g");
-		//		List<Filter> list = new LinkedList<>();
-		//		list.add(f);
-		//
-		//		System.out.println(INSTANCE.writeToString("xxxxxxxxxxx", null));
-		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
-		//		now = System.currentTimeMillis();
-		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
-		//
-		//		List<Integer> ii = new LinkedList<>(Arrays.asList(1, 3, 4, 56, 76, 6, 54, 2));
-		//		Map<String, Object> x = new HashMap<>();
-		//		x.put("oh shit", ii);
-		//		List<Map<String, Object>> p = new ArrayList<>();
-		//		p.add(x);
-		//		BasePage<Map<String, Object>> page = new BasePage<>(p, 1, 1, 1, 1);
-		//		now = System.currentTimeMillis();
-		//		System.out.println(INSTANCE.writeToStringWithAlias(page, null) + " 1  " + (System.currentTimeMillis() - now));
-		//		now = System.currentTimeMillis();
-		//		System.out.println(INSTANCE.writeToString(page, null) + " 2  " + (System.currentTimeMillis() - now));
-		//
-		//		com.cheuks.bin.original.common.util.conver.ObjectToJson j = com.cheuks.bin.original.common.util.conver.ObjectToJson.newInstance();
-		//
-		//		now = System.currentTimeMillis();
-		//		System.out.println(j.writeToString(page, null) + " 1  " + (System.currentTimeMillis() - now));
-		//		now = System.currentTimeMillis();
-		//		System.out.println(j.writeToString(page, null) + " 2  " + (System.currentTimeMillis() - now));
-		//
-		//		String a = "1896a7242805f2b72b9d94631aae6ed0.tomcat.tar";
-		//		System.err.println(a.substring(a.lastIndexOf(".") + 1));
-		//		System.err.println(ClassInfo.class.toString());
+		long now = System.currentTimeMillis();
+		Filter f = new Filter(ClassInfo.class, "a", "b", "c", "e", "f", "g");
+		List<Filter> list = new LinkedList<>();
+		list.add(f);
+
+		System.out.println(INSTANCE.writeToString("xxxxxxxxxxx", null));
+		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
+		now = System.currentTimeMillis();
+		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
+
+		List<Integer> ii = new LinkedList<>(Arrays.asList(1, 3, 4, 56, 76, 6, 54, 2));
+		Map<String, Object> x = new HashMap<>();
+		x.put("oh shit", ii);
+		List<Map<String, Object>> p = new ArrayList<>();
+		p.add(x);
+		BasePage<Map<String, Object>> page = new BasePage<>(p, 1, 1, 1, 1);
+		now = System.currentTimeMillis();
+		System.out.println(INSTANCE.writeToStringWithAlias(page, null) + " 1  " + (System.currentTimeMillis() - now));
+		now = System.currentTimeMillis();
+		System.out.println(INSTANCE.writeToString(page, null) + " 2  " + (System.currentTimeMillis() - now));
+
+		com.cheuks.bin.original.common.util.conver.ObjectToJson j = com.cheuks.bin.original.common.util.conver.ObjectToJson.newInstance();
+
+		now = System.currentTimeMillis();
+		System.out.println(j.writeToString(page, null) + " 1  " + (System.currentTimeMillis() - now));
+		now = System.currentTimeMillis();
+		System.out.println(j.writeToString(page, null) + " 2  " + (System.currentTimeMillis() - now));
+
+		String a = "1896a7242805f2b72b9d94631aae6ed0.tomcat.tar";
+		System.err.println(a.substring(a.lastIndexOf(".") + 1));
+		System.err.println(ClassInfo.class.toString());
 	}
 
 }
