@@ -14,6 +14,15 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class HttpClientUtil {
 
+	public static enum RequestMethod {
+										POST,
+										DELETE,
+										PUT,
+										GET,
+										HEAD,
+										Options
+	}
+
 	protected HttpClientUtil() {
 	}
 
@@ -162,11 +171,27 @@ public class HttpClientUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public HttpResponseModel POST(String urlPath, String parameterStr, int timeOut, boolean onlyRequest, boolean onlyResponseData) throws IOException {
-		return POST(urlPath, parameterStr, timeOut, onlyRequest, onlyResponseData, null);
+	public HttpResponseModel POST(String urlPath, String parameterStr, int timeOut, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws IOException {
+		return requestForMethodType(RequestMethod.POST, urlPath, parameterStr, timeOut, onlyRequest, onlyResponseData, header);
 	}
 
-	public HttpResponseModel POST(String urlPath, String parameterStr, int timeOut, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws IOException {
+	public HttpResponseModel PUT(String urlPath, String parameterStr, int timeOut, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws IOException {
+		return requestForMethodType(RequestMethod.PUT, urlPath, parameterStr, timeOut, onlyRequest, onlyResponseData, header);
+	}
+
+	public HttpResponseModel DELETE(String urlPath, String parameterStr, int timeOut, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws IOException {
+		return requestForMethodType(RequestMethod.DELETE, urlPath, parameterStr, timeOut, onlyRequest, onlyResponseData, header);
+	}
+
+	public HttpResponseModel HEAD(String urlPath, String parameterStr, int timeOut, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws IOException {
+		return requestForMethodType(RequestMethod.HEAD, urlPath, parameterStr, timeOut, onlyRequest, onlyResponseData, header);
+	}
+
+	public HttpResponseModel Options(String urlPath, String parameterStr, int timeOut, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws IOException {
+		return requestForMethodType(RequestMethod.Options, urlPath, parameterStr, timeOut, onlyRequest, onlyResponseData, header);
+	}
+
+	public HttpResponseModel requestForMethodType(RequestMethod requestMethod, String urlPath, String parameterStr, int timeOut, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws IOException {
 		HttpURLConnection con = null;
 		URL url = null;
 		InputStream in = null;
@@ -183,7 +208,7 @@ public class HttpClientUtil {
 			con.setUseCaches(false);
 			con.setDoInput(true);
 			con.setDoOutput(true);
-			con.setRequestMethod("POST");
+			con.setRequestMethod(requestMethod.toString());
 			con.setReadTimeout(timeOut);
 			if (null != header) {
 				for (Entry<String, String> item : header.entrySet()) {
