@@ -132,6 +132,70 @@ public class ReflectionUtil {
 		return result;
 	}
 
+	public Map<String, FieldInfo> scanClassFieldInfo4Map(Class<?> clazz, boolean hasSetting, boolean filterTransient, boolean hasAliasAnnotation, boolean keepBoth, Class... ignore) throws NoSuchFieldException, SecurityException {
+		if (null == clazz)
+			return null;
+
+		LinkedList<Class<?>> classes = new LinkedList<Class<?>>();
+		classes.add(clazz);
+		Class<?> tempClass;
+		Alias alias = null;// 别名
+		Class<?> currentClass = clazz;
+		List<Field> fields = new ArrayList<Field>();
+		List<Method> methods = new ArrayList<Method>();
+
+		// 向上遍历父类
+		while (true) {
+			if (null == (tempClass = clazz.getSuperclass()) || tempClass == currentClass)
+				break;
+			classes.addLast(currentClass = tempClass);
+		}
+		for (int i = 0, len = classes.size(); i < len; i++) {
+			tempClass = classes.removeLast();
+			fields.addAll(Arrays.asList(tempClass.getDeclaredFields()));
+			if (hasSetting) {
+				methods.addAll(Arrays.asList(tempClass.getDeclaredMethods()));
+			}
+		}
+
+		Map<String, FieldInfo> result = new LinkedHashMap<String, FieldInfo>();
+		Set<String> settingMethodName = null;
+		settingMethodName = new HashSet<String>();
+		for (Method m : methods) {
+			if (!Modifier.isPublic(m.getModifiers()))
+				continue;
+			if (m.getName().startsWith("set") || m.getName().startsWith("get")) {
+				settingMethodName.add(m.getName().substring(3).toLowerCase());
+			} else if (m.getName().startsWith("is")) {
+				settingMethodName.add(m.getName().substring(2).toLowerCase());
+			}
+		}
+		for (Field f : fields) {
+			if (Modifier.isStatic(f.getModifiers()))
+				continue;
+			if (filterTransient)
+				if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers()))
+					continue;
+			if (null != ignore && isIn(f, ignore)) {
+				continue;
+			}
+			if (!hasSetting || settingMethodName.contains(f.getName().toLowerCase())) {
+				f.setAccessible(true);
+				if (hasAliasAnnotation) {
+					alias = f.getAnnotation(Alias.class);
+					if (null != alias && alias.value().length() > 0) {
+						result.put(alias.value(), new FieldInfo(f, true));
+					}
+				}
+				if (!hasAliasAnnotation || null == alias || (hasAliasAnnotation && keepBoth)) {
+					result.put(f.getName(), new FieldInfo(f));
+
+				}
+			}
+		}
+		return result;
+	}
+
 	private boolean isIn(Field f, Class... ignore) {
 		for (Class annotation : ignore) {
 			if (null != f.getAnnotation(annotation))

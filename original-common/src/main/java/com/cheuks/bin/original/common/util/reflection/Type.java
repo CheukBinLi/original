@@ -9,27 +9,8 @@ import java.util.RandomAccess;
 import java.util.Set;
 
 public enum Type {
-					StringType(String.class),
-					PrimitiveInt(int.class),
-					PrimitiveBoolean(boolean.class),
-					PrimitiveChar(char.class),
-					PrimitiveShort(short.class),
-					PrimitiveLong(long.class),
-					PrimitiveFloat(float.class),
-					PrimitiveByte(byte.class),
-					PrimitiveDouble(double.class),
-					PackageInteger(Integer.class),
-					PackageBoolean(Boolean.class),
-					PackageCharacter(Character.class),
-					PackageShort(Short.class),
-					PackageLong(Long.class),
-					PackageFloat(Float.class),
-					PackageByte(Byte.class),
-					PackageDouble(Double.class),
-					Array(Arrays.class),
-					Map(Map.class),
-					Date(java.util.Date.class, java.sql.Date.class, java.sql.Timestamp.class, java.sql.Time.class),
-					Collection(RandomAccess.class, Collection.class, List.class, Set.class);
+	StringType(String.class), PrimitiveInt(int.class), PrimitiveBoolean(boolean.class), PrimitiveChar(char.class), PrimitiveShort(short.class), PrimitiveLong(long.class), PrimitiveFloat(float.class), PrimitiveByte(byte.class), PrimitiveDouble(double.class), PackageInteger(Integer.class), PackageBoolean(Boolean.class), PackageCharacter(Character.class), PackageShort(Short.class), PackageLong(Long.class), PackageFloat(Float.class), PackageByte(Byte.class), PackageDouble(Double.class), Array(
+			Arrays.class), Map(Map.class), Date(java.util.Date.class, java.sql.Date.class, java.sql.Timestamp.class, java.sql.Time.class), Collection(RandomAccess.class, Collection.class, List.class, Set.class);
 
 	Class<?>[] types;
 
@@ -126,13 +107,13 @@ public enum Type {
 			return "null";
 		switch (classInfo.getType()) {
 		case StringType:
-			return (String) value;
+			return valueTransference(((String) value).toCharArray());
 		case PrimitiveInt:
 			return Integer.toString((int) value);
 		case PrimitiveBoolean:
 			return Boolean.toString((boolean) value);
 		case PrimitiveChar:
-			return Character.toString((char) value);
+			return valueTransference((char) value);
 		case PrimitiveShort:
 			return Short.toString((short) value);
 		case PrimitiveLong:
@@ -171,6 +152,28 @@ public enum Type {
 		return "\"" + name + "\":null";
 	}
 
+	static String valueTransference(char... values) {
+		if (null == values || values.length < 1)
+			return "";
+		StringBuilder result = new StringBuilder();
+		for (char item : values) {
+			switch (item) {
+			case '\"':
+				result.append("\\\"");
+				break;
+			case '\r':
+//				result.append("\\r");
+				break;
+			case '\n':
+//				result.append("\\n");
+				break;
+			default:
+				result.append(item);
+			}
+		}
+		return result.toString();
+	}
+
 	public static String valueToJson(String name, final Object value, final ClassInfo field) throws IllegalArgumentException, IllegalAccessException {
 		name = (null == name ? "" : ("\"" + name + "\":"));
 		if (null == value) {
@@ -178,13 +181,15 @@ public enum Type {
 		}
 		switch (field.getType()) {
 		case StringType:
-			return name + "\"" + value.toString().replaceAll("\"", "\\\"") + "\"";
+			//			return name + "\"" + value.toString().replaceAll("\"", "\\\"") + "\"";
+			return name + "\"" + valueTransference(value.toString().toCharArray()) + "\"";
 		case PrimitiveInt:
 			return name + Integer.toString((int) value);
 		case PrimitiveBoolean:
 			return name + Boolean.toString((boolean) value);
 		case PrimitiveChar:
-			return name + "\"" + Character.toString((char) value).replaceAll("\"", "\\\"") + "\"";
+			//			return name + "\"" + Character.toString((char) value).replaceAll("\"", "\\\"") + "\"";
+			return name + "\"" + valueTransference((char) value) + "\"";
 		case PrimitiveShort:
 			return name + Short.toString((short) value);
 		case PrimitiveLong:
@@ -200,7 +205,8 @@ public enum Type {
 		case PackageBoolean:
 			return name + value.toString();
 		case PackageCharacter:
-			return name + "\"" + value.toString().replaceAll("\"", "\\\"") + "\"";
+			//			return name + "\"" + value.toString().replaceAll("\"", "\\\"") + "\"";
+			return name + "\"" + valueTransference((Character) value) + "\"";
 		case PackageShort:
 			return name + value.toString();
 		case PackageLong:
@@ -221,7 +227,7 @@ public enum Type {
 				StringBuilder b = new StringBuilder();
 				b.append(name + "[");
 				for (int i = 0;; i++) {
-					b.append("\"").append(String.valueOf(a[i])).append("\"");
+					b.append("\"").append(valueTransference(String.valueOf(a[i]).toCharArray())).append("\"");
 					if (i == iMax)
 						return b.append(']').toString();
 					b.append(", ");

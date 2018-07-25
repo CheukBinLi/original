@@ -19,6 +19,10 @@ public class JsonMapper {
 
 	final static Logger LOG = LoggerFactory.getLogger(JsonMapper.class);
 
+	protected static final String DEFAULT_EOL = "\r\n";
+
+	protected static final String COMPACT_EOL = "";
+
 	private ReflectionUtil reflectionUtil = ReflectionUtil.instance();
 
 	private static JsonMapper INSTANCE = new JsonMapper();
@@ -82,18 +86,58 @@ public class JsonMapper {
 		return writer(o, filterProvider, false, true);
 	}
 
-	@SuppressWarnings("unused")
-	private String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient) throws Exception {
+	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient) throws Exception {
+		//		ClassInfo classInfo = ClassInfo.getClassInfo(o.getClass());
+		//		StringBuilder result;
+		//		if (null == o) {
+		//			return "{}";
+		//		} else if (classInfo.isBasicOrArrays()) {
+		//			/** 基本类型 */
+		//			return "{\"" + Type.valueToString(o, classInfo) + "\"}";
+		//		} else if (classInfo.isDate()) {
+		//			/** 日期 */
+		//			return "{\"" + defaultFormat.format(o) + "\"}";
+		//		} else if (classInfo.isMapOrCollection()) {
+		//			/** 集合 */
+		//			recursionSub(null, o, result = new StringBuilder(), filterProvider, withAlias, withOutTransient);
+		//		} else {
+		//			result = new StringBuilder("{");
+		//			recursion(o, filterProvider, result, withAlias, withOutTransient);
+		//			result.append("}");
+		//		}
+		//		return result.toString();
+		return writerString(o, filterProvider, withAlias, withOutTransient, true);
+	}
+
+	@SuppressWarnings("unchecked")
+	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean eol, Map<String, ? extends Object>... additionalLogAttributes) throws Exception {
+		StringBuilder additional = null;
+		String subResult;
+		if (null != additionalLogAttributes && additionalLogAttributes.length > 0) {
+			additional = new StringBuilder();
+			for (Map<String, ? extends Object> attributes : additionalLogAttributes) {
+				//				recursionSub(null, attributes, subResult, filterProvider, withAlias, withOutTransient);
+				subResult = writerString(attributes, filterProvider, withAlias, withOutTransient, false);
+				additional.append(subResult.length() > 0 ? (subResult.toString() + ",") : COMPACT_EOL);
+			}
+			additional.setLength(additional.length() - 1);
+		}
+		String result = writerString(o, filterProvider, withAlias, withOutTransient, false);
+		return (null == additional ? "{" + result + "}" : "{" + result + (result.length() > 0 ? "," : COMPACT_EOL) + additional.toString() + "}") + (eol ? DEFAULT_EOL : COMPACT_EOL);
+	}
+
+	protected String writerString(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean brackets) throws Exception {
+		if (null == o) {
+			return brackets ? "{}" : COMPACT_EOL;
+		}
 		ClassInfo classInfo = ClassInfo.getClassInfo(o.getClass());
 		StringBuilder result;
-		if (null == o) {
-			return "{}";
-		} else if (classInfo.isBasicOrArrays()) {
+		if (classInfo.isBasicOrArrays()) {
 			/** 基本类型 */
-			return "{\"" + Type.valueToString(o, classInfo) + "\"}";
+			return brackets ? "{\"" + Type.valueToString(o, classInfo) + "\"}" : "\"" + Type.valueToString(o, classInfo) + "\"";
 		} else if (classInfo.isDate()) {
 			/** 日期 */
-			return "{\"" + defaultFormat.format(o) + "\"}";
+			return brackets ? "{\"" + defaultFormat.format(o) + "\"}" : "\"" + defaultFormat.format(o) + "\"";
 		} else if (classInfo.isMapOrCollection()) {
 			/** 集合 */
 			recursionSub(null, o, result = new StringBuilder(), filterProvider, withAlias, withOutTransient);
@@ -102,7 +146,9 @@ public class JsonMapper {
 			recursion(o, filterProvider, result, withAlias, withOutTransient);
 			result.append("}");
 		}
-		return result.toString();
+		if (brackets)
+			return result.toString();
+		return result.substring(1, result.length() - 1);
 	}
 
 	private void recursion(Object o, FilterProvider filterProvider, final StringBuilder result, boolean withAlias, boolean withOutTransient) throws Exception {
@@ -242,12 +288,14 @@ public class JsonMapper {
 	}
 
 	public static void main(String[] args) throws Throwable {
-		//		long now = System.currentTimeMillis();
-		//		Filter f = new Filter(ClassInfo.class, "a", "b", "c", "e", "f", "g");
-		//		List<Filter> list = new LinkedList<>();
-		//		list.add(f);
-		//
-		//		System.out.println(INSTANCE.writeToString("xxxxxxxxxxx", null));
+		//						long now = System.currentTimeMillis();
+		//						Filter f = new Filter(ClassInfo.class, "a", "b", "c", "e", "f", "g");
+		//						List<Filter> list = new LinkedList<>();
+		//						list.add(f);
+		//						Map<String, Object> xx = new HashMap<>();
+		//						xx.put("oh shit", list);
+		//						//
+		//						System.out.println(INSTANCE.writer(f, null, true, false, true, xx));
 		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
 		//		now = System.currentTimeMillis();
 		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
