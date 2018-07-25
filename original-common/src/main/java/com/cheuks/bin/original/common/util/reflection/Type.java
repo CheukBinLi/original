@@ -166,6 +166,7 @@ public enum Type {
 				break;
 			case '\n':
 //				result.append("\\n");
+			case '\t':
 				break;
 			default:
 				result.append(item);
