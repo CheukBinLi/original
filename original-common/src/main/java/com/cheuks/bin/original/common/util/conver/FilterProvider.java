@@ -26,4 +26,53 @@ public class FilterProvider {
 		return filters.get(null == clazz ? "*" : clazz);
 	}
 
+	public static boolean isInclude(String name, Filter... filters) {
+		boolean result = false;
+		if (null == name || null == filters || filters.length < 1)
+			return result;
+		for (Filter filter : filters) {
+			if (null == filter || filter.exceptsIsEmpty()) {
+				continue;
+			}
+			if (result = filter.getExcepts().contains(name))
+				return result;
+		}
+		return result;
+	}
+
+	public static boolean isIgnore(String name, Filter... filters) {
+		if (null == name || null == filters || filters.length < 1)
+			return false;
+		for (Filter filter : filters) {
+			if (null == filter) {
+				continue;
+			} else if (!filter.includesIsEmpty() && filter.getIncludes().containsKey(name)) {
+				return false;
+			} else if (filter.exceptsIsEmpty() && filter.getExcepts().contains(name)) {
+				return true;
+			}
+		}
+		return false;
+
+	}
+
+	public static String getCurrentValueFormat(String name, Filter... filters) {
+		return getCurrentValueFormat(name, null, filters);
+	}
+
+	public static String getCurrentValueFormat(String name, String defaultFormat, Filter... filters) {
+		if (null == name || null == filters || filters.length < 1)
+			return defaultFormat;
+		String result;
+		for (Filter filter : filters) {
+			if (null == filter || filter.includesIsEmpty()) {
+				continue;
+			}
+			result = filter.getIncludes().get(name);
+			if (null != result) {
+				return result;
+			}
+		}
+		return defaultFormat;
+	}
 }

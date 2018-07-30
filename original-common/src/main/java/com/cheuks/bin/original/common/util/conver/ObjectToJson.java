@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import com.cheuks.bin.original.common.util.reflection.ReflectionCache;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 
+@Deprecated
 public class ObjectToJson {
 
 	private ReflectionCache reflectionCache = ReflectionCache.newInstance();
@@ -75,7 +76,7 @@ public class ObjectToJson {
 		Filter filterAll = null == filterProvider ? null : filterProvider.getFilterByClass(null);
 		for (Field field : fields) {
 			tagName = field.getName();
-			if ((null != currentClazz && currentClazz.getExcepts().contains(tagName)) || (null != filterAll && filterAll.getExcepts().contains(tagName))) {
+			if (FilterProvider.isIgnore(tagName, currentClazz, filterAll)) {
 				continue;
 			}
 			tempValue = field.get(o);
@@ -152,7 +153,7 @@ public class ObjectToJson {
 					en = (Entry<?, ?>) tempSubValue;
 					tempSubValue = en.getValue();
 					tempSubKey = en.getKey();
-					if (null == tempSubKey || (null != currentClazz && currentClazz.getExcepts().contains(tempSubKey)) || (null != filterAll && filterAll.getExcepts().contains(tempSubKey))) {
+					if (null == tempSubKey || FilterProvider.isIgnore((String) tempSubKey, currentClazz, filterAll)) {
 						result.append(",");
 						continue;
 					}

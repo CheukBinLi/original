@@ -110,12 +110,12 @@ public class JsonMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean eol, Map<String, ? extends Object>... additionalLogAttributes) throws Exception {
+	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean eol, Map<String, ? extends Object>... additionalAttributes) throws Exception {
 		StringBuilder additional = null;
 		String subResult;
-		if (null != additionalLogAttributes && additionalLogAttributes.length > 0) {
+		if (null != additionalAttributes && additionalAttributes.length > 0) {
 			additional = new StringBuilder();
-			for (Map<String, ? extends Object> attributes : additionalLogAttributes) {
+			for (Map<String, ? extends Object> attributes : additionalAttributes) {
 				//				recursionSub(null, attributes, subResult, filterProvider, withAlias, withOutTransient);
 				subResult = writerString(attributes, filterProvider, withAlias, withOutTransient, false);
 				additional.append(subResult.length() > 0 ? (subResult.toString() + ",") : COMPACT_EOL);
@@ -159,7 +159,6 @@ public class JsonMapper {
 		FieldInfo fieldInfo;
 		Filter currentClazz = null == filterProvider ? null : filterProvider.getFilterByClass(o.getClass());
 		Filter filterAll = null == filterProvider ? null : filterProvider.getFilterByClass(null);
-
 		if (null == o || currentClassInfo.isBasicOrArrays()) {
 			/** 基本类型 */
 			result.append(Type.valueToString(o, currentClassInfo));
@@ -177,16 +176,14 @@ public class JsonMapper {
 				currentClassInfo.setFields(reflectionUtil.scanClassFieldInfo4Map(currentClassInfo.getClazz(), true, false, true, true));
 			for (Entry<String, FieldInfo> en : currentClassInfo.getFields().entrySet()) {
 				fieldInfo = en.getValue();
-				if (fieldInfo.isAlias() || (withOutTransient && Modifier.isTransient(fieldInfo.getField().getModifiers())))
+				if (fieldInfo.isAlias() || (withOutTransient && Modifier.isTransient(fieldInfo.getField().getModifiers())) || FilterProvider.isIgnore(tagName = fieldInfo.getAliasOrFieldName(withAlias), currentClazz, filterAll))
 					continue;
 				tempValue = fieldInfo.getField().get(o);
-				tagName = withAlias ? fieldInfo.getAliasOrFieldName() : fieldInfo.getField().getName();
+				//				System.out.println(fieldInfo.getField().getName());
 				//1-过滤
 				//2-空校验
 				//3-建模
-				if ((null != currentClazz && currentClazz.getExcepts().contains(tagName)) || (null != filterAll && filterAll.getExcepts().contains(tagName))) {
-					continue;
-				} else if (null == tempValue) {
+				if (null == tempValue) {
 					result.append(Type.nullToJson(tagName)).append(",");
 					continue;
 				}
@@ -196,11 +193,10 @@ public class JsonMapper {
 				if (subClassInfo.isMapOrCollection()) {
 					recursionSub(tagName, tempValue, result, filterProvider, withAlias, withOutTransient);
 				} else if (subClassInfo.isBasicOrArrays()) {
-					result.append(Type.valueToJson(tagName, tempValue, subClassInfo));
+					result.append(Type.valueToJson(tagName, tempValue, FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll), subClassInfo));
 				} else if (subClassInfo.isDate()) {
-
-					result.append("\"").append(tagName).append("\":\"").append(defaultFormat.format(tempValue)).append("\"");
-
+					String valueFormat = FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll);
+					result.append("\"").append(tagName).append("\":\"").append(null == valueFormat ? defaultFormat.format(tempValue) : new SimpleDateFormat(valueFormat).format(tempValue)).append("\"");
 				} else {
 					result.append("\"").append(tagName).append("\":").append("{");
 					recursion(tempValue, filterProvider, result, withAlias, withOutTransient);
@@ -226,12 +222,13 @@ public class JsonMapper {
 		String subTagName = tagName;
 		Filter currentClazz = null == filterProvider ? null : filterProvider.getFilterByClass(value.getClass());
 		Filter filterAll = null == filterProvider ? null : filterProvider.getFilterByClass(null);
+		String valueFormat;
 		if (hasTagName)
 			result.append("\"").append(tagName).append("\":");
 		if (currentClassInfo.isMap()) {
 			map = (Map<?, ?>) value;
 			if (map.isEmpty()) {
-				result.setLength(result.length() - 1);
+				result.setLength(result.length() > 0 ? result.length() - 1 : 0);
 				result.append(":null");
 				return;
 			}
@@ -260,7 +257,7 @@ public class JsonMapper {
 				subTagName = en.getKey().toString();
 			}
 
-			if ((null != currentClazz && currentClazz.getExcepts().contains(subTagName)) || (null != filterAll && filterAll.getExcepts().contains(subTagName))) {
+			if (FilterProvider.isIgnore(subTagName, currentClazz, filterAll)) {
 				continue;
 			}
 			if (null == tempSubValue) {
@@ -273,9 +270,11 @@ public class JsonMapper {
 			if (subClassInfo.isMapOrCollection()) {
 				recursionSub(hasTagName ? null : subTagName, tempSubValue, result, filterProvider, withAlias, withOutTransient);
 			} else if (subClassInfo.isBasicOrArrays()) {
-				result.append(currentClassInfo.isMap() ? Type.valueToJson(subTagName, tempSubValue, subClassInfo) : Type.valueToString4Json(tempSubValue, subClassInfo));
+				valueFormat = FilterProvider.getCurrentValueFormat(currentClassInfo.isMap() ? subTagName : tagName, currentClazz, filterAll);
+				result.append(currentClassInfo.isMap() ? Type.valueToJson(subTagName, tempSubValue, valueFormat, subClassInfo) : Type.valueToString4Json(tempSubValue, valueFormat, subClassInfo));
 			} else if (subClassInfo.isDate()) {
-				result.append("\"").append(currentClassInfo.getName()).append("\":\"").append(defaultFormat.format(tempSubValue)).append("\"");
+				valueFormat = FilterProvider.getCurrentValueFormat(subTagName, currentClazz, filterAll);
+				result.append("\"").append(subTagName).append("\":\"").append(null == valueFormat ? defaultFormat.format(tempSubValue) : new SimpleDateFormat(valueFormat).format(tempSubValue)).append("\"");
 			} else {
 				result.append("{");
 				recursion(tempSubValue, filterProvider, result, withAlias, withOutTransient);
@@ -288,14 +287,19 @@ public class JsonMapper {
 	}
 
 	public static void main(String[] args) throws Throwable {
-		//						long now = System.currentTimeMillis();
-		//						Filter f = new Filter(ClassInfo.class, "a", "b", "c", "e", "f", "g");
-		//						List<Filter> list = new LinkedList<>();
-		//						list.add(f);
-		//						Map<String, Object> xx = new HashMap<>();
-		//						xx.put("oh shit", list);
-		//						//
-		//						System.out.println(INSTANCE.writer(f, null, true, false, true, xx));
+		//				long now = System.currentTimeMillis();
+		//				//		Filter f = new Filter(ClassInfo.class, "a", "b", "c", "e", "f", "g");
+		//				Filter f = Filter.build(ClassInfo.class).addExcept("a", "b", "c", "e", "f", "g").addInclude("小绿:aaa");
+		//				List<Filter> list = new LinkedList<>();
+		//				list.add(f);
+		//				Map<String, Object> xx = new HashMap<>();
+		//				xx.put("oh shit", list);
+		//				xx.put("date_Time", new Date());
+		//				xx.put("Ignore", "哇哈哈");
+		//		//						//
+		//
+		//				FilterProvider provider = new FilterProvider(Filter.build(HashMap.class).addInclude("小绿:%s你好呀!"),Filter.build(Filter.class)/* .addExcept("includes") */, Filter.build(null).addExcept("Ignore","小绿").addInclude("date_Time:我要系yyyy年MM月dd日D日既HH:mm:ss打七小绿"));
+		//				System.out.println(INSTANCE.writer(f, provider, true, false, true, xx));
 		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
 		//		now = System.currentTimeMillis();
 		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));

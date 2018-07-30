@@ -1,39 +1,75 @@
 package com.cheuks.bin.original.common.util.conver;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Filter {
-	private Class<?> clazz;
-	private List<String> excepts;
 
-	public Filter() {
-		super();
+	static final Map<String, String> EMPTY_MAP = new HashMap<String, String>(1);
+	static final Set<String> EMPTY_SET = new HashSet<String>(1);
+	private Class<?> clazz;
+	private Set<String> excepts;//过滤
+	private Map<String, String> includes;//包含 
+
+	public final boolean exceptsIsEmpty() {
+		return EMPTY_SET == this.excepts;
 	}
 
-	public Filter(Class<?> clazz, String... excepts) {
-		super();
+	public final boolean includesIsEmpty() {
+		return EMPTY_MAP == this.includes;
+	}
+
+	public static Filter build(Class<?> clazz) {
+		return new Filter(clazz);
+	}
+
+	public Filter(Class<?> clazz) {
 		this.clazz = clazz;
-		this.excepts = new LinkedList<String>(Arrays.asList(excepts));
+		this.excepts = EMPTY_SET;
+		this.includes = EMPTY_MAP;
+	}
+
+	public synchronized Filter addInclude(String... include) {
+		if (null == include || include.length < 1) {
+			return this;
+		}
+		if (EMPTY_MAP == this.includes)
+			this.includes = new HashMap<String, String>();
+		int index;
+		for (String item : include) {
+			if ((index = item.indexOf(":")) > 0) {
+				this.includes.put(item.substring(0, index), item.substring(index + 1, item.length()));
+			} else {
+				this.includes.put(item, null);
+			}
+		}
+		return this;
+	}
+
+	public synchronized Filter addExcept(String... excepts) {
+		if (null == excepts || excepts.length < 1) {
+			return this;
+		}
+		if (EMPTY_SET == this.excepts)
+			this.excepts = new HashSet<String>();
+		for (String item : excepts) {
+			this.excepts.add(item);
+		}
+		return this;
 	}
 
 	public Class<?> getClazz() {
 		return clazz;
 	}
 
-	public Filter setClazz(Class<?> clazz) {
-		this.clazz = clazz;
-		return this;
-	}
-
-	public List<String> getExcepts() {
+	public Set<String> getExcepts() {
 		return excepts;
 	}
 
-	public Filter setExcepts(List<String> excepts) {
-		this.excepts = excepts;
-		return this;
+	public Map<String, String> getIncludes() {
+		return includes;
 	}
 
 }

@@ -9,8 +9,27 @@ import java.util.RandomAccess;
 import java.util.Set;
 
 public enum Type {
-	StringType(String.class), PrimitiveInt(int.class), PrimitiveBoolean(boolean.class), PrimitiveChar(char.class), PrimitiveShort(short.class), PrimitiveLong(long.class), PrimitiveFloat(float.class), PrimitiveByte(byte.class), PrimitiveDouble(double.class), PackageInteger(Integer.class), PackageBoolean(Boolean.class), PackageCharacter(Character.class), PackageShort(Short.class), PackageLong(Long.class), PackageFloat(Float.class), PackageByte(Byte.class), PackageDouble(Double.class), Array(
-			Arrays.class), Map(Map.class), Date(java.util.Date.class, java.sql.Date.class, java.sql.Timestamp.class, java.sql.Time.class), Collection(RandomAccess.class, Collection.class, List.class, Set.class);
+					StringType(String.class),
+					PrimitiveInt(int.class),
+					PrimitiveBoolean(boolean.class),
+					PrimitiveChar(char.class),
+					PrimitiveShort(short.class),
+					PrimitiveLong(long.class),
+					PrimitiveFloat(float.class),
+					PrimitiveByte(byte.class),
+					PrimitiveDouble(double.class),
+					PackageInteger(Integer.class),
+					PackageBoolean(Boolean.class),
+					PackageCharacter(Character.class),
+					PackageShort(Short.class),
+					PackageLong(Long.class),
+					PackageFloat(Float.class),
+					PackageByte(Byte.class),
+					PackageDouble(Double.class),
+					Array(Arrays.class),
+					Map(Map.class),
+					Date(java.util.Date.class, java.sql.Date.class, java.sql.Timestamp.class, java.sql.Time.class),
+					Collection(RandomAccess.class, Collection.class, List.class, Set.class);
 
 	Class<?>[] types;
 
@@ -88,58 +107,66 @@ public enum Type {
 	}
 
 	public static String valueToString4Json(final Object value, final ClassInfo classInfo) throws IllegalArgumentException, IllegalAccessException {
+		return valueToString4Json(value, null, classInfo);
+	}
+
+	public static String valueToString4Json(final Object value, final String format, final ClassInfo classInfo) throws IllegalArgumentException, IllegalAccessException {
 		if (null == value)
 			return "null";
 		switch (classInfo.getType()) {
 		case StringType:
-			return "\"" + (String) value + "\"";
+			return "\"" + stringFormat(format, (String) value) + "\"";
 		case PrimitiveChar:
-			return "\"" + Character.toString((char) value) + "\"";
+			return "\"" + stringFormat(format, Character.toString((char) value)) + "\"";
 		case PackageCharacter:
-			return "\"" + value.toString() + "\"";
+			return "\"" + stringFormat(format, value.toString()) + "\"";
 		default:
-			return valueToString(value, classInfo);
+			return valueToString(value, format, classInfo);
 		}
 	}
 
 	public static String valueToString(final Object value, final ClassInfo classInfo) throws IllegalArgumentException, IllegalAccessException {
+		return valueToString(value, null, classInfo);
+	}
+
+	public static String valueToString(final Object value, final String format, final ClassInfo classInfo) throws IllegalArgumentException, IllegalAccessException {
 		if (null == value)
 			return "null";
 		switch (classInfo.getType()) {
 		case StringType:
-			return valueTransference(((String) value).toCharArray());
+			return stringFormat(format, valueTransference(((String) value).toCharArray()));
 		case PrimitiveInt:
-			return Integer.toString((int) value);
+			return stringFormat(format, Integer.toString((int) value));
 		case PrimitiveBoolean:
-			return Boolean.toString((boolean) value);
+			return stringFormat(format, Boolean.toString((boolean) value));
 		case PrimitiveChar:
-			return valueTransference((char) value);
+			return stringFormat(format, valueTransference((char) value));
 		case PrimitiveShort:
-			return Short.toString((short) value);
+			return stringFormat(format, Short.toString((short) value));
 		case PrimitiveLong:
-			return Long.toString((long) value);
+			return stringFormat(format, Long.toString((long) value));
 		case PrimitiveFloat:
-			return Float.toString((float) value);
+			return stringFormat(format, Float.toString((float) value));
 		case PrimitiveByte:
-			return Byte.toString((byte) value);
+			return stringFormat(format, Byte.toString((byte) value));
 		case PrimitiveDouble:
-			return Double.toString((double) value);
+			return stringFormat(format, Double.toString((double) value));
 		case PackageInteger:
-			return value.toString();
+			return stringFormat(format, value.toString());
 		case PackageBoolean:
-			return value.toString();
+			return stringFormat(format, value.toString());
 		case PackageCharacter:
-			return value.toString();
+			return stringFormat(format, value.toString());
 		case PackageShort:
-			return value.toString();
+			return stringFormat(format, value.toString());
 		case PackageLong:
-			return value.toString();
+			return stringFormat(format, value.toString());
 		case PackageFloat:
-			return value.toString();
+			return stringFormat(format, value.toString());
 		case PackageByte:
-			return value.toString();
+			return stringFormat(format, value.toString());
 		case PackageDouble:
-			return value.toString();
+			return stringFormat(format, value.toString());
 		case Array:
 			return Arrays.toString((Object[]) value);
 		default:
@@ -162,10 +189,10 @@ public enum Type {
 				result.append("\\\"");
 				break;
 			case '\r':
-//				result.append("\\r");
+				//				result.append("\\r");
 				break;
 			case '\n':
-//				result.append("\\n");
+				//				result.append("\\n");
 			case '\t':
 				break;
 			default:
@@ -175,7 +202,15 @@ public enum Type {
 		return result.toString();
 	}
 
+	static String stringFormat(String format, String value) {
+		return (null == format || null == value) ? value : String.format(format, value);
+	}
+
 	public static String valueToJson(String name, final Object value, final ClassInfo field) throws IllegalArgumentException, IllegalAccessException {
+		return valueToJson(name, value, null, field);
+	}
+
+	public static String valueToJson(String name, final Object value, final String format, final ClassInfo field) throws IllegalArgumentException, IllegalAccessException {
 		name = (null == name ? "" : ("\"" + name + "\":"));
 		if (null == value) {
 			return "\"" + name + "\":null";
@@ -183,41 +218,41 @@ public enum Type {
 		switch (field.getType()) {
 		case StringType:
 			//			return name + "\"" + value.toString().replaceAll("\"", "\\\"") + "\"";
-			return name + "\"" + valueTransference(value.toString().toCharArray()) + "\"";
+			return name + "\"" + stringFormat(format, valueTransference(value.toString().toCharArray())) + "\"";
 		case PrimitiveInt:
-			return name + Integer.toString((int) value);
+			return name + stringFormat(format, Integer.toString((int) value));
 		case PrimitiveBoolean:
-			return name + Boolean.toString((boolean) value);
+			return name + stringFormat(format, Boolean.toString((boolean) value));
 		case PrimitiveChar:
 			//			return name + "\"" + Character.toString((char) value).replaceAll("\"", "\\\"") + "\"";
-			return name + "\"" + valueTransference((char) value) + "\"";
+			return name + "\"" + stringFormat(format, valueTransference((char) value)) + "\"";
 		case PrimitiveShort:
-			return name + Short.toString((short) value);
+			return name + stringFormat(format, Short.toString((short) value));
 		case PrimitiveLong:
-			return name + Long.toString((long) value);
+			return name + stringFormat(format, stringFormat(format, Long.toString((long) value)));
 		case PrimitiveFloat:
-			return name + Float.toString((float) value);
+			return name + stringFormat(format, Float.toString((float) value));
 		case PrimitiveByte:
-			return name + Byte.toString((byte) value);
+			return name + stringFormat(format, Byte.toString((byte) value));
 		case PrimitiveDouble:
-			return name + Double.toString((double) value);
+			return name + stringFormat(format, Double.toString((double) value));
 		case PackageInteger:
-			return name + value.toString();
+			return name + stringFormat(format, value.toString());
 		case PackageBoolean:
-			return name + value.toString();
+			return name + stringFormat(format, value.toString());
 		case PackageCharacter:
 			//			return name + "\"" + value.toString().replaceAll("\"", "\\\"") + "\"";
-			return name + "\"" + valueTransference((Character) value) + "\"";
+			return name + "\"" + stringFormat(format, valueTransference((Character) value)) + "\"";
 		case PackageShort:
-			return name + value.toString();
+			return name + stringFormat(format, value.toString());
 		case PackageLong:
-			return name + value.toString();
+			return name + stringFormat(format, value.toString());
 		case PackageFloat:
-			return name + value.toString();
+			return name + stringFormat(format, value.toString());
 		case PackageByte:
-			return name + value.toString();
+			return name + stringFormat(format, value.toString());
 		case PackageDouble:
-			return name + value.toString();
+			return name + stringFormat(format, value.toString());
 		case Array:
 			if (value instanceof String[] || value instanceof Character[] || value instanceof char[]) {
 				Object[] a = (Object[]) value;

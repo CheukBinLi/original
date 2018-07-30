@@ -10,6 +10,10 @@ public class FieldInfo {
 	private boolean isAlias;
 	private Alias alias;
 
+	public String getAliasOrFieldName(boolean isAlias) {
+		return (null == alias || !isAlias) ? field.getName() : alias.value();
+	}
+
 	public String getAliasOrFieldName() {
 		return null == alias ? field.getName() : alias.value();
 	}
