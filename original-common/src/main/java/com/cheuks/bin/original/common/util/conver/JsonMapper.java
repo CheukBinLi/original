@@ -87,25 +87,6 @@ public class JsonMapper {
 	}
 
 	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient) throws Exception {
-		//		ClassInfo classInfo = ClassInfo.getClassInfo(o.getClass());
-		//		StringBuilder result;
-		//		if (null == o) {
-		//			return "{}";
-		//		} else if (classInfo.isBasicOrArrays()) {
-		//			/** 基本类型 */
-		//			return "{\"" + Type.valueToString(o, classInfo) + "\"}";
-		//		} else if (classInfo.isDate()) {
-		//			/** 日期 */
-		//			return "{\"" + defaultFormat.format(o) + "\"}";
-		//		} else if (classInfo.isMapOrCollection()) {
-		//			/** 集合 */
-		//			recursionSub(null, o, result = new StringBuilder(), filterProvider, withAlias, withOutTransient);
-		//		} else {
-		//			result = new StringBuilder("{");
-		//			recursion(o, filterProvider, result, withAlias, withOutTransient);
-		//			result.append("}");
-		//		}
-		//		return result.toString();
 		return writerString(o, filterProvider, withAlias, withOutTransient, true);
 	}
 
@@ -179,10 +160,6 @@ public class JsonMapper {
 				if (fieldInfo.isAlias() || (withOutTransient && Modifier.isTransient(fieldInfo.getField().getModifiers())) || FilterProvider.isIgnore(tagName = fieldInfo.getAliasOrFieldName(withAlias), currentClazz, filterAll))
 					continue;
 				tempValue = fieldInfo.getField().get(o);
-				//				System.out.println(fieldInfo.getField().getName());
-				//1-过滤
-				//2-空校验
-				//3-建模
 				if (null == tempValue) {
 					result.append(Type.nullToJson(tagName)).append(",");
 					continue;

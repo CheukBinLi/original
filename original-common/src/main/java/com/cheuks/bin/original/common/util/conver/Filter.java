@@ -10,6 +10,7 @@ public class Filter {
 	static final Map<String, String> EMPTY_MAP = new HashMap<String, String>(1);
 	static final Set<String> EMPTY_SET = new HashSet<String>(1);
 	private Class<?> clazz;
+	private boolean onlyIncude;
 	private Set<String> excepts;//过滤
 	private Map<String, String> includes;//包含 
 
@@ -70,6 +71,15 @@ public class Filter {
 
 	public Map<String, String> getIncludes() {
 		return includes;
+	}
+
+	public boolean isOnlyIncude() {
+		return onlyIncude;
+	}
+
+	public Filter setOnlyIncude(boolean onlyIncude) {
+		this.onlyIncude = onlyIncude;
+		return this;
 	}
 
 }

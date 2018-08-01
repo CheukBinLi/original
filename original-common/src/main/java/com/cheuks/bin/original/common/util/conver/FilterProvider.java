@@ -46,9 +46,15 @@ public class FilterProvider {
 		for (Filter filter : filters) {
 			if (null == filter) {
 				continue;
+			}
+			if (filter.isOnlyIncude()) {
+				if (!filter.includesIsEmpty() && filter.getIncludes().containsKey(name)) {
+					return false;
+				}
+				return true;
 			} else if (!filter.includesIsEmpty() && filter.getIncludes().containsKey(name)) {
 				return false;
-			} else if (filter.exceptsIsEmpty() && filter.getExcepts().contains(name)) {
+			} else if (!filter.exceptsIsEmpty() && filter.getExcepts().contains(name)) {
 				return true;
 			}
 		}

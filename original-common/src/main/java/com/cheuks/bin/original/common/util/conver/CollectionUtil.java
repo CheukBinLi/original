@@ -1,5 +1,6 @@
 package com.cheuks.bin.original.common.util.conver;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -44,6 +45,30 @@ public class CollectionUtil {
 			result.put((K) params[i++], params[i]);
 		}
 		return result;
+	}
+
+	public boolean isNotEmpty(Collection<?> collection) {
+		return !isEmpty(collection);
+	}
+
+	public boolean isEmpty(Collection<?> collection) {
+		return null != collection && collection.size() > 0;
+	}
+
+	public boolean isNotEmpty(Map<?, ?> map) {
+		return !isEmpty(map);
+	}
+
+	public boolean isEmpty(Map<?, ?> map) {
+		return null != map && map.size() > 0;
+	}
+
+	public boolean isNotEmpty(Object... o) {
+		return !isEmpty(o);
+	}
+
+	public boolean isEmpty(Object... o) {
+		return null != o && o.length > 0;
 	}
 
 	public static void main(String[] args) {
