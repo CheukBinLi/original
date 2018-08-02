@@ -1,7 +1,10 @@
 package com.cheuks.bin.original.common.util.conver;
 
 import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,6 +18,7 @@ public class ObjectFill {
 	protected final static Map<String, Map<String, Field>> FIELDS = new ConcurrentSkipListMap<String, Map<String, Field>>();
 
 	private volatile SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private volatile SimpleDateFormat dateFormatShort = new SimpleDateFormat("yyyy-MM-dd");
 
 	public ObjectFill setDateFormat(String format) {
 		dateFormat.applyPattern(format);
@@ -38,6 +42,10 @@ public class ObjectFill {
 	// }
 	// return map;
 	// }
+
+	public final <T> T fillObject(Class<T> t, Map<String, ?> data, DateFormat dateFormat) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
+		return fillObject(t.newInstance(), data, dateFormat);
+	}
 
 	public final <T> T fillObject(Class<T> t, Map<String, ?> data) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
 		return fillObject(t.newInstance(), data);
@@ -93,6 +101,10 @@ public class ObjectFill {
 	}
 
 	public final <T> T fillObject(T t, Map<String, ?> data) throws IllegalArgumentException, IllegalAccessException {
+		return fillObject(t, data, null);
+	}
+
+	public final <T> T fillObject(T t, Map<String, ?> data, DateFormat dateFormat) throws IllegalArgumentException, IllegalAccessException {
 		// System.out.println(t.getClass());
 		Class<?> c = t.getClass();
 		if (!FIELDS.containsKey(c.getName()))
@@ -105,7 +117,7 @@ public class ObjectFill {
 			if (null == value || null == (field = fields.get(en.getKey())))
 				continue;
 			try {
-				field.set(t, getValue(field.getType(), value));
+				field.set(t, getValue(field.getType(), value, dateFormat));
 			} catch (Exception e) {
 				// e.printStackTrace();
 			}
@@ -113,7 +125,7 @@ public class ObjectFill {
 		return t;
 	}
 
-	public Object getValue(Class<?> c, Object data) {
+	public Object getValue(Class<?> c, Object data, DateFormat dateFormat) {
 		String simpleName = c.getSimpleName();
 		boolean isArray = data.getClass().isArray();
 		try {
@@ -139,12 +151,36 @@ public class ObjectFill {
 			else if (simpleName.equalsIgnoreCase("float"))
 				return Float.valueOf(getFirstValue(isArray, data));
 			else if (simpleName.equalsIgnoreCase("Date")) {
-				return dateFormat.parse(data.toString());
+				return stringToDate(data.toString(), dateFormat);
 			}
 			return data;
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	Date stringToDate(String date, DateFormat dateFormat) {
+		Date result = null;
+		try {
+			if (null != dateFormat)
+				result = dateFormat.parse(date);
+			else
+				result = this.dateFormat.parse(date);
+		} catch (ParseException e) {
+			try {
+				if (null != dateFormat)
+					result = this.dateFormat.parse(date);
+				else
+					result = this.dateFormatShort.parse(date);
+			} catch (ParseException e1) {
+				return null;
+			}
+		}
+		return result;
+	}
+
+	public Object getValue(Class<?> c, Object data) {
+		return getValue(c, data, dateFormat);
 	}
 
 	private String getFirstValue(boolean isArray, Object data) {
