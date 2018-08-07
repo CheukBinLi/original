@@ -1,5 +1,6 @@
 package com.cheuks.bin.original.common.util.reflection;
 
+import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -35,7 +36,7 @@ public enum Type {
 
 	static final List<Class<?>> COLLECTION = Arrays.asList(RandomAccess.class, Collection.class, List.class, Set.class);
 	static final List<Class<?>> DATE = Arrays.asList(java.util.Date.class, java.sql.Date.class, java.sql.Timestamp.class, java.sql.Time.class);
-	static final Set<Class<?>> WRAPPER = new HashSet<Class<?>>(Arrays.asList(String.class, Integer.class, Boolean.class, Character.class, Short.class, Long.class, Float.class, Byte.class));
+	static final Set<Class<?>> WRAPPER = new HashSet<Class<?>>(Arrays.asList(String.class, Integer.class, Boolean.class, Character.class, Short.class, Long.class, Float.class, Byte.class, Double.class));
 
 	Type(Class<?>... clazz) {
 		this.types = clazz;
@@ -276,6 +277,63 @@ public enum Type {
 		}
 	}
 
+	/***
+	 * 不理会空格
+	 * 
+	 * @param c
+	 * @param data
+	 * @param dateFormat
+	 * @return
+	 */
+	public Object getValue(Class<?> c, String data, DateFormat dateFormat) {
+		ClassInfo classInfo = ClassInfo.getClassInfo(c);
+		switch (classInfo.getType()) {
+		case StringType:
+			return data;
+		case PrimitiveInt:
+			return Integer.valueOf(data);
+		case PrimitiveBoolean:
+			return Boolean.valueOf(data);
+		case PrimitiveChar:
+			return null == data ? null : data.length() > 0 ? data.charAt(0) : null;
+		case PrimitiveShort:
+			return Short.valueOf(data);
+		case PrimitiveLong:
+			return Long.valueOf(data);
+		case PrimitiveFloat:
+			return Float.valueOf(data);
+		case PrimitiveByte:
+			return Byte.valueOf(data);
+		case PrimitiveDouble:
+			return Double.valueOf(data);
+		case PackageInteger:
+			return Integer.valueOf(data);
+		case PackageBoolean:
+			return Boolean.valueOf(data);
+		case PackageCharacter:
+			return null == data ? null : data.length() > 0 ? data.charAt(0) : null;
+		case PackageShort:
+			return Short.valueOf(data);
+		case PackageLong:
+			return Long.valueOf(data);
+		case PackageFloat:
+			return Float.valueOf(data);
+		case PackageByte:
+			return Byte.valueOf(data);
+		case PackageDouble:
+			return Double.valueOf(data);
+		case Date:
+			System.err.println("日期末实现");//子过滤
+			return null;
+		case Array:
+			System.err.println("数组末实现");//再增加返回数组方法
+			return null;
+		default:
+			return data;
+		}
+
+	}
+
 	public static String valueToJson(final Object value, final ClassInfo field) throws IllegalArgumentException, IllegalAccessException {
 		return valueToJson(field.getName(), value, field);
 	}
@@ -291,6 +349,5 @@ public enum Type {
 		System.out.println(Arrays.toString((String[]) b));
 
 		System.out.println(isWrapper(String.class));
-
 	}
 }

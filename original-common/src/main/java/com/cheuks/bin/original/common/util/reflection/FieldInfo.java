@@ -1,6 +1,7 @@
 package com.cheuks.bin.original.common.util.reflection;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
 
@@ -9,6 +10,7 @@ public class FieldInfo {
 	private Field field;
 	private boolean isAlias;
 	private Alias alias;
+	private boolean isTransient;
 
 	public String getAliasOrFieldName(boolean isAlias) {
 		return (null == alias || !isAlias) ? field.getName() : alias.value();
@@ -25,14 +27,13 @@ public class FieldInfo {
 	public FieldInfo(Field field) {
 		super();
 		this.field = field;
+		isTransient = Modifier.isTransient(field.getModifiers());
 		this.alias = field.getDeclaredAnnotation(Alias.class);
 	}
 
 	public FieldInfo(Field field, boolean isAlias) {
-		super();
-		this.field = field;
+		this(field);
 		this.isAlias = isAlias;
-		this.alias = field.getDeclaredAnnotation(Alias.class);
 	}
 
 	public Field getField() {
@@ -59,6 +60,15 @@ public class FieldInfo {
 
 	public void setAlias(boolean isAlias) {
 		this.isAlias = isAlias;
+	}
+
+	public boolean isTransient() {
+		return isTransient;
+	}
+
+	public FieldInfo setTransient(boolean isTransient) {
+		this.isTransient = isTransient;
+		return this;
 	}
 
 }

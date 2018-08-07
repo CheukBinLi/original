@@ -154,7 +154,7 @@ public class JsonMapper {
 			/** 特殊对象 */
 			if (null == currentClassInfo.getFields())
 				//				currentClassInfo.setFields(reflectionUtil.scanClassFieldInfo4List(currentClassInfo.getClazz(), true, true, true));
-				currentClassInfo.setFields(reflectionUtil.scanClassFieldInfo4Map(currentClassInfo.getClazz(), true, false, true, true));
+				currentClassInfo.setFields(reflectionUtil.scanClassFieldInfo4Map(currentClassInfo.getClazz(), true, true, true));
 			for (Entry<String, FieldInfo> en : currentClassInfo.getFields().entrySet()) {
 				fieldInfo = en.getValue();
 				if (fieldInfo.isAlias() || (withOutTransient && Modifier.isTransient(fieldInfo.getField().getModifiers())) || FilterProvider.isIgnore(tagName = fieldInfo.getAliasOrFieldName(withAlias), currentClazz, filterAll))

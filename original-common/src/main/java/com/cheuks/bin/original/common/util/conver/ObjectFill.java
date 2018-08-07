@@ -4,13 +4,18 @@ import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
+import com.cheuks.bin.original.common.util.reflection.ClassInfo;
+import com.cheuks.bin.original.common.util.reflection.FieldInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 
 public class ObjectFill {
@@ -186,4 +191,36 @@ public class ObjectFill {
 	private String getFirstValue(boolean isArray, Object data) {
 		return isArray ? ((String[]) data)[0] : data.toString();
 	}
+
+	public static void xcopy(final Object source, final Object target, boolean notNull, boolean notTransient, String... ignores) throws Exception {
+		if (null == source || null == target)
+			return;
+		final ClassInfo a = ClassInfo.getClassInfo(source.getClass());
+		if (a.isMapOrCollection() || a.isArrays() || a.isBasicOrArrays())
+			return;
+
+		final ClassInfo b = ClassInfo.getClassInfo(target.getClass());
+		if (b.isMapOrCollection() || b.isArrays() || b.isBasicOrArrays())
+			return;
+		if (null == a.getFields())
+			a.setFields(ReflectionUtil.instance().scanClassFieldInfo4Map(a.getClazz(), true, true, true));
+		if (null == b.getFields())
+			b.setFields(ReflectionUtil.instance().scanClassFieldInfo4Map(b.getClazz(), true, true, true));
+
+		Set<String> igonre = null == ignores ? null : new HashSet<>(Arrays.asList(ignores));
+		Object value = null;
+		for (Entry<String, FieldInfo> en : a.getFields().entrySet()) {
+			if (null != igonre && igonre.contains(en.getKey())) {
+				continue;
+			}
+			if ((notTransient && en.getValue().isTransient()) || (notNull && null == (value = en.getValue().getField().get(source)))) {
+				continue;
+			}
+			FieldInfo fieldInfo = b.getFields().get(en.getKey());
+			if (null != fieldInfo) {
+				fieldInfo.getField().set(target, value);
+			}
+		}
+	}
+
 }

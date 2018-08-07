@@ -132,7 +132,7 @@ public class ReflectionUtil {
 		return result;
 	}
 
-	public Map<String, FieldInfo> scanClassFieldInfo4Map(Class<?> clazz, boolean hasSetting, boolean filterTransient, boolean hasAliasAnnotation, boolean keepBoth, Class... ignore) throws NoSuchFieldException, SecurityException {
+	public Map<String, FieldInfo> scanClassFieldInfo4Map(Class<?> clazz, boolean hasSetting, boolean hasAliasAnnotation, boolean keepBoth, Class... ignore) throws NoSuchFieldException, SecurityException {
 		if (null == clazz)
 			return null;
 
@@ -173,9 +173,6 @@ public class ReflectionUtil {
 		for (Field f : fields) {
 			if (Modifier.isStatic(f.getModifiers()))
 				continue;
-			if (filterTransient)
-				if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers()))
-					continue;
 			if (null != ignore && isIn(f, ignore)) {
 				continue;
 			}
@@ -261,7 +258,7 @@ public class ReflectionUtil {
 		return result;
 	}
 
-	public List<FieldInfo> scanClassFieldInfo4List(Class<?> clazz, boolean isAccessible, boolean hasSetting, boolean filterTransient, Class... ignore) throws NoSuchFieldException, SecurityException {
+	public List<FieldInfo> scanClassFieldInfo4List(Class<?> clazz, boolean isAccessible, boolean hasSetting, Class... ignore) throws NoSuchFieldException, SecurityException {
 		if (null == clazz)
 			return null;
 
@@ -303,9 +300,6 @@ public class ReflectionUtil {
 		for (Field f : fields) {
 			if (Modifier.isStatic(f.getModifiers()))
 				continue;
-			if (filterTransient)
-				if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers()))
-					continue;
 			if (null != ignore && isIn(f, ignore)) {
 				continue;
 			}
