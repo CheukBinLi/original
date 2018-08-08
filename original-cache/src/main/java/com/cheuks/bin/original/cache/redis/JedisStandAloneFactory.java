@@ -28,6 +28,12 @@ public class JedisStandAloneFactory implements RedisFactory {
 
 	private int timeOut = 10000;
 
+	private int maxIdle = 50;// 空闲
+
+	private int maxTotal = 300;
+
+	private int maxWaitMillis = 5000;
+
 	private String password;
 
 	private String host = "127.0.0.1";
@@ -73,6 +79,10 @@ public class JedisStandAloneFactory implements RedisFactory {
 		}
 		config = new JedisPoolConfig();
 		config.setTestOnBorrow(testOnBorrow);
+		config.setMaxIdle(this.maxIdle);
+		config.setMaxTotal(this.maxTotal);
+		config.setMaxWaitMillis(this.maxWaitMillis);
+		config.setMaxTotal(this.maxTotal);
 		pool = ((null != password && password.length() > 1) ? new JedisPool(config, host, port, timeOut, password) : new JedisPool(config, host, port, timeOut));
 	}
 
@@ -1363,6 +1373,34 @@ public class JedisStandAloneFactory implements RedisFactory {
 
 	public void setExpireSecond(int expireSecond) {
 		this.expireSecond = expireSecond;
+	}
+
+	public int getMaxIdle() {
+		return maxIdle;
+	}
+
+	public void setMaxIdle(int maxIdle) {
+		this.maxIdle = maxIdle;
+	}
+
+	public int getMaxTotal() {
+		return maxTotal;
+	}
+
+	public void setMaxTotal(int maxTotal) {
+		this.maxTotal = maxTotal;
+	}
+
+	public int getMaxWaitMillis() {
+		return maxWaitMillis;
+	}
+
+	public void setMaxWaitMillis(int maxWaitMillis) {
+		this.maxWaitMillis = maxWaitMillis;
+	}
+
+	public void setTimeOut(int timeOut) {
+		this.timeOut = timeOut;
 	}
 
 }

@@ -57,8 +57,9 @@ public class JedisClusterFactory extends AbstractJedisCluster<JedisCluster> {
 		config.setMaxTotal(this.maxTotal);
 		config.setMaxWaitMillis(this.maxWaitMillis);
 		config.setTestOnBorrow(testOnBorrow);
+		config.setMaxTotal(this.maxTotal);
 		if (null == this.host) {
-			LOG.warn("servlet is null.");
+			LOG.warn("host is null.");
 			return;
 		}
 		StringTokenizer ip = new StringTokenizer(host, ",");
