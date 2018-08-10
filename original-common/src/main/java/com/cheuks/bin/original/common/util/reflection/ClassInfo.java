@@ -3,14 +3,14 @@ package com.cheuks.bin.original.common.util.reflection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-public class ClassInfo implements Cloneable{
+public class ClassInfo implements Cloneable {
 
 	protected final static Map<String, ClassInfo> CLASS_INFOS = new ConcurrentSkipListMap<String, ClassInfo>();
 	protected final static ClassInfo ARRAYS_CLASS_INFO_TYPE = new ClassInfo().setType(Type.Array);
 	protected final static Map<String, ClassInfo> BASIC_TYPE_CLASS_INFO = new ConcurrentSkipListMap<String, ClassInfo>();
 	static {
 		ARRAYS_CLASS_INFO_TYPE.isArrays = true;
-		
+
 		BASIC_TYPE_CLASS_INFO.put(String.class.getName(), new ClassInfo(String.class));
 		BASIC_TYPE_CLASS_INFO.put(int.class.getName(), new ClassInfo(int.class));
 		BASIC_TYPE_CLASS_INFO.put(boolean.class.getName(), new ClassInfo());
@@ -37,11 +37,12 @@ public class ClassInfo implements Cloneable{
 	private String name;
 	private Type type;
 	private Class<?> clazz;
-//	private List<FieldInfo> fields;
-	private Map<String,FieldInfo> fields;
+	//	private List<FieldInfo> fields;
+	private Map<String, FieldInfo> fields;
 	private boolean isBasic;//基础类型+封装类
 	private boolean isArrays;
 	private boolean isMap;
+	private boolean isSet;
 	private boolean isDate;
 	private boolean isCollection = false;
 
@@ -56,7 +57,8 @@ public class ClassInfo implements Cloneable{
 			return;
 		this.isArrays = clazz.isArray();
 		this.isDate = isArrays ? false : Type.isDate(clazz);
-		this.isMap = isArrays ? false : isDate ? false : Type.isMapByClass(clazz);
+		this.isSet = isArrays ? false : isDate ? false : Type.isSetByClass(clazz);
+		this.isMap = isArrays ? false : isDate ? false : isSet ? false : Type.isMapByClass(clazz);
 		this.isCollection = isDate ? false : isMap ? false : Type.isCollectionByClass(clazz);
 		this.type = isArrays ? Type.Array : isMap ? Type.Map : isCollection ? Type.Collection : Type.getTypeByClass(clazz);
 		this.isBasic = isDate ? false : isMap ? false : isCollection ? false : isArrays ? false : (clazz.isPrimitive() | Type.isWrapper(clazz));
@@ -97,8 +99,8 @@ public class ClassInfo implements Cloneable{
 		return isCollection;
 	}
 
-	public boolean isMapOrCollection() {
-		return (isMap || isCollection);
+	public boolean isMapOrSetOrCollection() {
+		return (isMap || isCollection || isSet);
 	}
 
 	public boolean isBasicOrArrays() {
@@ -113,16 +115,20 @@ public class ClassInfo implements Cloneable{
 		return isArrays;
 	}
 
-	public Map<String,FieldInfo> getFields() {
+	public boolean isSet() {
+		return isSet;
+	}
+
+	public Map<String, FieldInfo> getFields() {
 		return fields;
 	}
 
-	public void setFields(Map<String,FieldInfo> fields) {
+	public void setFields(Map<String, FieldInfo> fields) {
 		this.fields = fields;
 	}
 
 	public final static void addClassInfo(ClassInfo classInfo) {
-		if (!classInfo.isMapOrCollection() && !classInfo.isBasicOrArrays())
+		if (!classInfo.isMapOrSetOrCollection() && !classInfo.isBasicOrArrays())
 			CLASS_INFOS.put(classInfo.getClazz().getName(), classInfo);
 	}
 

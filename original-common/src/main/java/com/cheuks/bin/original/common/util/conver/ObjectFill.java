@@ -196,11 +196,11 @@ public class ObjectFill {
 		if (null == source || null == target)
 			return;
 		final ClassInfo a = ClassInfo.getClassInfo(source.getClass());
-		if (a.isMapOrCollection() || a.isArrays() || a.isBasicOrArrays())
+		if (a.isMapOrSetOrCollection() || a.isArrays() || a.isBasicOrArrays())
 			return;
 
 		final ClassInfo b = ClassInfo.getClassInfo(target.getClass());
-		if (b.isMapOrCollection() || b.isArrays() || b.isBasicOrArrays())
+		if (b.isMapOrSetOrCollection() || b.isArrays() || b.isBasicOrArrays())
 			return;
 		if (null == a.getFields())
 			a.setFields(ReflectionUtil.instance().scanClassFieldInfo4Map(a.getClazz(), true, true, true));

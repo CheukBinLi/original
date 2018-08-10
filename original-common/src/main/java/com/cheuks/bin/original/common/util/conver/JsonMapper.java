@@ -119,7 +119,7 @@ public class JsonMapper {
 		} else if (classInfo.isDate()) {
 			/** 日期 */
 			return brackets ? "{\"" + defaultFormat.format(o) + "\"}" : "\"" + defaultFormat.format(o) + "\"";
-		} else if (classInfo.isMapOrCollection()) {
+		} else if (classInfo.isMapOrSetOrCollection()) {
 			/** 集合 */
 			recursionSub(null, o, result = new StringBuilder(), filterProvider, withAlias, withOutTransient);
 		} else {
@@ -147,7 +147,7 @@ public class JsonMapper {
 		} else if (currentClassInfo.isDate()) {
 			/** 日期 */
 			result.append(defaultFormat.format(o));
-		} else if (currentClassInfo.isMapOrCollection()) {
+		} else if (currentClassInfo.isMapOrSetOrCollection()) {
 			/** 集合 */
 			recursionSub(null, o, result, filterProvider, withAlias, withOutTransient);
 		} else {
@@ -167,7 +167,7 @@ public class JsonMapper {
 				subClassInfo = ClassInfo.getClassInfo(tempValue.getClass());
 				if (LOG.isDebugEnabled())
 					LOG.debug("field:{} type:{}", tagName, subClassInfo.getClazz().getName());
-				if (subClassInfo.isMapOrCollection()) {
+				if (subClassInfo.isMapOrSetOrCollection()) {
 					recursionSub(tagName, tempValue, result, filterProvider, withAlias, withOutTransient);
 				} else if (subClassInfo.isBasicOrArrays()) {
 					result.append(Type.valueToJson(tagName, tempValue, FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll), subClassInfo));
@@ -212,7 +212,8 @@ public class JsonMapper {
 			result.append("{");
 			end = "}";
 			it = map.entrySet().iterator();
-		} else if (currentClassInfo.isCollection()) {
+		}
+		else if (currentClassInfo.isCollection() || currentClassInfo.isSet()) {
 			collection = (Collection<?>) value;
 			if (collection.isEmpty()) {
 				result.setLength(result.length() - 1);
@@ -238,13 +239,15 @@ public class JsonMapper {
 				continue;
 			}
 			if (null == tempSubValue) {
-				result.append(Type.nullToJson(subTagName)).append(",");
+				if (currentClassInfo.isMap()) {
+					result.append(Type.nullToJson(subTagName)).append(",");
+				}
 				continue;
 			}
 
 			subClassInfo = ClassInfo.getClassInfo(tempSubValue.getClass());
 
-			if (subClassInfo.isMapOrCollection()) {
+			if (subClassInfo.isMapOrSetOrCollection()) {
 				recursionSub(hasTagName ? null : subTagName, tempSubValue, result, filterProvider, withAlias, withOutTransient);
 			} else if (subClassInfo.isBasicOrArrays()) {
 				valueFormat = FilterProvider.getCurrentValueFormat(currentClassInfo.isMap() ? subTagName : tagName, currentClazz, filterAll);
