@@ -29,6 +29,7 @@ public enum Type {
 					PackageDouble(Double.class),
 					Array(Arrays.class),
 					Map(Map.class),
+					Set(Set.class),
 					Date(java.util.Date.class, java.sql.Date.class, java.sql.Timestamp.class, java.sql.Time.class),
 					Collection(RandomAccess.class, Collection.class, List.class, Set.class);
 
@@ -39,6 +40,7 @@ public enum Type {
 	static final Set<Class<?>> WRAPPER = new HashSet<Class<?>>(Arrays.asList(String.class, Integer.class, Boolean.class, Character.class, Short.class, Long.class, Float.class, Byte.class, Double.class));
 
 	Type(Class<?>... clazz) {
+
 		this.types = clazz;
 	}
 
@@ -88,6 +90,11 @@ public enum Type {
 		return interfaces.contains(Map.class);
 	}
 
+	public static boolean isSetByClass(Class<?> clazz) {
+		List<Class<?>> interfaces = Arrays.asList(clazz.getInterfaces());
+		return interfaces.contains(Set.class);
+	}
+
 	public static boolean isMapByValue(Object value) {
 		return isMapByClass(value.getClass());
 	}
@@ -107,11 +114,11 @@ public enum Type {
 		return isCollectionByClass(value.getClass());
 	}
 
-	public static String valueToString4Json(final Object value, final ClassInfo classInfo) throws IllegalArgumentException, IllegalAccessException {
-		return valueToString4Json(value, null, classInfo);
+	public static String valueToString4Json(final Object value, final ClassInfo classInfo, boolean filterSpecialCharacters) throws IllegalArgumentException, IllegalAccessException {
+		return valueToString4Json(value, null, classInfo, filterSpecialCharacters);
 	}
 
-	public static String valueToString4Json(final Object value, final String format, final ClassInfo classInfo) throws IllegalArgumentException, IllegalAccessException {
+	public static String valueToString4Json(final Object value, final String format, final ClassInfo classInfo, boolean filterSpecialCharacters) throws IllegalArgumentException, IllegalAccessException {
 		if (null == value)
 			return "null";
 		switch (classInfo.getType()) {
@@ -122,26 +129,26 @@ public enum Type {
 		case PackageCharacter:
 			return "\"" + stringFormat(format, value.toString()) + "\"";
 		default:
-			return valueToString(value, format, classInfo);
+			return valueToString(value, format, classInfo, filterSpecialCharacters);
 		}
 	}
 
-	public static String valueToString(final Object value, final ClassInfo classInfo) throws IllegalArgumentException, IllegalAccessException {
-		return valueToString(value, null, classInfo);
+	public static String valueToString(final Object value, final ClassInfo classInfo, boolean filterSpecialCharacters) throws IllegalArgumentException, IllegalAccessException {
+		return valueToString(value, null, classInfo, filterSpecialCharacters);
 	}
 
-	public static String valueToString(final Object value, final String format, final ClassInfo classInfo) throws IllegalArgumentException, IllegalAccessException {
+	public static String valueToString(final Object value, final String format, final ClassInfo classInfo, boolean filterSpecialCharacters) throws IllegalArgumentException, IllegalAccessException {
 		if (null == value)
 			return "null";
 		switch (classInfo.getType()) {
 		case StringType:
-			return stringFormat(format, valueTransference(((String) value).toCharArray()));
+			return stringFormat(format, valueConver((String) value, filterSpecialCharacters));
 		case PrimitiveInt:
 			return stringFormat(format, Integer.toString((int) value));
 		case PrimitiveBoolean:
 			return stringFormat(format, Boolean.toString((boolean) value));
 		case PrimitiveChar:
-			return stringFormat(format, valueTransference((char) value));
+			return stringFormat(format, valueConver(Character.toString((char) value), filterSpecialCharacters));
 		case PrimitiveShort:
 			return stringFormat(format, Short.toString((short) value));
 		case PrimitiveLong:
@@ -180,9 +187,7 @@ public enum Type {
 		return "\"" + name + "\":null";
 	}
 
-	static String valueTransference(char... values) {
-		if (null == values || values.length < 1)
-			return "";
+	static String valueConver(char... values) {
 		StringBuilder result = new StringBuilder();
 		for (char item : values) {
 			switch (item) {
@@ -190,11 +195,12 @@ public enum Type {
 				result.append("\\\"");
 				break;
 			case '\r':
-				//				result.append("\\r");
+				result.append("\\r");
 				break;
 			case '\n':
-				//				result.append("\\n");
+				result.append("\\n");
 			case '\t':
+				result.append("\\t");
 				break;
 			default:
 				result.append(item);
@@ -203,15 +209,21 @@ public enum Type {
 		return result.toString();
 	}
 
+	static String valueConver(String values, boolean filterSpecialCharacters) {
+		if (!filterSpecialCharacters || null == values || values.length() < 1)
+			return values;
+		return valueConver(values.toCharArray());
+	}
+
 	static String stringFormat(String format, String value) {
 		return (null == format || null == value) ? value : String.format(format, value);
 	}
 
-	public static String valueToJson(String name, final Object value, final ClassInfo field) throws IllegalArgumentException, IllegalAccessException {
-		return valueToJson(name, value, null, field);
+	public static String valueToJson(String name, final Object value, final ClassInfo field, boolean filterSpecialCharacters) throws IllegalArgumentException, IllegalAccessException {
+		return valueToJson(name, value, null, field, filterSpecialCharacters);
 	}
 
-	public static String valueToJson(String name, final Object value, final String format, final ClassInfo field) throws IllegalArgumentException, IllegalAccessException {
+	public static String valueToJson(String name, final Object value, final String format, final ClassInfo field, boolean filterSpecialCharacters) throws IllegalArgumentException, IllegalAccessException {
 		name = (null == name ? "" : ("\"" + name + "\":"));
 		if (null == value) {
 			return "\"" + name + "\":null";
@@ -219,14 +231,14 @@ public enum Type {
 		switch (field.getType()) {
 		case StringType:
 			//			return name + "\"" + value.toString().replaceAll("\"", "\\\"") + "\"";
-			return name + "\"" + stringFormat(format, valueTransference(value.toString().toCharArray())) + "\"";
+			return name + "\"" + stringFormat(format, valueConver(value.toString(), filterSpecialCharacters)) + "\"";
 		case PrimitiveInt:
 			return name + stringFormat(format, Integer.toString((int) value));
 		case PrimitiveBoolean:
 			return name + stringFormat(format, Boolean.toString((boolean) value));
 		case PrimitiveChar:
 			//			return name + "\"" + Character.toString((char) value).replaceAll("\"", "\\\"") + "\"";
-			return name + "\"" + stringFormat(format, valueTransference((char) value)) + "\"";
+			return name + "\"" + stringFormat(format, valueConver(Character.toString((char) value), filterSpecialCharacters)) + "\"";
 		case PrimitiveShort:
 			return name + stringFormat(format, Short.toString((short) value));
 		case PrimitiveLong:
@@ -243,7 +255,7 @@ public enum Type {
 			return name + stringFormat(format, value.toString());
 		case PackageCharacter:
 			//			return name + "\"" + value.toString().replaceAll("\"", "\\\"") + "\"";
-			return name + "\"" + stringFormat(format, valueTransference((Character) value)) + "\"";
+			return name + "\"" + stringFormat(format, valueConver(((Character) value).toString(), filterSpecialCharacters)) + "\"";
 		case PackageShort:
 			return name + stringFormat(format, value.toString());
 		case PackageLong:
@@ -264,7 +276,7 @@ public enum Type {
 				StringBuilder b = new StringBuilder();
 				b.append(name + "[");
 				for (int i = 0;; i++) {
-					b.append("\"").append(valueTransference(String.valueOf(a[i]).toCharArray())).append("\"");
+					b.append("\"").append(valueConver(String.valueOf(a[i]), filterSpecialCharacters)).append("\"");
 					if (i == iMax)
 						return b.append(']').toString();
 					b.append(", ");
@@ -335,7 +347,7 @@ public enum Type {
 	}
 
 	public static String valueToJson(final Object value, final ClassInfo field) throws IllegalArgumentException, IllegalAccessException {
-		return valueToJson(field.getName(), value, field);
+		return valueToJson(field.getName(), value, field, true);
 	}
 
 	public static void main(String[] args) {
@@ -349,5 +361,7 @@ public enum Type {
 		System.out.println(Arrays.toString((String[]) b));
 
 		System.out.println(isWrapper(String.class));
+
+		System.out.println("a\ra   \\ra\\rb");
 	}
 }

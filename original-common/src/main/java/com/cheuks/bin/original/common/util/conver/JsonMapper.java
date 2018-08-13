@@ -86,28 +86,32 @@ public class JsonMapper {
 		return writer(o, filterProvider, false, true);
 	}
 
+	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean filterSpecialCharacters) throws Exception {
+		return writerString(o, filterProvider, withAlias, withOutTransient, true, filterSpecialCharacters);
+	}
+
 	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient) throws Exception {
-		return writerString(o, filterProvider, withAlias, withOutTransient, true);
+		return writerString(o, filterProvider, withAlias, withOutTransient, true, false);
 	}
 
 	@SuppressWarnings("unchecked")
-	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean eol, Map<String, ? extends Object>... additionalAttributes) throws Exception {
+	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean eol, boolean filterSpecialCharacters, Map<String, ? extends Object>... additionalAttributes) throws Exception {
 		StringBuilder additional = null;
 		String subResult;
 		if (null != additionalAttributes && additionalAttributes.length > 0) {
 			additional = new StringBuilder();
 			for (Map<String, ? extends Object> attributes : additionalAttributes) {
 				//				recursionSub(null, attributes, subResult, filterProvider, withAlias, withOutTransient);
-				subResult = writerString(attributes, filterProvider, withAlias, withOutTransient, false);
+				subResult = writerString(attributes, filterProvider, withAlias, withOutTransient, false, filterSpecialCharacters);
 				additional.append(subResult.length() > 0 ? (subResult.toString() + ",") : COMPACT_EOL);
 			}
 			additional.setLength(additional.length() - 1);
 		}
-		String result = writerString(o, filterProvider, withAlias, withOutTransient, false);
+		String result = writerString(o, filterProvider, withAlias, withOutTransient, false, filterSpecialCharacters);
 		return (null == additional ? "{" + result + "}" : "{" + result + (result.length() > 0 ? "," : COMPACT_EOL) + additional.toString() + "}") + (eol ? DEFAULT_EOL : COMPACT_EOL);
 	}
 
-	protected String writerString(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean brackets) throws Exception {
+	protected String writerString(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean brackets, boolean filterSpecialCharacters) throws Exception {
 		if (null == o) {
 			return brackets ? "{}" : COMPACT_EOL;
 		}
@@ -115,16 +119,16 @@ public class JsonMapper {
 		StringBuilder result;
 		if (classInfo.isBasicOrArrays()) {
 			/** 基本类型 */
-			return brackets ? "{\"" + Type.valueToString(o, classInfo) + "\"}" : "\"" + Type.valueToString(o, classInfo) + "\"";
+			return brackets ? "{\"" + Type.valueToString(o, classInfo, filterSpecialCharacters) + "\"}" : "\"" + Type.valueToString(o, classInfo, filterSpecialCharacters) + "\"";
 		} else if (classInfo.isDate()) {
 			/** 日期 */
 			return brackets ? "{\"" + defaultFormat.format(o) + "\"}" : "\"" + defaultFormat.format(o) + "\"";
 		} else if (classInfo.isMapOrSetOrCollection()) {
 			/** 集合 */
-			recursionSub(null, o, result = new StringBuilder(), filterProvider, withAlias, withOutTransient);
+			recursionSub(null, o, result = new StringBuilder(), filterProvider, withAlias, withOutTransient, filterSpecialCharacters);
 		} else {
 			result = new StringBuilder("{");
-			recursion(o, filterProvider, result, withAlias, withOutTransient);
+			recursion(o, filterProvider, result, withAlias, withOutTransient, filterSpecialCharacters);
 			result.append("}");
 		}
 		if (brackets)
@@ -132,7 +136,7 @@ public class JsonMapper {
 		return result.substring(1, result.length() - 1);
 	}
 
-	private void recursion(Object o, FilterProvider filterProvider, final StringBuilder result, boolean withAlias, boolean withOutTransient) throws Exception {
+	private void recursion(Object o, FilterProvider filterProvider, final StringBuilder result, boolean withAlias, boolean withOutTransient, boolean filterSpecialCharacters) throws Exception {
 		ClassInfo currentClassInfo = ClassInfo.getClassInfo(o.getClass());
 		ClassInfo subClassInfo;
 		String tagName;
@@ -142,14 +146,14 @@ public class JsonMapper {
 		Filter filterAll = null == filterProvider ? null : filterProvider.getFilterByClass(null);
 		if (null == o || currentClassInfo.isBasicOrArrays()) {
 			/** 基本类型 */
-			result.append(Type.valueToString(o, currentClassInfo));
+			result.append(Type.valueToString(o, currentClassInfo, filterSpecialCharacters));
 			return;
 		} else if (currentClassInfo.isDate()) {
 			/** 日期 */
 			result.append(defaultFormat.format(o));
 		} else if (currentClassInfo.isMapOrSetOrCollection()) {
 			/** 集合 */
-			recursionSub(null, o, result, filterProvider, withAlias, withOutTransient);
+			recursionSub(null, o, result, filterProvider, withAlias, withOutTransient, filterSpecialCharacters);
 		} else {
 			/** 特殊对象 */
 			if (null == currentClassInfo.getFields())
@@ -168,15 +172,15 @@ public class JsonMapper {
 				if (LOG.isDebugEnabled())
 					LOG.debug("field:{} type:{}", tagName, subClassInfo.getClazz().getName());
 				if (subClassInfo.isMapOrSetOrCollection()) {
-					recursionSub(tagName, tempValue, result, filterProvider, withAlias, withOutTransient);
+					recursionSub(tagName, tempValue, result, filterProvider, withAlias, withOutTransient, filterSpecialCharacters);
 				} else if (subClassInfo.isBasicOrArrays()) {
-					result.append(Type.valueToJson(tagName, tempValue, FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll), subClassInfo));
+					result.append(Type.valueToJson(tagName, tempValue, FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll), subClassInfo, filterSpecialCharacters));
 				} else if (subClassInfo.isDate()) {
 					String valueFormat = FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll);
 					result.append("\"").append(tagName).append("\":\"").append(null == valueFormat ? defaultFormat.format(tempValue) : new SimpleDateFormat(valueFormat).format(tempValue)).append("\"");
 				} else {
 					result.append("\"").append(tagName).append("\":").append("{");
-					recursion(tempValue, filterProvider, result, withAlias, withOutTransient);
+					recursion(tempValue, filterProvider, result, withAlias, withOutTransient, filterSpecialCharacters);
 					result.append("}");
 				}
 				result.append(",");
@@ -186,7 +190,7 @@ public class JsonMapper {
 			result.setLength(result.length() - 1);
 	}
 
-	private void recursionSub(final String tagName, final Object value, final StringBuilder result, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient) throws Exception {
+	private void recursionSub(final String tagName, final Object value, final StringBuilder result, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean filterSpecialCharacters) throws Exception {
 		boolean hasTagName = null != tagName;
 		Map<?, ?> map = null;
 		Object tempSubValue;
@@ -212,8 +216,7 @@ public class JsonMapper {
 			result.append("{");
 			end = "}";
 			it = map.entrySet().iterator();
-		}
-		else if (currentClassInfo.isCollection() || currentClassInfo.isSet()) {
+		} else if (currentClassInfo.isCollection() || currentClassInfo.isSet()) {
 			collection = (Collection<?>) value;
 			if (collection.isEmpty()) {
 				result.setLength(result.length() - 1);
@@ -248,16 +251,16 @@ public class JsonMapper {
 			subClassInfo = ClassInfo.getClassInfo(tempSubValue.getClass());
 
 			if (subClassInfo.isMapOrSetOrCollection()) {
-				recursionSub(hasTagName ? null : subTagName, tempSubValue, result, filterProvider, withAlias, withOutTransient);
+				recursionSub(hasTagName ? null : subTagName, tempSubValue, result, filterProvider, withAlias, withOutTransient, filterSpecialCharacters);
 			} else if (subClassInfo.isBasicOrArrays()) {
 				valueFormat = FilterProvider.getCurrentValueFormat(currentClassInfo.isMap() ? subTagName : tagName, currentClazz, filterAll);
-				result.append(currentClassInfo.isMap() ? Type.valueToJson(subTagName, tempSubValue, valueFormat, subClassInfo) : Type.valueToString4Json(tempSubValue, valueFormat, subClassInfo));
+				result.append(currentClassInfo.isMap() ? Type.valueToJson(subTagName, tempSubValue, valueFormat, subClassInfo, filterSpecialCharacters) : Type.valueToString4Json(tempSubValue, valueFormat, subClassInfo, filterSpecialCharacters));
 			} else if (subClassInfo.isDate()) {
 				valueFormat = FilterProvider.getCurrentValueFormat(subTagName, currentClazz, filterAll);
 				result.append("\"").append(subTagName).append("\":\"").append(null == valueFormat ? defaultFormat.format(tempSubValue) : new SimpleDateFormat(valueFormat).format(tempSubValue)).append("\"");
 			} else {
 				result.append("{");
-				recursion(tempSubValue, filterProvider, result, withAlias, withOutTransient);
+				recursion(tempSubValue, filterProvider, result, withAlias, withOutTransient, filterSpecialCharacters);
 				result.append("}");
 			}
 			result.append(",");

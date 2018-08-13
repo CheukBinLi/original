@@ -31,7 +31,7 @@ public class ValueReference {
 
 	public ValueReference(Class<?> clazz) {
 		this.classInfo = ClassInfo.getClassInfo(clazz);
-		if (null == this.classInfo || !(this.classInfo.isBasicOrArrays() && this.classInfo.isMapOrCollection())) {
+		if (null == this.classInfo || !(this.classInfo.isBasicOrArrays() && this.classInfo.isMapOrSetOrCollection())) {
 			try {
 				this.classInfo.setFields(ReflectionUtil.instance().scanClassFieldInfo4Map(clazz, true, true, true));
 			} catch (NoSuchFieldException e) {
