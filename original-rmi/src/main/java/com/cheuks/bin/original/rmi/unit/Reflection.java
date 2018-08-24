@@ -6,13 +6,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import com.cheuks.bin.original.common.util.Encryption;
-import com.cheuks.bin.original.common.util.ReflectionUtil;
+import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -37,9 +36,8 @@ public class Reflection extends ReflectionUtil {
 	}
 
 	public List<FieldList> isCollection(Field field, boolean isAccessible) throws NoSuchFieldException, SecurityException {
-		List<Class<?>> interfaces = Arrays.asList(field.getType().getInterfaces());
 		List<FieldList> fieldList = null;
-		if (!interfaces.containsAll(CollectionType)) {
+		if (!com.cheuks.bin.original.common.util.reflection.Type.isCollectionByClass(field.getType())) {
 			ParameterizedType type;
 			try {
 				type = (ParameterizedType) field.getGenericType();

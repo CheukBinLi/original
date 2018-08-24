@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Set;
 
 import com.cheuks.bin.original.common.util.Encryption;
-import com.cheuks.bin.original.common.util.ReflectionUtil;
+import com.cheuks.bin.original.common.util.reflection.ReflectionCache;
 
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 
-public class Reflection extends ReflectionUtil {
+public class Reflection extends ReflectionCache {
 
     protected Reflection() {}
 
@@ -90,9 +90,8 @@ public class Reflection extends ReflectionUtil {
     }
 
     public List<FieldList> isCollection(Field field, boolean isAccessible) throws NoSuchFieldException, SecurityException {
-        List<Class<?>> interfaces = Arrays.asList(field.getType().getInterfaces());
         List<FieldList> fieldList = null;
-        if (!interfaces.containsAll(CollectionType)) {
+        if (!com.cheuks.bin.original.common.util.reflection.Type.isCollectionByClass(field.getType())) {
             ParameterizedType type;
             try {
                 type = (ParameterizedType) field.getGenericType();
