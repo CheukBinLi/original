@@ -3,7 +3,11 @@ package com.cheuks.bin.original.common.util.conver;
 import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -115,6 +119,47 @@ public class JsonMapper {
 		return (null == additional ? "{" + result + "}" : "{" + result + (result.length() > 0 ? "," : COMPACT_EOL) + additional.toString() + "}") + (eol ? DEFAULT_EOL : COMPACT_EOL);
 	}
 
+	StringBuilder checkBrackets(StringBuilder json, char startWith, char endWith, String startValue, String endValue) {
+		if (json.charAt(0) != startWith) {
+			json.insert(0, startValue);
+		}
+		if (json.charAt(json.length() - 1) != endWith) {
+			json.append(endValue);
+		}
+		return json;
+	}
+
+	String startWith(StringBuilder json, char startWith, String withValue, String withoutValue) {
+		if (json.length() < 1)
+			return withoutValue;
+		return json.charAt(0) != startWith ? withValue : withoutValue;
+	}
+
+	String endWith(StringBuilder json, char endWith, String withValue, String withoutValue) {
+		if (json.length() < 1)
+			return withValue;
+		return json.charAt(json.length() - 1) != endWith ? withValue : withoutValue;
+	}
+
+	String checkAndPackerJson(StringBuilder json, String start, String end, String startValue, String endValue) {
+		String defaultStart = null == startValue ? start : startValue;
+		String defaultEnd = null == endValue ? end : endValue;
+		if (json.charAt(0) != '{') {
+			json.insert(0, defaultStart);
+		}
+		if (json.charAt(json.length() - 1) != '}') {
+			json.append(defaultEnd);
+		}
+		return json.toString();
+	}
+
+	String checkAndPackerJson(String json, String start, String end, String startValue, String endValue) {
+		String defaultStart = null == startValue ? start : startValue;
+		String defaultEnd = null == endValue ? end : endValue;
+		String empty = "";
+		return (json.startsWith(start) ? empty : defaultStart) + json + (json.endsWith(end) ? empty : defaultEnd);
+	}
+
 	protected String writerString(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean brackets, boolean filterSpecialCharacters) throws Exception {
 		if (null == o) {
 			return brackets ? "{}" : COMPACT_EOL;
@@ -123,7 +168,7 @@ public class JsonMapper {
 		StringBuilder result;
 		if (classInfo.isBasicOrArrays()) {
 			/** 基本类型 */
-			return brackets ? "{\"" + Type.valueToString(o, classInfo, filterSpecialCharacters) + "\"}" : "\"" + Type.valueToString(o, classInfo, filterSpecialCharacters) + "\"";
+			return brackets ? checkAndPackerJson(Type.valueToString(o, classInfo, filterSpecialCharacters), "{", "}", "{\"", "\"}") : "\"" + Type.valueToString(o, classInfo, filterSpecialCharacters) + "\"";
 		} else if (classInfo.isDate()) {
 			/** 日期 */
 			return brackets ? "{\"" + defaultFormat.format(o) + "\"}" : "\"" + defaultFormat.format(o) + "\"";
@@ -183,9 +228,9 @@ public class JsonMapper {
 					String valueFormat = FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll);
 					result.append("\"").append(tagName).append("\":\"").append(null == valueFormat ? defaultFormat.format(tempValue) : new SimpleDateFormat(valueFormat).format(tempValue)).append("\"");
 				} else {
-					result.append("\"").append(tagName).append("\":").append("{");
+					result.append("\"").append(tagName).append("\":").append(startWith(result, '{', "", "{"));
 					recursion(tempValue, filterProvider, result, withAlias, withOutTransient, filterSpecialCharacters);
-					result.append("}");
+					result.append(endWith(result, '}', "", "}"));
 				}
 				result.append(",");
 			}
@@ -195,6 +240,7 @@ public class JsonMapper {
 	}
 
 	private void recursionSub(final String tagName, final Object value, final StringBuilder result, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean filterSpecialCharacters) throws Exception {
+		int len;
 		boolean hasTagName = null != tagName;
 		Map<?, ?> map = null;
 		Object tempSubValue;
@@ -217,7 +263,7 @@ public class JsonMapper {
 				result.append(":null");
 				return;
 			}
-			result.append("{");
+			result.append(startWith(result, '{', "", "{"));
 			end = "}";
 			it = map.entrySet().iterator();
 		} else if (currentClassInfo.isCollection() || currentClassInfo.isSet()) {
@@ -227,7 +273,7 @@ public class JsonMapper {
 				result.append(":null");
 				return;
 			}
-			result.append("[");
+			result.append(startWith(result, '[', "", "["));
 			it = collection.iterator();
 		} else {
 			System.err.println("unkonw type:" + value.getClass());
@@ -263,35 +309,39 @@ public class JsonMapper {
 				valueFormat = FilterProvider.getCurrentValueFormat(subTagName, currentClazz, filterAll);
 				result.append("\"").append(subTagName).append("\":\"").append(null == valueFormat ? defaultFormat.format(tempSubValue) : new SimpleDateFormat(valueFormat).format(tempSubValue)).append("\"");
 			} else {
-				result.append("{");
+				result.append(startWith(result, '{', "", "{"));
+				len = result.length();
 				recursion(tempSubValue, filterProvider, result, withAlias, withOutTransient, filterSpecialCharacters);
-				result.append("}");
+				if (result.length() > len) {
+					result.append(endWith(result, '}', "", "}"));
+				}
 			}
 			result.append(",");
 		}
 		result.setLength(result.length() - 1);
-		result.append(end);
+		result.append(endWith(result, end.charAt(0), "", end));
 	}
 
 	public static void main(String[] args) throws Throwable {
 //		long now = System.currentTimeMillis();
 //		//		Filter f = new Filter(ClassInfo.class, "a", "b", "c", "e", "f", "g");
-//		Filter f = Filter.build(ClassInfo.class).addExcept("a", "b", "c", "e", "f", "g").addInclude("小绿:aaa","Ignore");
+//		Filter f = Filter.build(ClassInfo.class).addExcept("a", "b", "c", "e", "f", "g").addInclude("小绿:aaa", "Ignore");
 //		List<Filter> list = new LinkedList<>();
 //		list.add(f);
 //		Map<String, Object> xx = new HashMap<>();
-////		xx.put("oh shit", list);
+//		xx.put("oh shit", list);
 //		xx.put("oh shit", "aaaaaaaaaaaa\"\"aaaaaaaaa");
 //		xx.put("date_Time", new Date());
 //		xx.put("Ignore", "哇哈哈");
-////		xx.put("Ignore", "\"哇1哈哈\"");
-		//		//						//
-		//
-//						FilterProvider provider = new FilterProvider(Filter.build(HashMap.class).addInclude("小绿:%s你好呀!"),Filter.build(Filter.class)/* .addExcept("includes") */, Filter.build(null).addExcept("Ignore","小绿").addInclude("date_Time:我要系yyyy年MM月dd日D日既HH:mm:ss打七小绿"));
-//						System.out.println(INSTANCE.writer(f, provider, true, false, true,true, xx));
-		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
-		//		now = System.currentTimeMillis();
-		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
+//		//		xx.put("Ignore", "\"哇1哈哈\"");
+//		//		//						//
+//		//
+//		FilterProvider provider = new FilterProvider(Filter.build(HashMap.class).addInclude("小绿:%s你好呀!"), Filter.build(Filter.class)/* .addExcept("includes") */, Filter.build(null).addExcept("Ignore", "小绿").addInclude("date_Time:我要系yyyy年MM月dd日D日既HH:mm:ss打七小绿"));
+//		//		System.out.println(INSTANCE.writer(f, provider, true, false, true, true, xx));
+//		System.out.println(INSTANCE.writer(list, null, false, false, true, true));
+		//				System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
+		//				now = System.currentTimeMillis();
+		//				System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
 		//
 		//		List<Integer> ii = new LinkedList<>(Arrays.asList(1, 3, 4, 56, 76, 6, 54, 2));
 		//		Map<String, Object> x = new HashMap<>();
