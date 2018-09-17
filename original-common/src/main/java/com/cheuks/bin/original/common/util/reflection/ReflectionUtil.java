@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.RandomAccess;
 import java.util.Set;
+import java.util.Vector;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
 
@@ -22,6 +24,18 @@ import com.cheuks.bin.original.common.annotation.reflect.Alias;
 public class ReflectionUtil {
 
 	private static ReflectionUtil INSTANCE;
+
+	static Field classes;
+	{
+		try {
+			if (null == classes) {
+				classes = ClassLoader.class.getDeclaredField("classes");
+				classes.setAccessible(true);
+			}
+		} catch (Throwable e) {
+			classes = null;
+		}
+	}
 
 	protected final Set<Class<?>> WrapperClass = new HashSet<Class<?>>(Arrays.asList(String.class, Integer.class, Boolean.class, Character.class, Short.class, Long.class, Float.class, Byte.class));
 
@@ -341,5 +355,25 @@ public class ReflectionUtil {
 
 	public boolean isMap(Object o) {
 		return Arrays.asList(o.getClass().getInterfaces()).contains(Map.class);
+	}
+
+	public Set<ClassInfo> findImplementation(ClassLoader loader, Class<?> parent) throws IllegalArgumentException, IllegalAccessException {
+		Vector<Class<?>> clazzes = (Vector<Class<?>>) classes.get(loader);
+		Set<ClassInfo> result = new HashSet<ClassInfo>();
+		ClassInfo classInfo;
+		Class<?> item;
+		Enumeration<Class<?>> enumeration = clazzes.elements();
+		while (enumeration.hasMoreElements()) {
+			item = enumeration.nextElement();
+			if (!parent.equals(item) && parent.isAssignableFrom(item)) {
+				classInfo = ClassInfo.getClassInfo(item);
+				result.add(classInfo);
+			}
+		}
+		return result;
+	}
+
+	public Set<ClassInfo> findImplementation(Class<?> parent) throws IllegalArgumentException, IllegalAccessException {
+		return findImplementation(this.getClass().getClassLoader(), parent);
 	}
 }
