@@ -64,7 +64,7 @@ public class ClassInfo implements Cloneable {
 		this.isCollection = isDate ? false : isMap ? false : Type.isCollectionByClass(clazz);
 		this.type = isArrays ? Type.Array : isMap ? Type.Map : isCollection ? Type.Collection : Type.getTypeByClass(clazz);
 		this.isBasic = isDate ? false : isMap ? false : isCollection ? false : isArrays ? false : (clazz.isPrimitive() | Type.isWrapper(clazz));
-		this.isAbstract = isBasic ? false : isArrays ? false : isSet ? false : isMap ? false : isDate ? false : this.clazz.isInterface() ? false : Modifier.isAbstract(this.clazz.getModifiers());
+		this.isAbstract = isBasic ? false : isArrays ? false : isSet ? false : isMap ? false : isDate ? false : this.clazz.isInterface() ? true : Modifier.isAbstract(this.clazz.getModifiers());
 	}
 
 	public ClassInfo() {
