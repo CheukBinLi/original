@@ -142,8 +142,9 @@ public class ScanSimple extends AbstractScan {
 		String name;
 		while (it.hasNext()) {
 			u = it.next();
+			System.err.println(u.getPath());
 
-			if (StringUtil.newInstance().concatCount(jarPath = u.getPath(), ".jar!") == 2) {
+			if (StringUtil.newInstance().concatCount(jarPath = u.getPath(), "jar!") == 2) {
 				jarPaths = jarPath.split("!");
 				JarFile jarFile = new JarFile(new File(jarPaths[0].replaceAll("file:/", "").replaceAll("file:", "")));
 				JarInputStream jarInputStream = new JarInputStream(jarFile.getInputStream(jarFile.getJarEntry(jarPaths[1].substring(1))));
@@ -154,8 +155,10 @@ public class ScanSimple extends AbstractScan {
 					}
 				}
 			} else {
-
-				JarFile jarFile = new JarFile(new File(u.getPath().substring(0, u.getPath().lastIndexOf("!")).replaceAll("file:", "")));
+				System.err.println("###");
+				System.err.println(u.getPath().substring(0, u.getPath().indexOf("!")).replaceAll("file:", ""));
+				System.err.println("###");
+				JarFile jarFile = new JarFile(new File(u.getPath().substring(0, u.getPath().indexOf("!")).replaceAll("file:", "")));
 				Enumeration<JarEntry> jars = jarFile.entries();
 				while (jars.hasMoreElements()) {
 					JarEntry jarEntry = jars.nextElement();

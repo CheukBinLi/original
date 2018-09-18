@@ -19,11 +19,15 @@ import java.util.Set;
 import java.util.Vector;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
+import com.cheuks.bin.original.common.util.scan.Scan;
+import com.cheuks.bin.original.common.util.scan.ScanSimple;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class ReflectionUtil {
 
 	private static ReflectionUtil INSTANCE;
+
+	private final Scan scan = new ScanSimple();
 
 	static Field classes;
 	{
@@ -357,7 +361,7 @@ public class ReflectionUtil {
 		return Arrays.asList(o.getClass().getInterfaces()).contains(Map.class);
 	}
 
-	public Set<ClassInfo> findImplementation(ClassLoader loader, Class<?> parent) throws IllegalArgumentException, IllegalAccessException {
+	public synchronized Set<ClassInfo> findImplementation(final ClassLoader loader, final Class<?> parent) throws IllegalArgumentException, IllegalAccessException {
 		Vector<Class<?>> clazzes = (Vector<Class<?>>) classes.get(loader);
 		Set<ClassInfo> result = new HashSet<ClassInfo>();
 		ClassInfo classInfo;
@@ -373,7 +377,30 @@ public class ReflectionUtil {
 		return result;
 	}
 
-	public Set<ClassInfo> findImplementation(Class<?> parent) throws IllegalArgumentException, IllegalAccessException {
+	public Set<ClassInfo> findImplementation(final Class<?> parent) throws IllegalArgumentException, IllegalAccessException {
 		return findImplementation(this.getClass().getClassLoader(), parent);
 	}
+
+	public synchronized Set<ClassInfo> findImplementationForSpringBoot(String packagePrefix, final ClassLoader loader, final Class<?> parent) throws Throwable {
+		if (null == packagePrefix || null == parent)
+			return null;
+		final ClassLoader classLoader = null == loader ? this.getClass().getClassLoader() : loader;
+		Map<String, Set<String>> classMap = scan.doScan(packagePrefix + ".*$class");
+		Set<String> classes = classMap.get(packagePrefix + ".*$class");
+		final Set<ClassInfo> result = new HashSet<ClassInfo>();
+		classes.forEach(item -> {
+			System.out.println(item);
+			String className = item.replaceAll("/", ".");
+			try {
+				Class<?> clazz = Class.forName(className.substring(0, className.length() - 6), false, classLoader);
+				if (!parent.equals(clazz) && parent.isAssignableFrom(clazz)) {
+					result.add(ClassInfo.getClassInfo(clazz));
+				}
+			} catch (Throwable e) {
+			}
+		});
+
+		return result;
+	}
+
 }
