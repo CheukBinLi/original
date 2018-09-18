@@ -1,5 +1,6 @@
 package com.cheuks.bin.original.common.util.reflection;
 
+import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -44,6 +45,7 @@ public class ClassInfo implements Cloneable {
 	private boolean isMap;
 	private boolean isSet;
 	private boolean isDate;
+	private boolean isAbstract = false;
 	private boolean isCollection = false;
 
 	public ClassInfo(Class<?> clazz) {
@@ -62,7 +64,7 @@ public class ClassInfo implements Cloneable {
 		this.isCollection = isDate ? false : isMap ? false : Type.isCollectionByClass(clazz);
 		this.type = isArrays ? Type.Array : isMap ? Type.Map : isCollection ? Type.Collection : Type.getTypeByClass(clazz);
 		this.isBasic = isDate ? false : isMap ? false : isCollection ? false : isArrays ? false : (clazz.isPrimitive() | Type.isWrapper(clazz));
-
+		this.isAbstract = isBasic ? false : isArrays ? false : isSet ? false : isMap ? false : isDate ? false : this.clazz.isInterface() ? false : Modifier.isAbstract(this.clazz.getModifiers());
 	}
 
 	public ClassInfo() {
@@ -136,7 +138,11 @@ public class ClassInfo implements Cloneable {
 		return isDate;
 	}
 
-	public final static ClassInfo getClassInfo(Class<?> clazz) {
+	public boolean isAbstract() {
+		return isAbstract;
+	}
+
+	public final synchronized static ClassInfo getClassInfo(final Class<?> clazz) {
 		if (null == clazz) {
 			return null;
 		}
