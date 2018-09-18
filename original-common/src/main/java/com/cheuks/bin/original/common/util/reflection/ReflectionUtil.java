@@ -389,7 +389,6 @@ public class ReflectionUtil {
 		Set<String> classes = classMap.get(packagePrefix + ".*$class");
 		final Set<ClassInfo> result = new HashSet<ClassInfo>();
 		classes.forEach(item -> {
-			System.out.println(item);
 			String className = item.replaceAll("/", ".");
 			try {
 				Class<?> clazz = Class.forName(className.substring(0, className.length() - 6), false, classLoader);
