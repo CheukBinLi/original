@@ -1,5 +1,6 @@
 package com.cheuks.bin.original.common.util.reflection;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +28,7 @@ public enum Type {
 					PackageFloat(Float.class),
 					PackageByte(Byte.class),
 					PackageDouble(Double.class),
+					PackageBigDecimal(BigDecimal.class),
 					Array(Arrays.class),
 					Map(Map.class),
 					Set(Set.class),
@@ -37,7 +39,7 @@ public enum Type {
 
 	static final List<Class<?>> COLLECTION = Arrays.asList(RandomAccess.class, Collection.class, List.class, Set.class);
 	static final List<Class<?>> DATE = Arrays.asList(java.util.Date.class, java.sql.Date.class, java.sql.Timestamp.class, java.sql.Time.class);
-	static final Set<Class<?>> WRAPPER = new HashSet<Class<?>>(Arrays.asList(String.class, Integer.class, Boolean.class, Character.class, Short.class, Long.class, Float.class, Byte.class, Double.class));
+	static final Set<Class<?>> WRAPPER = new HashSet<Class<?>>(Arrays.asList(BigDecimal.class, String.class, Integer.class, Boolean.class, Character.class, Short.class, Long.class, Float.class, Byte.class, Double.class));
 
 	Type(Class<?>... clazz) {
 
@@ -175,6 +177,8 @@ public enum Type {
 			return stringFormat(format, value.toString());
 		case PackageDouble:
 			return stringFormat(format, value.toString());
+		case PackageBigDecimal:
+			return stringFormat(format, value.toString());
 		case Array:
 			return Arrays.toString((Object[]) value);
 		default:
@@ -266,6 +270,8 @@ public enum Type {
 			return name + stringFormat(format, value.toString());
 		case PackageDouble:
 			return name + stringFormat(format, value.toString());
+		case PackageBigDecimal:
+			return name + stringFormat(format, value.toString());
 		case Array:
 			if (value instanceof String[] || value instanceof Character[] || value instanceof char[]) {
 				Object[] a = (Object[]) value;
@@ -334,6 +340,8 @@ public enum Type {
 			return Byte.valueOf(data);
 		case PackageDouble:
 			return Double.valueOf(data);
+		case PackageBigDecimal:
+			return BigDecimal.valueOf(Double.valueOf(data));
 		case Date:
 			System.err.println("日期末实现");//子过滤
 			return null;
