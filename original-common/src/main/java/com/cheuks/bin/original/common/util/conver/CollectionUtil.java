@@ -46,6 +46,21 @@ public class CollectionUtil {
 		}
 		return result;
 	}
+	
+	@SafeVarargs
+	public static <K, V> Map<K, V> collage(Map<K, V>... maps) {
+		Map<K, V> result = null;
+		for (Map<K, V> map : maps) {
+			if (null == map || map.size() < 1) {
+				continue;
+			}
+			if (null == result) {
+				result = map;
+			}
+			result.putAll(map);
+		}
+		return result;
+	}
 
 	public boolean isNotEmpty(Collection<?> collection) {
 		return !isEmpty(collection);
