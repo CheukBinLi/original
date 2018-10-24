@@ -198,6 +198,9 @@ public enum Type {
 			case '\"':
 				result.append("\\\"");
 				break;
+			case '\\':
+				result.append("\\\\");
+				break;
 			case '\r':
 				result.append("\\r");
 				break;
