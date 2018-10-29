@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.0.RELEASE</version>
+		<version>2.0.2.RELEASE</version>
 	</parent>
 	<groupId>com.cheuks.bin</groupId>
 	<artifactId>original-prototype-spring-boot</artifactId>
@@ -16,7 +16,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<lombok.version>1.16.18</lombok.version>
-		<druid.version>1.1.9</druid.version>
+		<druid.version>1.1.10</druid.version>
 		<mysql.version>5.1.46</mysql.version>
 	</properties>
 	<dependencyManagement>

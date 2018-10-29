@@ -32,7 +32,7 @@
 		<org.apache.curator.version>4.0.0</org.apache.curator.version>
 		<com.orbitz.consul.client>0.16.3</com.orbitz.consul.client>
 		<git.jar.path>d:/lib/maven</git.jar.path>
-		<jackson.version>2.8.9</jackson.version>
+		<jackson.version>2.9.6</jackson.version>
 	</properties>
 	<!-- <distributionManagement> <repository> <id>releases</id> <name>Local Nexus Repository</name> <url>http://nexus.juweitu.com:8081/content/repositories/releases/</url> </repository> <snapshotRepository> <id>Snapshots</id> <name>Local Nexus Repository</name> <url>http://nexus.juweitu.com:8081/content/repositories/snapshots/</url> </snapshotRepository> </distributionManagement> -->
 	<dependencies>
@@ -65,24 +65,24 @@
 		</dependency>
 	</dependencies>
 	<modules>
-		<module>original-common</module>
+		<!-- <module>original-common</module> -->
+		<!-- <module>original-cache</module> -->
+<!-- 		<module>original-db-manager</module>
 		<module>original-config</module>
-		<module>original-cache</module>
-		<module>original-db-manager</module>
 		<module>original-message-queue</module>
 		<module>original-generate</module>
 		<module>original-weixin</module>
 		<module>original-search</module>
 		<module>original-reflect</module>
-		<module>original-registration-center</module>
 		<module>original-session</module>
 		<module>original-test</module>
 		<module>original-web</module>
 		<module>original-web-common</module>
-		<module>original-rmi</module>
 		<module>original-prototype</module>
     <module>original-anything-test</module>
-    <module>original-configuration</module>
+    <module>original-configuration</module> -->
+		<module>original-rmi</module>
+		<!-- <module>original-registration-center</module> -->
   </modules>
 
 	<build>

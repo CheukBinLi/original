@@ -65,7 +65,7 @@ public class ClassRebuild {
 			methodString = generateMethod(m, null == modifyMethod ? "" : modifyMethod.appCodeToBefore(m.getName(), param), (superBody = null == (temp = null == modifyMethod ? null : modifyMethod.overrideSuperMethod(m.getName(), param)) ? superBody : temp), null == modifyMethod ? "" : modifyMethod.appCodeToAfter(m.getName(), param));
 			newClass.addMethod(CtNewMethod.make(methodString, newClass));
 		}
-		newClass.writeFile("C:/Users/BIN/Desktop");
+//		newClass.writeFile("C:/Users/BIN/Desktop");
 		return newClass.toClass();
 	}
 

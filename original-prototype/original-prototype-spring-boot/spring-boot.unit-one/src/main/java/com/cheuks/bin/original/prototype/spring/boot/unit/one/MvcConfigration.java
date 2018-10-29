@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /***
@@ -17,8 +18,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author BIN
  * @see 是用来全局定制 化 Spring Boot 的 MVC 特性
  */
-@Configurable
 @Component
+@Configurable
 public class MvcConfigration implements WebMvcConfigurer {
 
 	@Override
@@ -37,8 +38,7 @@ public class MvcConfigration implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(new HandlerInterceptor() {
 			@Override
-			public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-					throws Exception {
+			public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 				System.out.println(request.getRequestURL());
 				return HandlerInterceptor.super.preHandle(request, response, handler);
 			}
@@ -54,6 +54,12 @@ public class MvcConfigration implements WebMvcConfigurer {
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**");
 		WebMvcConfigurer.super.addCorsMappings(registry);
+	}
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/file/**").addResourceLocations("file:g:/psp/");
+		WebMvcConfigurer.super.addResourceHandlers(registry);
 	}
 
 }

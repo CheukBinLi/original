@@ -274,21 +274,21 @@ public class JsonMapper {
 	}
 
 	public static void main(String[] args) throws Throwable {
-//		long now = System.currentTimeMillis();
-//		//		Filter f = new Filter(ClassInfo.class, "a", "b", "c", "e", "f", "g");
-//		Filter f = Filter.build(ClassInfo.class).addExcept("a", "b", "c", "e", "f", "g").addInclude("小绿:aaa","Ignore");
-//		List<Filter> list = new LinkedList<>();
-//		list.add(f);
-//		Map<String, Object> xx = new HashMap<>();
-////		xx.put("oh shit", list);
-//		xx.put("oh shit", "aaaaaaaaaaaa\"\"aaaaaaaaa");
-//		xx.put("date_Time", new Date());
-//		xx.put("Ignore", "哇哈哈");
-////		xx.put("Ignore", "\"哇1哈哈\"");
+		//		long now = System.currentTimeMillis();
+		//		//		Filter f = new Filter(ClassInfo.class, "a", "b", "c", "e", "f", "g");
+		//		Filter f = Filter.build(ClassInfo.class).addExcept("a", "b", "c", "e", "f", "g").addInclude("小绿:aaa","Ignore");
+		//		List<Filter> list = new LinkedList<>();
+		//		list.add(f);
+		//		Map<String, Object> xx = new HashMap<>();
+		////		xx.put("oh shit", list);
+		//		xx.put("oh shit", "aaaaaaaaaaaa\"\"aaaaaaaaa");
+		//		xx.put("date_Time", new Date());
+		//		xx.put("Ignore", "哇哈哈");
+		////		xx.put("Ignore", "\"哇1哈哈\"");
 		//		//						//
 		//
-//						FilterProvider provider = new FilterProvider(Filter.build(HashMap.class).addInclude("小绿:%s你好呀!"),Filter.build(Filter.class)/* .addExcept("includes") */, Filter.build(null).addExcept("Ignore","小绿").addInclude("date_Time:我要系yyyy年MM月dd日D日既HH:mm:ss打七小绿"));
-//						System.out.println(INSTANCE.writer(f, provider, true, false, true,true, xx));
+		//						FilterProvider provider = new FilterProvider(Filter.build(HashMap.class).addInclude("小绿:%s你好呀!"),Filter.build(Filter.class)/* .addExcept("includes") */, Filter.build(null).addExcept("Ignore","小绿").addInclude("date_Time:我要系yyyy年MM月dd日D日既HH:mm:ss打七小绿"));
+		//						System.out.println(INSTANCE.writer(f, provider, true, false, true,true, xx));
 		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
 		//		now = System.currentTimeMillis();
 		//		System.out.println(INSTANCE.writeToString(list, null) + "   " + (System.currentTimeMillis() - now));
@@ -314,6 +314,8 @@ public class JsonMapper {
 		//		String a = "1896a7242805f2b72b9d94631aae6ed0.tomcat.tar";
 		//		System.err.println(a.substring(a.lastIndexOf(".") + 1));
 		//		System.err.println(ClassInfo.class.toString());
+		System.out.println(JsonMapper.INSTANCE.writer("\\U5b89\\U4fdd\\U4e2d\\U5fc3", null, false, false));
+		System.out.println(JsonMapper.INSTANCE.writer("\\U5b89\\U4fdd\\U4e2d\\U5fc3", null, false, false, true));
 	}
 
 }

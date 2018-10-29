@@ -1,2 +1,5 @@
 server:
   port: 8899
+debug: true
+logging:
+  config: classpath:log.xml
