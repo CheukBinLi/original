@@ -306,7 +306,7 @@ public enum Type {
 	 * @param dateFormat
 	 * @return
 	 */
-	public Object getValue(Class<?> c, String data, DateFormat dateFormat) {
+	public static Object getValue(Class<?> c, String data, DateFormat dateFormat) {
 		ClassInfo classInfo = ClassInfo.getClassInfo(c);
 		switch (classInfo.getType()) {
 		case StringType:

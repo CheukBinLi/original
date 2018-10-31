@@ -67,7 +67,7 @@ public class CollectionUtil {
 	}
 
 	public boolean isEmpty(Collection<?> collection) {
-		return null != collection && collection.size() > 0;
+		return null == collection || collection.size() == 0;
 	}
 
 	public boolean isNotEmpty(Map<?, ?> map) {

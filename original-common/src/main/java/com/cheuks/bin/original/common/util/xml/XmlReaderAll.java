@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -14,9 +15,12 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.cheuks.bin.original.common.util.conver.CollectionUtil;
 import com.cheuks.bin.original.common.util.conver.ObjectFill;
+import com.cheuks.bin.original.common.util.conver.StringUtil;
 import com.cheuks.bin.original.common.util.reflection.ReflectionCache;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
+import com.cheuks.bin.original.common.util.reflection.Type;
 
 /***
  * xml数据填充
@@ -26,151 +30,172 @@ import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
  */
 public class XmlReaderAll extends DefaultHandler {
 
-    private ReflectionCache reflectionCache = ReflectionCache.newInstance();
+	private ReflectionCache reflectionCache = ReflectionCache.newInstance();
 
-    private ReflectionUtil reflectionUtil = ReflectionUtil.instance();
+	private ReflectionUtil reflectionUtil = ReflectionUtil.instance();
 
-    private final ObjectFill objectFill = new ObjectFill();
+	private Field clazz = null;
+	{
+		try {
+			clazz = Field.class.getDeclaredField("clazz");
+			clazz.setAccessible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    private static XmlReaderAll INSTANCE;
+	@SuppressWarnings("unused")
+	private final ObjectFill objectFill = new ObjectFill();
 
-    public static XmlReaderAll newInstance() {
-        if (null == INSTANCE) {
-            synchronized (XmlReaderAll.class) {
-                if (null == INSTANCE) {
-                    INSTANCE = new XmlReaderAll();
-                }
-            }
-        }
-        return INSTANCE;
-    }
+	private static XmlReaderAll INSTANCE;
 
-    SAXParserFactory factory = SAXParserFactory.newInstance();
+	public static XmlReaderAll newInstance() {
+		if (null == INSTANCE) {
+			synchronized (XmlReaderAll.class) {
+				if (null == INSTANCE) {
+					INSTANCE = new XmlReaderAll();
+				}
+			}
+		}
+		return INSTANCE;
+	}
 
-    SAXParser parser = null;
-    {
-        try {
-            parser = factory.newSAXParser();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	SAXParserFactory factory = SAXParserFactory.newInstance();
 
-    public static <T> T paddingModel(byte[] bytes, Class<T> obj) throws NoSuchFieldException, SecurityException, ParserConfigurationException, SAXException, IOException, InstantiationException, IllegalAccessException {
-        return new XmlReaderAll().padding(bytes, obj);
-    }
+	SAXParser parser = null;
+	{
+		try {
+			parser = factory.newSAXParser();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    public synchronized <T> T padding(byte[] bytes, Class<T> obj) throws ParserConfigurationException, SAXException, IOException, NoSuchFieldException, SecurityException, InstantiationException, IllegalAccessException {
-        return padding(bytes, obj.newInstance());
-    }
+	public static <T> T paddingModel(byte[] bytes, Class<T> obj) throws NoSuchFieldException, SecurityException, ParserConfigurationException, SAXException, IOException, InstantiationException, IllegalAccessException {
+		return new XmlReaderAll().padding(bytes, obj);
+	}
 
-    public synchronized <T> T padding(byte[] bytes, T obj) throws ParserConfigurationException, SAXException, IOException, NoSuchFieldException, SecurityException, InstantiationException, IllegalAccessException {
-        link.clear();
-        T result = obj;
-        link.addFirst(new Node(null, null, result));
-        XmlReaderAll handler = this;
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        InputSource is = new InputSource(in);
-        is.setEncoding("utf-8");
-        parser.parse(is, handler);
+	public synchronized <T> T padding(byte[] bytes, Class<T> obj) throws ParserConfigurationException, SAXException, IOException, NoSuchFieldException, SecurityException, InstantiationException, IllegalAccessException {
+		return padding(bytes, obj.newInstance());
+	}
 
-        T t = (T) result;
-        // 译放obj
-        result = null;
-        return t;
-    }
+	public synchronized <T> T padding(byte[] bytes, T obj) throws ParserConfigurationException, SAXException, IOException, NoSuchFieldException, SecurityException, InstantiationException, IllegalAccessException {
+		link.clear();
+		T result = obj;
+		link.addFirst(new Node(null, null, result));
+		XmlReaderAll handler = this;
+		ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+		InputSource is = new InputSource(in);
+		is.setEncoding("utf-8");
+		parser.parse(is, handler);
 
-    static class Node {
-        private String tagName;
+		T t = (T) result;
+		// 译放obj
+		result = null;
+		return t;
+	}
 
-        private Field field;
+	static class Node {
+		private String tagName;
 
-        private Object obj;
+		private Field field;
 
-        public String getTagName() {
-            return tagName;
-        }
+		private Object obj;
 
-        public Node setTagName(String tagName) {
-            this.tagName = tagName;
-            return this;
-        }
+		public String getTagName() {
+			return tagName;
+		}
 
-        public Object getObj() {
-            return obj;
-        }
+		public Node setTagName(String tagName) {
+			this.tagName = tagName;
+			return this;
+		}
 
-        public Node setObj(Object obj) {
-            this.obj = obj;
-            return this;
-        }
+		public Object getObj() {
+			return obj;
+		}
 
-        public Field getField() {
-            return field;
-        }
+		public Node setObj(Object obj) {
+			this.obj = obj;
+			return this;
+		}
 
-        public Node setField(Field field) {
-            this.field = field;
-            return this;
-        }
+		public Field getField() {
+			return field;
+		}
 
-        public Node(String tagName, Field field, Object obj) {
-            super();
-            this.tagName = tagName;
-            this.field = field;
-            this.obj = obj;
-        }
-    }
+		public Node setField(Field field) {
+			this.field = field;
+			return this;
+		}
 
-    LinkedList<Node> link = new LinkedList<XmlReaderAll.Node>();
+		public Node(String tagName, Field field, Object obj) {
+			super();
+			this.tagName = tagName;
+			this.field = field;
+			this.obj = obj;
+		}
+	}
 
-    @Override
-    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        Object X = link.getLast().getObj();
-        Field f = null;
-        Object o = null;
-        try {
-            try {
-                // f = X.getClass().getDeclaredField(qName);
-                f = reflectionCache.getFieldByMap(X.getClass(), qName);
-            } catch (Exception e) {
-                e.printStackTrace();
-                // f = X.getClass().getSuperclass().getDeclaredField(qName);
-                f = reflectionCache.getFieldByMap(X.getClass().getSuperclass(), qName);
-            }
-            if (null == f)
-                return;
-            f.setAccessible(true);
-            o = f.get(X);
-            if (null == o && f.getType().isPrimitive() && !reflectionUtil.isWrapperClass(f.getType()))
-                f.set(X, o = Class.forName(f.getType().getName()).newInstance());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (null != f || null != o)
-            link.addLast(new Node(qName, f, o));
-    }
+	LinkedList<Node> link = new LinkedList<XmlReaderAll.Node>();
 
-    @Override
-    public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (!link.isEmpty() && null != link.getLast().getTagName() && link.getLast().getTagName().equals(qName))
-            link.removeLast();
-    }
+	@Override
+	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+		Object X = link.getLast().getObj();
+		Field f = null;
+		Object o = null;
+		try {
+			try {
+				f = reflectionCache.getFieldByMap(X.getClass(), qName);
+			} catch (Exception e) {
+				e.printStackTrace();
+				f = reflectionCache.getFieldByMap(X.getClass().getSuperclass(), qName);
+			}
+			if (null == f) {
+				f = reflectionCache.getFieldByMap(X.getClass(), StringUtil.newInstance().toLowerUnderscoreCaseCamel(qName));
+				if (null == f) {
+					return;
+				}
+			}
+			f.setAccessible(true);
+			List<Field> subField = reflectionUtil.searchCollection(f, true);
+			if (CollectionUtil.newInstance().isNotEmpty(subField)) {//list,map有问题
+				//				f.set(qName, null);
+				Class<?> c = (Class<?>) clazz.get(subField.get(0));
+				o = c.newInstance();
+			} else {
+				o = f.get(X);
+				if (null == o && f.getType().isPrimitive() && !reflectionUtil.isWrapperClass(f.getType())) {
+					f.set(X, o = Class.forName(f.getType().getName()).newInstance());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (null != f || null != o)
+			link.addLast(new Node(qName, f, o));
+	}
 
-    @Override
-    public void characters(char[] ch, int start, int length) throws SAXException {
-        if (link.size() == 1)
-            return;
-        Node node = link.removeLast();
-        Object o = link.getLast().getObj();
-        Field f = node.getField();
-        try {
-            f.setAccessible(true);
-            // f.set(o, new String(ch, start, length));
-            f.set(o, objectFill.getValue(f.getType(), new String(ch, start, length)));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	@Override
+	public void endElement(String uri, String localName, String qName) throws SAXException {
+		if (!link.isEmpty() && null != link.getLast().getTagName() && link.getLast().getTagName().equals(qName))
+			link.removeLast();
+	}
+
+	@Override
+	public void characters(char[] ch, int start, int length) throws SAXException {
+		if (link.size() == 1)
+			return;
+		Node node = link.removeLast();
+		Object o = link.getLast().getObj();
+		Field f = node.getField();
+		try {
+			f.setAccessible(true);
+			//            f.set(o, objectFill.getValue(f.getType(), new String(ch, start, length)));
+			f.set(o, Type.getValue(f.getType(), new String(ch, start, length), null));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 }

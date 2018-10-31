@@ -111,6 +111,24 @@ public class StringUtil extends ConverType {
 		return result.toString();
 	}
 
+	public String toLowerUnderscoreCaseCamel(String str) {
+		if (isEmpty(str))
+			return "";
+		StringBuilder result = new StringBuilder();
+		boolean nextChange = false;
+		for (Character item : str.toCharArray()) {
+			if (item == '_') {
+				nextChange = true;
+				continue;
+			}
+			result.append(nextChange ? (char) (item - 32) : item);
+			if (nextChange) {
+				nextChange = false;
+			}
+		}
+		return result.toString();
+	}
+
 	public static void main(String[] args) {
 		System.out.println(StringUtil.newInstance().concatCount(
 				"file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua", ".jar!"));
@@ -119,6 +137,8 @@ public class StringUtil extends ConverType {
 		String[] as = a.split("!");
 		System.err.println(Arrays.toString(as));
 		System.out.println(a.substring(a.lastIndexOf(".jar!") + 5));
+		
+		System.out.println(new StringUtil().toLowerUnderscoreCaseCamel("a_abcde_fghijk_"));
 
 	}
 }
