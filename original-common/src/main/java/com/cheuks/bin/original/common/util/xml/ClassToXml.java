@@ -123,13 +123,13 @@ public class ClassToXml {
 			tagName = underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(tagName) : tagName;
 			result.append("<").append(tagName).append(">");
 			tempValue = field.get(o);
-			if (null == tempValue)
-				continue;
-			subClassInfo = ClassInfo.getClassInfo(tempValue.getClass());
-			if (subClassInfo.isMapOrSetOrCollection()) {
-				recursionSub(tagName, tempValue, result, underscoreCamel);
-			} else if (null != tempValue) {
-				result.append("<![CDATA[").append(tempValue).append("]]>");
+			if (null != tempValue) {
+				subClassInfo = ClassInfo.getClassInfo(tempValue.getClass());
+				if (subClassInfo.isMapOrSetOrCollection()) {
+					recursionSub(tagName, tempValue, result, underscoreCamel);
+				} else if (null != tempValue) {
+					result.append("<![CDATA[").append(tempValue).append("]]>");
+				}
 			}
 			result.append("</").append(tagName).append(">");
 		}
