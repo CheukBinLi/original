@@ -41,39 +41,6 @@ public class ConverType extends ObjectFill {
 		return (T) o;
 	}
 
-	public String toUpperCaseFirstOne(String name) {
-		char[] ch = name.toCharArray();
-		ch[0] = Character.toUpperCase(ch[0]);
-		return new String(ch);
-	}
-
-	public String toLowerCaseFirstOne(String name) {
-		if (name.length() < 1)
-			return name;
-		char[] ch = name.toCharArray();
-		ch[0] = Character.toLowerCase(ch[0]);
-		return new String(ch);
-	}
-
-	public boolean isEmpty(String str) {
-		if (null == str || str.length() < 1)
-			return true;
-		return false;
-	}
-
-	public String isEmpty(String str, String defaultValue) {
-		if (null == str || str.length() < 1)
-			return defaultValue;
-		return str;
-	}
-
-	public String isEmpty(String str, String defaultValue, boolean isDefaultValueToUpperCaseFirstOne) {
-		if (null == str || str.length() < 1)
-			if (null == str || str.length() < 1)
-				return isDefaultValueToUpperCaseFirstOne ? toLowerCaseFirstOne(defaultValue) : defaultValue;
-		return str;
-	}
-
 	public static void main(String[] args) {
 		System.out.println(Thread.currentThread().getContextClassLoader().getResource(""));
 		// int a = (Integer) ConverType.newInstance.convery(1);

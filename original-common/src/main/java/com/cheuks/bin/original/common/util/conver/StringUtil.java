@@ -63,10 +63,57 @@ public class StringUtil extends ConverType {
 		return count;
 	}
 
+	public String toUpperCaseFirstOne(String name) {
+		char[] ch = name.toCharArray();
+		ch[0] = Character.toUpperCase(ch[0]);
+		return new String(ch);
+	}
+
+	public String toLowerCaseFirstOne(String name) {
+		if (name.length() < 1)
+			return name;
+		char[] ch = name.toCharArray();
+		ch[0] = Character.toLowerCase(ch[0]);
+		return new String(ch);
+	}
+
+	public boolean isEmpty(String str) {
+		if (null == str || str.length() < 1)
+			return true;
+		return false;
+	}
+
+	public String isEmpty(String str, String defaultValue) {
+		if (null == str || str.length() < 1)
+			return defaultValue;
+		return str;
+	}
+
+	public String isEmpty(String str, String defaultValue, boolean isDefaultValueToUpperCaseFirstOne) {
+		if (null == str || str.length() < 1)
+			if (null == str || str.length() < 1)
+				return isDefaultValueToUpperCaseFirstOne ? toLowerCaseFirstOne(defaultValue) : defaultValue;
+		return str;
+	}
+
+	/***
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public String toLowerCaseUnderscoreCamel(String str) {
+		if (isEmpty(str))
+			return "";
+		StringBuilder result = new StringBuilder();
+		for (Character item : str.toCharArray()) {
+			result.append((65 <= item && 90 >= item) ? "_" + (char) (item + 32) : item);
+		}
+		return result.toString();
+	}
+
 	public static void main(String[] args) {
 		System.out.println(StringUtil.newInstance().concatCount(
-				"file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua",
-				".jar!"));
+				"file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua", ".jar!"));
 
 		String a = "file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua";
 		String[] as = a.split("!");

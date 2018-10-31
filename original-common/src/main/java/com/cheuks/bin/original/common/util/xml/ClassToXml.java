@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
 import com.cheuks.bin.original.common.util.conver.CollectionUtil;
+import com.cheuks.bin.original.common.util.conver.StringUtil;
 import com.cheuks.bin.original.common.util.reflection.ClassInfo;
 import com.cheuks.bin.original.common.util.reflection.FieldInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionCache;
@@ -49,14 +50,19 @@ public class ClassToXml {
 	public String toXml() throws Throwable {
 		//		return recursion(this, null, null);
 		StringBuilder result = new StringBuilder();
-		recursion(this, result);
+		recursion(this, result, false);
 		return result.toString();
 	}
 
 	public String toXml(Object o) throws Throwable {
 		//		return recursion(o, null, null);
+		return toXml(o, false);
+	}
+
+	public String toXml(Object o, boolean underscoreCamel) throws Throwable {
+		//		return recursion(o, null, null);
 		StringBuilder result = new StringBuilder();
-		recursion(o, result);
+		recursion(o, result, underscoreCamel);
 		return result.toString();
 	}
 
@@ -97,7 +103,7 @@ public class ClassToXml {
 		return result.toString();
 	}
 
-	private void recursion(final Object o, final StringBuilder result) throws Throwable {
+	private void recursion(final Object o, final StringBuilder result, boolean underscoreCamel) throws Throwable {
 		if (null == result)
 			return;
 		ClassInfo classInfo = ClassInfo.getClassInfo(o.getClass());
@@ -114,13 +120,14 @@ public class ClassToXml {
 		for (Entry<String, FieldInfo> en : fields.entrySet()) {
 			field = en.getValue().getField();
 			tagName = en.getValue().getAliasOrFieldName();
+			tagName = underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(tagName) : tagName;
 			result.append("<").append(tagName).append(">");
 			tempValue = field.get(o);
 			if (null == tempValue)
 				continue;
 			subClassInfo = ClassInfo.getClassInfo(tempValue.getClass());
 			if (subClassInfo.isMapOrSetOrCollection()) {
-				recursionSub(tagName, tempValue, result);
+				recursionSub(tagName, tempValue, result, underscoreCamel);
 			} else if (null != tempValue) {
 				result.append("<![CDATA[").append(tempValue).append("]]>");
 			}
@@ -128,7 +135,7 @@ public class ClassToXml {
 		}
 	}
 
-	private void recursionSub(final String tagName, final Object value, final StringBuilder result) throws Throwable {
+	private void recursionSub(final String tagName, final Object value, final StringBuilder result, boolean underscoreCamel) throws Throwable {
 		boolean hasTagName = null != tagName;
 		Map<?, ?> map = null;
 		Object tempSubValue;
@@ -171,11 +178,11 @@ public class ClassToXml {
 			subClassInfo = ClassInfo.getClassInfo(tempSubValue.getClass());
 
 			if (subClassInfo.isMapOrSetOrCollection()) {
-				recursionSub(hasTagName ? null : subTagName, tempSubValue, result);
+				recursionSub(hasTagName ? null : subTagName, tempSubValue, result, underscoreCamel);
 			} else if (subClassInfo.isBasicOrArrays()) {
-				result.append(currentClassInfo.isMap() ? "<" + subTagName + "><![CDATA[" + tempSubValue + "]]></" + subTagName + ">" : "<" + tagName + "><![CDATA[" + tempSubValue + "]]></" + tagName + ">");
+				result.append(currentClassInfo.isMap() ? "<" + (subTagName = underscoreCamel ? StringUtil.newInstance().toUpperCaseFirstOne(subTagName) : subTagName) + "><![CDATA[" + tempSubValue + "]]></" + subTagName + ">" : "<" + tagName + "><![CDATA[" + tempSubValue + "]]></" + tagName + ">");
 			} else {
-				recursion(tempSubValue, result);
+				recursion(tempSubValue, result, underscoreCamel);
 			}
 		}
 	}
