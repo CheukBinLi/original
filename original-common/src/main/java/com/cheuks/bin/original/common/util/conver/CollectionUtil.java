@@ -46,7 +46,7 @@ public class CollectionUtil {
 		}
 		return result;
 	}
-	
+
 	@SafeVarargs
 	public static <K, V> Map<K, V> collage(Map<K, V>... maps) {
 		Map<K, V> result = null;
@@ -75,7 +75,7 @@ public class CollectionUtil {
 	}
 
 	public boolean isEmpty(Map<?, ?> map) {
-		return null != map && map.size() > 0;
+		return null == map || map.size() == 0;
 	}
 
 	public boolean isNotEmpty(Object... o) {
