@@ -61,6 +61,10 @@ public class ObjectFill {
 	}
 
 	public static final Map<String, Object> objectToMap(Object o, boolean useAlias, String... ignore) throws IllegalArgumentException, IllegalAccessException {
+		return objectToMap(o, false, false, ignore);
+	}
+
+	public static final Map<String, Object> objectToMap(Object o, boolean withOutNull, boolean useAlias, String... ignore) throws IllegalArgumentException, IllegalAccessException {
 		if (!FIELDS.containsKey(o.getClass().getName()))
 			scanClass(o.getClass());
 		Map<String, Field> fields = FIELDS.get(o.getClass().getName());
@@ -71,8 +75,9 @@ public class ObjectFill {
 		if (null != ignore && ignore.length > 0) {
 			ignoreField = new HashSet<String>(Arrays.asList(ignore));
 		}
+		Object value = null;
 		for (Entry<String, Field> en : fields.entrySet()) {
-			if (null != ignoreField && ignoreField.contains(en.getKey())) {
+			if ((null == (value = en.getValue().get(o)) && withOutNull) || null != ignoreField && ignoreField.contains(en.getKey())) {
 				continue;
 			}
 			if (useAlias) {
@@ -84,7 +89,7 @@ public class ObjectFill {
 			} else {
 				name = en.getKey();
 			}
-			result.put(name, en.getValue().get(o));
+			result.put(name, value);
 		}
 		return result;
 	}
@@ -100,8 +105,9 @@ public class ObjectFill {
 		if (null != ignore && ignore.length > 0) {
 			ignoreField = new HashSet<String>(Arrays.asList(ignore));
 		}
+		String value;
 		for (Entry<String, Field> en : fields.entrySet()) {
-			if (null != ignoreField && ignoreField.contains(en.getKey())) {
+			if (null == (value = en.getValue().get(o).toString()) || null != ignoreField && ignoreField.contains(en.getKey())) {
 				continue;
 			}
 			if (useAlias) {
@@ -109,11 +115,11 @@ public class ObjectFill {
 				if (null != alias) {
 					name = alias.value();
 					name = name.length() > 0 ? name : en.getKey();
-					result.append("&").append(name).append("=").append(en.getValue().get(o));
+					result.append("&").append(name).append("=").append(value);
 				}
 				continue;
 			} else {
-				result.append("&").append(en.getKey()).append("=").append(en.getValue().get(o));
+				result.append("&").append(en.getKey()).append("=").append(value);
 			}
 		}
 		return result.length() > 0 ? result.substring(1) : "";
@@ -128,11 +134,12 @@ public class ObjectFill {
 		if (null != ignore && ignore.length > 0) {
 			ignoreField = new HashSet<String>(Arrays.asList(ignore));
 		}
+		String value;
 		for (Entry<String, Field> en : fields.entrySet()) {
-			if (null != ignoreField && ignoreField.contains(en.getKey())) {
+			if (null == (value = en.getValue().get(o).toString()) || null != ignoreField && ignoreField.contains(en.getKey())) {
 				continue;
 			}
-			result.append("&").append(underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(en.getKey()) : en.getKey()).append("=").append(en.getValue().get(o));
+			result.append("&").append(underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(en.getKey()) : en.getKey()).append("=").append(value);
 
 		}
 		return result.length() > 0 ? result.substring(1) : "";
