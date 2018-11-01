@@ -174,7 +174,7 @@ public class JsonMapper {
 				}
 				subClassInfo = ClassInfo.getClassInfo(tempValue.getClass());
 				if (LOG.isDebugEnabled())
-					LOG.debug("field:{} type:{}", tagName, subClassInfo.getClazz().getName());
+					LOG.debug("field:{} type:{}", tagName, subClassInfo.getClazz());
 				if (subClassInfo.isMapOrSetOrCollection()) {
 					recursionSub(tagName, tempValue, result, filterProvider, withAlias, withOutTransient, filterSpecialCharacters);
 				} else if (subClassInfo.isBasicOrArrays()) {
