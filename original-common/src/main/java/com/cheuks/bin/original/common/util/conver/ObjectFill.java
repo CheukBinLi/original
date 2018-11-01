@@ -56,18 +56,25 @@ public class ObjectFill {
 		return fillObject(t.newInstance(), data);
 	}
 
-	public static final Map<String, Object> objectToMap(Object o) throws IllegalArgumentException, IllegalAccessException {
-		return objectToMap(o, false);
+	public static final Map<String, Object> objectToMap(Object o, String... ignore) throws IllegalArgumentException, IllegalAccessException {
+		return objectToMap(o, false, ignore);
 	}
 
-	public static final Map<String, Object> objectToMap(Object o, boolean useAlias) throws IllegalArgumentException, IllegalAccessException {
+	public static final Map<String, Object> objectToMap(Object o, boolean useAlias, String... ignore) throws IllegalArgumentException, IllegalAccessException {
 		if (!FIELDS.containsKey(o.getClass().getName()))
 			scanClass(o.getClass());
 		Map<String, Field> fields = FIELDS.get(o.getClass().getName());
 		Map<String, Object> result = new HashMap<String, Object>();
 		Alias alias;
 		String name = null;
+		Set<String> ignoreField = null;
+		if (null != ignore && ignore.length > 0) {
+			ignoreField = new HashSet<String>(Arrays.asList(ignore));
+		}
 		for (Entry<String, Field> en : fields.entrySet()) {
+			if (null != ignoreField && ignoreField.contains(en.getKey())) {
+				continue;
+			}
 			if (useAlias) {
 				alias = en.getValue().getAnnotation(Alias.class);
 				if (null != alias) {
@@ -82,14 +89,21 @@ public class ObjectFill {
 		return result;
 	}
 
-	public static final String objectToUrlParams(Object o, boolean useAlias) throws IllegalArgumentException, IllegalAccessException {
+	public static final String objectToUrlParams(Object o, boolean useAlias, String... ignore) throws IllegalArgumentException, IllegalAccessException {
 		if (!FIELDS.containsKey(o.getClass().getName()))
 			scanClass(o.getClass());
 		Map<String, Field> fields = FIELDS.get(o.getClass().getName());
 		StringBuilder result = new StringBuilder();
 		Alias alias;
 		String name = null;
+		Set<String> ignoreField = null;
+		if (null != ignore && ignore.length > 0) {
+			ignoreField = new HashSet<String>(Arrays.asList(ignore));
+		}
 		for (Entry<String, Field> en : fields.entrySet()) {
+			if (null != ignoreField && ignoreField.contains(en.getKey())) {
+				continue;
+			}
 			if (useAlias) {
 				alias = en.getValue().getAnnotation(Alias.class);
 				if (null != alias) {
@@ -105,12 +119,19 @@ public class ObjectFill {
 		return result.length() > 0 ? result.substring(1) : "";
 	}
 
-	public static final String objectCaseUnderscoreCamelToUrlParams(Object o, boolean underscoreCamel) throws IllegalArgumentException, IllegalAccessException {
+	public static final String objectCaseUnderscoreCamelToUrlParams(Object o, boolean underscoreCamel, String... ignore) throws IllegalArgumentException, IllegalAccessException {
 		if (!FIELDS.containsKey(o.getClass().getName()))
 			scanClass(o.getClass());
 		Map<String, Field> fields = FIELDS.get(o.getClass().getName());
 		StringBuilder result = new StringBuilder();
+		Set<String> ignoreField = null;
+		if (null != ignore && ignore.length > 0) {
+			ignoreField = new HashSet<String>(Arrays.asList(ignore));
+		}
 		for (Entry<String, Field> en : fields.entrySet()) {
+			if (null != ignoreField && ignoreField.contains(en.getKey())) {
+				continue;
+			}
 			result.append("&").append(underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(en.getKey()) : en.getKey()).append("=").append(en.getValue().get(o));
 
 		}
