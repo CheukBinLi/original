@@ -22,15 +22,15 @@ public class ObjectFill {
 
 	protected final static Map<String, Map<String, Field>> FIELDS = new ConcurrentSkipListMap<String, Map<String, Field>>();
 
-	private volatile SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private volatile SimpleDateFormat dateFormatShort = new SimpleDateFormat("yyyy-MM-dd");
+	private static volatile SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static volatile SimpleDateFormat dateFormatShort = new SimpleDateFormat("yyyy-MM-dd");
 
 	public ObjectFill setDateFormat(String format) {
 		dateFormat.applyPattern(format);
 		return this;
 	}
 
-	public void scanClass(Class<?> c) {
+	public static void scanClass(Class<?> c) {
 		// FIELDS.put(c, fieldsConvertMap(c.getDeclaredFields()));
 		try {
 			FIELDS.put(c.getName(), ReflectionUtil.instance().scanClassField4Map(c, true, false, false, true));
@@ -48,19 +48,19 @@ public class ObjectFill {
 	// return map;
 	// }
 
-	public final <T> T fillObject(Class<T> t, Map<String, ?> data, DateFormat dateFormat) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
+	public static final <T> T fillObject(Class<T> t, Map<String, ?> data, DateFormat dateFormat) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
 		return fillObject(t.newInstance(), data, dateFormat);
 	}
 
-	public final <T> T fillObject(Class<T> t, Map<String, ?> data) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
+	public static final <T> T fillObject(Class<T> t, Map<String, ?> data) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
 		return fillObject(t.newInstance(), data);
 	}
 
-	public final Map<String, Object> objectToMap(Object o) throws IllegalArgumentException, IllegalAccessException {
+	public static final Map<String, Object> objectToMap(Object o) throws IllegalArgumentException, IllegalAccessException {
 		return objectToMap(o, false);
 	}
 
-	public final Map<String, Object> objectToMap(Object o, boolean useAlias) throws IllegalArgumentException, IllegalAccessException {
+	public static final Map<String, Object> objectToMap(Object o, boolean useAlias) throws IllegalArgumentException, IllegalAccessException {
 		if (!FIELDS.containsKey(o.getClass().getName()))
 			scanClass(o.getClass());
 		Map<String, Field> fields = FIELDS.get(o.getClass().getName());
@@ -82,7 +82,7 @@ public class ObjectFill {
 		return result;
 	}
 
-	public final String objectToUrlParams(Object o, boolean useAlias) throws IllegalArgumentException, IllegalAccessException {
+	public static final String objectToUrlParams(Object o, boolean useAlias) throws IllegalArgumentException, IllegalAccessException {
 		if (!FIELDS.containsKey(o.getClass().getName()))
 			scanClass(o.getClass());
 		Map<String, Field> fields = FIELDS.get(o.getClass().getName());
@@ -105,11 +105,23 @@ public class ObjectFill {
 		return result.length() > 0 ? result.substring(1) : "";
 	}
 
-	public final <T> T fillObject(T t, Map<String, ?> data) throws IllegalArgumentException, IllegalAccessException {
+	public static final String objectCaseUnderscoreCamelToUrlParams(Object o, boolean underscoreCamel) throws IllegalArgumentException, IllegalAccessException {
+		if (!FIELDS.containsKey(o.getClass().getName()))
+			scanClass(o.getClass());
+		Map<String, Field> fields = FIELDS.get(o.getClass().getName());
+		StringBuilder result = new StringBuilder();
+		for (Entry<String, Field> en : fields.entrySet()) {
+			result.append("&").append(underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(en.getKey()) : en.getKey()).append("=").append(en.getValue().get(o));
+
+		}
+		return result.length() > 0 ? result.substring(1) : "";
+	}
+
+	public static final <T> T fillObject(T t, Map<String, ?> data) throws IllegalArgumentException, IllegalAccessException {
 		return fillObject(t, data, null);
 	}
 
-	public final <T> T fillObject(T t, Map<String, ?> data, DateFormat dateFormat) throws IllegalArgumentException, IllegalAccessException {
+	public static final <T> T fillObject(T t, Map<String, ?> data, DateFormat dateFormat) throws IllegalArgumentException, IllegalAccessException {
 		// System.out.println(t.getClass());
 		Class<?> c = t.getClass();
 		if (!FIELDS.containsKey(c.getName()))
@@ -130,7 +142,7 @@ public class ObjectFill {
 		return t;
 	}
 
-	public Object getValue(Class<?> c, Object data, DateFormat dateFormat) {
+	public static Object getValue(Class<?> c, Object data, DateFormat dateFormat) {
 		String simpleName = c.getSimpleName();
 		boolean isArray = data.getClass().isArray();
 		try {
@@ -164,19 +176,19 @@ public class ObjectFill {
 		}
 	}
 
-	Date stringToDate(String date, DateFormat dateFormat) {
+	static Date stringToDate(String date, DateFormat dateFormat) {
 		Date result = null;
 		try {
 			if (null != dateFormat)
 				result = dateFormat.parse(date);
 			else
-				result = this.dateFormat.parse(date);
+				result = ObjectFill.dateFormat.parse(date);
 		} catch (ParseException e) {
 			try {
 				if (null != dateFormat)
-					result = this.dateFormat.parse(date);
+					result = ObjectFill.dateFormat.parse(date);
 				else
-					result = this.dateFormatShort.parse(date);
+					result = ObjectFill.dateFormatShort.parse(date);
 			} catch (ParseException e1) {
 				return null;
 			}
@@ -188,7 +200,7 @@ public class ObjectFill {
 		return getValue(c, data, dateFormat);
 	}
 
-	private String getFirstValue(boolean isArray, Object data) {
+	private static String getFirstValue(boolean isArray, Object data) {
 		return isArray ? ((String[]) data)[0] : data.toString();
 	}
 
