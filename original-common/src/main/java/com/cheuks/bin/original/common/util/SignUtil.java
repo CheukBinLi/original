@@ -36,11 +36,11 @@ public class SignUtil {
 	 * @throws Exception
 	 */
 	public static String generateSignature(final Map<String, Object> data, String head, String tail, SignType signType, String key, boolean underscoreCamel, String... ignores) throws Exception {
-		return generateSignature(data, head, tail, signType, key, underscoreCamel, "=", "&", ignores);
+		return generateSignature(data, head, tail, signType, key, "=", "&", underscoreCamel, ignores);
 
 	}
 
-	public static String generateSignature(final Map<String, Object> data, String head, String tail, SignType signType, String key, boolean underscoreCamel, String assignmentCharacter, String linkCharacter, String... ignores) throws Exception {
+	public static String generateSignature(final Map<String, Object> data, String head, String tail, SignType signType, String key, String assignmentCharacter, String linkCharacter, boolean underscoreCamel, String... ignores) throws Exception {
 		Set<String> keySet = data.keySet();
 		Set<String> ignore = (null == ignores || ignores.length < 1) ? null : new HashSet<>(Arrays.asList(ignores));
 		String[] keyArray = keySet.toArray(new String[keySet.size()]);
