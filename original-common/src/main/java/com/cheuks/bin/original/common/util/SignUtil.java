@@ -54,7 +54,7 @@ public class SignUtil {
 			if (null == (value = data.get(k)) || (null != ignore && ignore.contains(k))) {
 				continue;
 			}
-			sb.append(underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(k) : k).append("=").append(value.toString().trim()).append("&");
+			sb.append(underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(k) : k).append(assignmentCharacter).append(value.toString().trim()).append(linkCharacter);
 		}
 		if (StringUtil.newInstance().isEmpty(tail)) {
 			sb.setLength(sb.length() - (null == linkCharacter ? 0 : linkCharacter.length()));
