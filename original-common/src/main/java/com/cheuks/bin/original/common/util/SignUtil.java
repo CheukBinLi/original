@@ -36,11 +36,11 @@ public class SignUtil {
 	 * @throws Exception
 	 */
 	public static String generateSignature(final Map<String, Object> data, String head, String tail, SignType signType, String key, boolean underscoreCamel, String... ignores) throws Exception {
-		return generateSignature(data, head, tail, signType, key, null, null, underscoreCamel, true, ignores);
+		return generateSignature(data, head, tail, signType, key, null, null, underscoreCamel, ignores);
 
 	}
 
-	public static String generateSignature(final Map<String, Object> data, String head, String tail, SignType signType, String key, String assignmentCharacter, String linkCharacter, boolean underscoreCamel, boolean toUpperCase, String... ignores) throws Exception {
+	public static String generateSignature(final Map<String, Object> data, String head, String tail, SignType signType, String key, String assignmentCharacter, String linkCharacter, boolean underscoreCamel, String... ignores) throws Exception {
 		Set<String> keySet = data.keySet();
 		Set<String> ignore = (null == ignores || ignores.length < 1) ? null : new HashSet<>(Arrays.asList(ignores));
 		String[] keyArray = keySet.toArray(new String[keySet.size()]);
@@ -62,15 +62,15 @@ public class SignUtil {
 			sb.append(tail);
 		}
 		if (SignType.MD5.equals(signType)) {
-			return toUpperCase ? MD5(sb.toString()).toUpperCase() : MD5(sb.toString());
+			return MD5(sb.toString()).toUpperCase();
 		} else if (SignType.HMACSHA256.equals(signType)) {
-			return HMACSHA256(sb.toString(), key, toUpperCase);
+			return HMACSHA256(sb.toString(), key);
 		} else {
 			throw new Exception(String.format("Invalid sign_type: %s", signType));
 		}
 	}
 
-	public static String HMACSHA256(String data, String key, boolean toUpperCase) throws Exception {
+	public static String HMACSHA256(String data, String key) throws Exception {
 		Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
 		SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
 		sha256_HMAC.init(secret_key);
@@ -79,7 +79,7 @@ public class SignUtil {
 		for (byte item : array) {
 			sb.append(Integer.toHexString((item & 0xFF) | 0x100).substring(1, 3));
 		}
-		return toUpperCase ? sb.toString().toUpperCase() : sb.toString();
+		return sb.toString().toUpperCase();
 	}
 
 	public static String MD5(String data) throws Exception {
