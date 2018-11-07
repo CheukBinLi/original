@@ -55,7 +55,7 @@ public class SignUtil {
 			sb.append(underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(k) : k).append("=").append(value.toString().trim()).append("&");
 		}
 		if (StringUtil.newInstance().isEmpty(tail)) {
-			sb.setLength(sb.length() - 1);
+			sb.setLength(sb.length() - (null == linkCharacter ? 0 : linkCharacter.length()));
 		} else {
 			sb.append(tail);
 		}
