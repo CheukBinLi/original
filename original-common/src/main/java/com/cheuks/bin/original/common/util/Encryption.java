@@ -40,6 +40,17 @@ public class Encryption {
 			MD5.reset();
 		}
 	}
+	
+	public synchronized String MD5(byte[] bt) {
+		String strDes = null;
+		try {
+			MD5.update(bt);
+			strDes = bytes2Hex(MD5.digest()); // to HexString
+			return strDes;
+		} finally {
+			MD5.reset();
+		}
+	}
 
 	private String bytes2Hex(byte[] bts) {
 		StringBuffer des = new StringBuffer();

@@ -83,7 +83,7 @@ public class CollectionUtil {
 	}
 
 	public boolean isEmpty(Object... o) {
-		return null != o && o.length > 0;
+		return null == o || o.length < 1;
 	}
 
 	public static void main(String[] args) {

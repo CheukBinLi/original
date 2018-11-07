@@ -12,15 +12,12 @@ import java.util.Map.Entry;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import com.cheuks.bin.original.common.util.conver.CollectionUtil;
+
 public class HttpClientUtil {
 
 	public static enum RequestMethod {
-										POST,
-										DELETE,
-										PUT,
-										GET,
-										HEAD,
-										Options
+		POST, DELETE, PUT, GET, HEAD, Options
 	}
 
 	protected HttpClientUtil() {
@@ -98,6 +95,69 @@ public class HttpClientUtil {
 			in = con.getInputStream();
 			while ((bytes = in.read(bufferOut)) != -1) {
 				result.write(bufferOut, 0, bytes);
+			}
+			in.close();
+		} finally {
+			if (null != con)
+				con.disconnect();
+		}
+		return result;
+	}
+
+	public HttpResponseModel dataFrom(String url, Map<String, Object> params, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws Exception {
+		ByteArrayOutputStream out;
+		HttpResponseModel result;
+		URL urlObj = new URL(url);
+		boolean isHttps = url.toLowerCase().contains("https:");
+		HttpURLConnection con = null;
+		InputStream in;
+		try {
+			if (isHttps)
+				con = (HttpsURLConnection) urlObj.openConnection();
+			else
+				con = (HttpURLConnection) urlObj.openConnection();
+			con.setRequestMethod("POST");
+			con.setDoInput(true);
+			con.setDoOutput(true);
+			con.setUseCaches(false);
+			con.setRequestProperty("Connection", "Keep-Alive");
+			con.setRequestProperty("Charset", "UTF-8");
+			if (null != header) {
+				for (Entry<String, String> item : header.entrySet()) {
+					con.setRequestProperty(item.getKey(), item.getValue());
+				}
+			}
+			String BOUNDARY = "" + System.currentTimeMillis();
+			con.setRequestProperty("Content-Type", "multipart/form-data; boundary=----" + BOUNDARY);
+			con.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8");
+			con.setRequestProperty("Accept", "*/*");
+			con.setRequestProperty("Range", "bytes=" + "");
+			StringBuilder sb = new StringBuilder();
+
+			if (!CollectionUtil.newInstance().isEmpty(params)) {
+				params.forEach((k, v) -> {
+					sb.append("------").append(BOUNDARY).append("\r\n");
+					sb.append("Content-Disposition: form-data; name=\"");
+					sb.append(k);
+					sb.append("\"\r\n\r\n");
+					sb.append(v.toString());
+					sb.append("\r\n");
+				});
+			}
+			sb.append("------").append(BOUNDARY).append("--\r\n");
+			OutputStream outWriter = new DataOutputStream(con.getOutputStream());
+			outWriter.write(sb.toString().getBytes("utf-8"));
+			outWriter.flush();
+			outWriter.close();
+
+			result = new HttpResponseModel(con.getResponseCode(), onlyResponseData ? null : con.getHeaderFields(), out = new ByteArrayOutputStream());
+			if (onlyRequest)
+				return result;
+			int bytes = 0;
+			byte[] bufferOut = new byte[1024];
+			in = con.getInputStream();
+			while ((bytes = in.read(bufferOut)) != -1) {
+				out.write(bufferOut, 0, bytes);
 			}
 			in.close();
 		} finally {
@@ -240,5 +300,4 @@ public class HttpClientUtil {
 		}
 		return result;
 	}
-
 }
