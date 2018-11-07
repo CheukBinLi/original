@@ -36,7 +36,7 @@ public class SignUtil {
 	 * @throws Exception
 	 */
 	public static String generateSignature(final Map<String, Object> data, String head, String tail, SignType signType, String key, boolean underscoreCamel, String... ignores) throws Exception {
-		return generateSignature(data, head, tail, signType, key, "=", "&", underscoreCamel, ignores);
+		return generateSignature(data, head, tail, signType, key, null, null, underscoreCamel, ignores);
 
 	}
 
@@ -44,6 +44,8 @@ public class SignUtil {
 		Set<String> keySet = data.keySet();
 		Set<String> ignore = (null == ignores || ignores.length < 1) ? null : new HashSet<>(Arrays.asList(ignores));
 		String[] keyArray = keySet.toArray(new String[keySet.size()]);
+		assignmentCharacter = null == assignmentCharacter ? "=" : assignmentCharacter;
+		linkCharacter = null == linkCharacter ? "&" : linkCharacter;
 		Arrays.sort(keyArray);
 		StringBuilder sb = new StringBuilder(StringUtil.newInstance().isEmpty(head) ? "" : head);
 		Object value;
