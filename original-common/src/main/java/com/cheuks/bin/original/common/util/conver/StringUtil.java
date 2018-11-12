@@ -129,6 +129,26 @@ public class StringUtil extends ConverType {
 		return result.toString();
 	}
 
+	public Long[] converLongs(String... strs) {
+		if (null == strs || strs.length < 1)
+			return new Long[0];
+		Long[] result = new Long[strs.length];
+		for (int i = 0, len = strs.length; i < len; i++) {
+			result[i] = Long.valueOf(Long.valueOf(strs[i]));
+		}
+		return result;
+	}
+
+	public Integer[] converIntegers(String... strs) {
+		if (null == strs || strs.length < 1)
+			return new Integer[0];
+		Integer[] result = new Integer[strs.length];
+		for (int i = 0, len = strs.length; i < len; i++) {
+			result[i] = Integer.valueOf(Integer.valueOf(strs[i]));
+		}
+		return result;
+	}
+	
 	public static void main(String[] args) {
 		System.out.println(StringUtil.newInstance().concatCount(
 				"file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua", ".jar!"));
@@ -137,7 +157,7 @@ public class StringUtil extends ConverType {
 		String[] as = a.split("!");
 		System.err.println(Arrays.toString(as));
 		System.out.println(a.substring(a.lastIndexOf(".jar!") + 5));
-		
+
 		System.out.println(new StringUtil().toLowerUnderscoreCaseCamel("a_abcde_fghijk_"));
 
 	}
