@@ -104,7 +104,7 @@ public class HttpClientUtil {
 		return result;
 	}
 
-	public HttpResponseModel dataFrom(String url, Map<String, Object> params, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws Exception {
+	public HttpResponseModel fromData(String url, Map<String, Object> params, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws Exception {
 		ByteArrayOutputStream out;
 		HttpResponseModel result;
 		URL urlObj = new URL(url);
