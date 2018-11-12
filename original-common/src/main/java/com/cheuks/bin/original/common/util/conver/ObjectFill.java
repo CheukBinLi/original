@@ -65,6 +65,10 @@ public class ObjectFill {
 	}
 
 	public static final Map<String, Object> objectToMap(Object o, boolean withOutNull, boolean useAlias, String... ignore) throws IllegalArgumentException, IllegalAccessException {
+		return objectToMap(o, withOutNull, useAlias, false, ignore);
+	}
+
+	public static final Map<String, Object> objectToMap(Object o, boolean withOutNull, boolean useAlias, boolean UnderscoreCamel, String... ignore) throws IllegalArgumentException, IllegalAccessException {
 		if (!FIELDS.containsKey(o.getClass().getName()))
 			scanClass(o.getClass());
 		Map<String, Field> fields = FIELDS.get(o.getClass().getName());
@@ -89,7 +93,7 @@ public class ObjectFill {
 			} else {
 				name = en.getKey();
 			}
-			result.put(name, value);
+			result.put(UnderscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(name) : name, value);
 		}
 		return result;
 	}
