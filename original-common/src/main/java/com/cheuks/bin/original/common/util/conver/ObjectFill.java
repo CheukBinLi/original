@@ -89,6 +89,8 @@ public class ObjectFill {
 				if (null != alias) {
 					name = alias.value();
 					name = name.length() > 0 ? name : en.getKey();
+				} else {
+					name = en.getKey();
 				}
 			} else {
 				name = en.getKey();
