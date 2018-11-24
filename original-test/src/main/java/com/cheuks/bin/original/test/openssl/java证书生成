@@ -1,0 +1,7 @@
+1生成私钥：
+openssl genrsa -out rsa_private_key.pem -passout pass:123456 -des3 1024
+
+2根据私钥生成公钥：
+openssl rsa -in rsa_private_key.pem -out rsa_public_key.pem  -pubout
+3 java证书
+openssl pkcs8 -topk8 -in rsa_private_key.pem -out pkcs8_rsa_private_key.pem –nocrypt
