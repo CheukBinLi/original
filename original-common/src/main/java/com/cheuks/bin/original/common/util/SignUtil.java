@@ -40,6 +40,25 @@ public class SignUtil {
 
 	}
 
+	public static String paramSort(final Map<String, Object> data, String head, String tail, String assignmentCharacter, String linkCharacter, boolean underscoreCamel, String... ignores) throws Exception {
+		Set<String> keySet = data.keySet();
+		Set<String> ignore = (null == ignores || ignores.length < 1) ? null : new HashSet<>(Arrays.asList(ignores));
+		String[] keyArray = keySet.toArray(new String[keySet.size()]);
+		assignmentCharacter = null == assignmentCharacter ? "=" : assignmentCharacter;
+		linkCharacter = null == linkCharacter ? "&" : linkCharacter;
+		Arrays.sort(keyArray);
+		StringBuilder sb = new StringBuilder();
+		Object value;
+		for (String k : keyArray) {
+			// 参数值为空，则不参与签名
+			if (null == (value = data.get(k)) || (null != ignore && ignore.contains(k))) {
+				continue;
+			}
+			sb.append(linkCharacter).append(underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(k) : k).append(assignmentCharacter).append(value.toString().trim());
+		}
+		return StringUtil.newInstance().isEmpty(head, "") + (sb.length() > 0 ? sb.substring(linkCharacter.length()) : "") + StringUtil.newInstance().isEmpty(tail, "");
+	}
+
 	public static String generateSignature(final Map<String, Object> data, String head, String tail, SignType signType, String key, String assignmentCharacter, String linkCharacter, boolean underscoreCamel, String... ignores) throws Exception {
 		Set<String> keySet = data.keySet();
 		Set<String> ignore = (null == ignores || ignores.length < 1) ? null : new HashSet<>(Arrays.asList(ignores));
@@ -47,7 +66,7 @@ public class SignUtil {
 		assignmentCharacter = null == assignmentCharacter ? "=" : assignmentCharacter;
 		linkCharacter = null == linkCharacter ? "&" : linkCharacter;
 		Arrays.sort(keyArray);
-		StringBuilder sb = new StringBuilder(StringUtil.newInstance().isEmpty(head) ? "" : head);
+		StringBuilder sb = new StringBuilder(StringUtil.newInstance().isEmpty(head, ""));
 		Object value;
 		for (String k : keyArray) {
 			// 参数值为空，则不参与签名
@@ -56,7 +75,7 @@ public class SignUtil {
 			}
 			sb.append(underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(k) : k).append(assignmentCharacter).append(value.toString().trim()).append(linkCharacter);
 		}
-		if(!StringUtil.newInstance().isEmpty(key)) {
+		if (!StringUtil.newInstance().isEmpty(key)) {
 			sb.append("key").append(assignmentCharacter).append(key).append(linkCharacter);
 		}
 		if (StringUtil.newInstance().isEmpty(tail)) {
