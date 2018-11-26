@@ -81,4 +81,15 @@ public class FilterProvider {
 		}
 		return defaultFormat;
 	}
+
+	public static ReplaceProvider getCurrentReplaceProvider(String name, Filter filter) {
+		if (null == name || null == filter)
+			return null;
+		//		for (Filter filter : filters) {
+		//			if (null == filter || filter.getReplaces().isEmpty()) {
+		//				continue;
+		//			}
+		//		}
+		return filter.getReplaces().get(name);
+	}
 }

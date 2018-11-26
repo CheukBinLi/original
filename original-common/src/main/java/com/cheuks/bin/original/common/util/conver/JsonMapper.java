@@ -123,7 +123,7 @@ public class JsonMapper {
 		StringBuilder result;
 		if (classInfo.isBasicOrArrays()) {
 			/** 基本类型 */
-			return brackets ? "{\"" + Type.valueToString(o, classInfo, filterSpecialCharacters) + "\"}" : "\"" + Type.valueToString(o, classInfo, filterSpecialCharacters) + "\"";
+			return brackets ? "{\"" + Type.valueToString(o, classInfo, null, filterSpecialCharacters) + "\"}" : "\"" + Type.valueToString(o, classInfo, null, filterSpecialCharacters) + "\"";
 		} else if (classInfo.isDate()) {
 			/** 日期 */
 			return brackets ? "{\"" + defaultFormat.format(o) + "\"}" : "\"" + defaultFormat.format(o) + "\"";
@@ -150,7 +150,7 @@ public class JsonMapper {
 		Filter filterAll = null == filterProvider ? null : filterProvider.getFilterByClass(null);
 		if (null == o || currentClassInfo.isBasicOrArrays()) {
 			/** 基本类型 */
-			result.append(Type.valueToString(o, currentClassInfo, filterSpecialCharacters));
+			result.append(Type.valueToString(o, currentClassInfo, null, filterSpecialCharacters));
 			return;
 		} else if (currentClassInfo.isDate()) {
 			/** 日期 */
@@ -178,7 +178,7 @@ public class JsonMapper {
 				if (subClassInfo.isMapOrSetOrCollection()) {
 					recursionSub(tagName, tempValue, result, filterProvider, withAlias, withOutTransient, filterSpecialCharacters);
 				} else if (subClassInfo.isBasicOrArrays()) {
-					result.append(Type.valueToJson(tagName, tempValue, FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll), subClassInfo, filterSpecialCharacters));
+					result.append(Type.valueToJson(tagName, tempValue, FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll), subClassInfo, currentClazz.getReplaces().get(tagName), filterSpecialCharacters));
 				} else if (subClassInfo.isDate()) {
 					String valueFormat = FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll);
 					result.append("\"").append(tagName).append("\":\"").append(null == valueFormat ? defaultFormat.format(tempValue) : new SimpleDateFormat(valueFormat).format(tempValue)).append("\"");
@@ -208,6 +208,7 @@ public class JsonMapper {
 		Filter currentClazz = null == filterProvider ? null : filterProvider.getFilterByClass(value.getClass());
 		Filter filterAll = null == filterProvider ? null : filterProvider.getFilterByClass(null);
 		String valueFormat;
+		ReplaceProvider replaceProvider;
 		if (hasTagName)
 			result.append("\"").append(tagName).append("\":");
 		if (currentClassInfo.isMap()) {
@@ -258,7 +259,8 @@ public class JsonMapper {
 				recursionSub(hasTagName ? null : subTagName, tempSubValue, result, filterProvider, withAlias, withOutTransient, filterSpecialCharacters);
 			} else if (subClassInfo.isBasicOrArrays()) {
 				valueFormat = FilterProvider.getCurrentValueFormat(currentClassInfo.isMap() ? subTagName : tagName, currentClazz, filterAll);
-				result.append(currentClassInfo.isMap() ? Type.valueToJson(subTagName, tempSubValue, valueFormat, subClassInfo, filterSpecialCharacters) : Type.valueToString4Json(tempSubValue, valueFormat, subClassInfo, filterSpecialCharacters));
+				replaceProvider = FilterProvider.getCurrentReplaceProvider(currentClassInfo.isMap() ? subTagName : tagName, currentClazz);
+				result.append(currentClassInfo.isMap() ? Type.valueToJson(subTagName, tempSubValue, subClassInfo, replaceProvider, filterSpecialCharacters) : Type.valueToString4Json(tempSubValue, valueFormat, subClassInfo, replaceProvider, filterSpecialCharacters));
 			} else if (subClassInfo.isDate()) {
 				valueFormat = FilterProvider.getCurrentValueFormat(subTagName, currentClazz, filterAll);
 				result.append("\"").append(subTagName).append("\":\"").append(null == valueFormat ? defaultFormat.format(tempSubValue) : new SimpleDateFormat(valueFormat).format(tempSubValue)).append("\"");
