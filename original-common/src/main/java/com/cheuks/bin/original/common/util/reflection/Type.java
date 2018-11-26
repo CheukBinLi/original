@@ -225,7 +225,8 @@ public enum Type {
 	}
 
 	static String stringFormat(String format, String value, ReplaceProvider replaceProvider) {
-		return (null == format || null == value) ? value : String.format(format, null == replaceProvider ? value : replaceProvider.replace(value));
+		value = null == replaceProvider ? value : replaceProvider.replace(value);
+		return (null == format || null == value) ? value : String.format(format, value);
 	}
 
 	public static String valueToJson(String name, final Object value, final ClassInfo field, ReplaceProvider replaceProvider, boolean filterSpecialCharacters) throws IllegalArgumentException, IllegalAccessException {
