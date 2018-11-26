@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Filter {
 
@@ -42,7 +40,7 @@ public class Filter {
 			return this;
 		}
 		if (EMPTY_MAP == this.includes)
-			this.includes = new ConcurrentSkipListMap<String, String>();
+			this.includes = new HashMap<String, String>();
 		int index;
 		for (String item : include) {
 			if ((index = item.indexOf(":")) > 0) {
@@ -59,7 +57,7 @@ public class Filter {
 			return this;
 		}
 		if (EMPTY_SET == this.excepts)
-			this.excepts = new ConcurrentSkipListSet<String>();
+			this.excepts = new HashSet<String>();
 		for (String item : excepts) {
 			this.excepts.add(item);
 		}
@@ -71,7 +69,7 @@ public class Filter {
 			return this;
 		}
 		if (EMPTY_REPLACEP_ROVIDER == this.replaces)
-			this.replaces = new ConcurrentSkipListMap<>();
+			this.replaces = new HashMap<String, ReplaceProvider>();
 		for (ReplaceProvider item : replaceProviders) {
 			this.replaces.put(item.getField(), item);
 		}
