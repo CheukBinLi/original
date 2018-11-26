@@ -178,7 +178,7 @@ public class JsonMapper {
 				if (subClassInfo.isMapOrSetOrCollection()) {
 					recursionSub(tagName, tempValue, result, filterProvider, withAlias, withOutTransient, filterSpecialCharacters);
 				} else if (subClassInfo.isBasicOrArrays()) {
-					result.append(Type.valueToJson(tagName, tempValue, FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll), subClassInfo, currentClazz.getReplaces().get(tagName), filterSpecialCharacters));
+					result.append(Type.valueToJson(tagName, tempValue, FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll), subClassInfo, null == currentClazz ? null : currentClazz.getReplaces().get(tagName), filterSpecialCharacters));
 				} else if (subClassInfo.isDate()) {
 					String valueFormat = FilterProvider.getCurrentValueFormat(tagName, currentClazz, filterAll);
 					result.append("\"").append(tagName).append("\":\"").append(null == valueFormat ? defaultFormat.format(tempValue) : new SimpleDateFormat(valueFormat).format(tempValue)).append("\"");
