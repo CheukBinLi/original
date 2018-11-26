@@ -70,7 +70,7 @@ public class Filter {
 		if (null == replaceProviders || replaceProviders.length < 1) {
 			return this;
 		}
-		if (null == replaces)
+		if (EMPTY_REPLACEP_ROVIDER == this.replaces)
 			this.replaces = new ConcurrentSkipListMap<>();
 		for (ReplaceProvider item : replaceProviders) {
 			this.replaces.put(item.getField(), item);
