@@ -3,5 +3,7 @@ openssl genrsa -out rsa_private_key.pem -passout pass:123456 -des3 1024
 
 2根据私钥生成公钥：
 openssl rsa -in rsa_private_key.pem -out rsa_public_key.pem  -pubout
-3 java证书
+3 java证书(带密码)
 openssl pkcs8 -topk8 -in rsa_private_key.pem -out pkcs8_rsa_private_key.pem –nocrypt
+(免密码)
+openssl pkcs8 -in rsa_private_key.pem -topk8  -nocrypt -out pkcs8_rsa_private_key.pem
