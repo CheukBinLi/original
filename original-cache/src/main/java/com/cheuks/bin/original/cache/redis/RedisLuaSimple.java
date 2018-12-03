@@ -17,101 +17,119 @@ import com.cheuks.bin.original.common.util.scan.ScanSimple;
 
 public class RedisLuaSimple implements RedisLua {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RedisLua.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RedisLua.class);
 
-    private RedisFactory redisFactory;
+	private RedisFactory redisFactory;
 
-    private Scan scan;
+	private Scan scan;
 
-    private String scanPath = "lua.*$lua";
+	private String scanPath = "lua.*$lua";
 
-    private final Map<String, String> sha = new ConcurrentHashMap<String, String>();
+	private final Map<String, String> sha = new ConcurrentHashMap<String, String>();
+	private final Map<String, String> scriptPath = new ConcurrentHashMap<String, String>();
 
-    public void initLoader(String... filePaths) throws IOException, RedisExcecption {
-        if (null == redisFactory)
-            redisFactory = new JedisStandAloneFactory();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        InputStream in = null;
-        byte[] buffer = new byte[1024];
-        int length;
-        String fileName;
-        byte[] sha;
-        // String script;
-        for (String str : filePaths) {
-            out.reset();
-            try {
-                fileName = str.substring(str.lastIndexOf("/") + 1, str.lastIndexOf("."));
-                in = Thread.currentThread().getContextClassLoader().getResourceAsStream(str);
-                while (-1 != (length = in.read(buffer))) {
-                    out.write(buffer, 0, length);
-                }
-                // script = new String(out.toByteArray());
-                sha = redisFactory.scriptLoad(fileName.getBytes(), out.toByteArray());
-                if (null != sha)
-                    this.sha.put(fileName, new String(sha));
-                if (LOG.isDebugEnabled())
-                    LOG.debug(fileName + ":" + new String(sha));
-            } finally {
-                if (null != in)
-                    in.close();
-            }
-        }
-    }
+	public void initLoader(String... filePaths) throws IOException, RedisExcecption {
+		if (null == filePaths)
+			initLoader();
+		if (null == redisFactory)
+			redisFactory = new JedisStandAloneFactory();
+		String fileName;
+		for (String str : filePaths) {
+			fileName = str.substring(str.lastIndexOf("/") + 1, str.lastIndexOf("."));
+			scriptPath.put(fileName, str);
+			scriptLoad(fileName, str);
+		}
+	}
 
-    public void initLoader() throws IOException, RedisExcecption {
-        if (null == redisFactory)
-            redisFactory = new JedisStandAloneFactory();
-        else if (null == scan) {
-            scan = new ScanSimple();
-        }
-        try {
-            initLoader(scan.doScan(scanPath).get(scanPath).toArray(new String[0]));
-        } catch (Throwable e) {
-            throw new RedisExcecption(e);
-        }
-    }
+	void scriptLoad(String fileName, String path) throws IOException, RedisExcecption {
+		if (null == redisFactory)
+			redisFactory = new JedisStandAloneFactory();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		InputStream in = null;
+		byte[] buffer = new byte[1024];
+		int length;
+		byte[] sha;
+		out.reset();
+		try {
+			in = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+			while (-1 != (length = in.read(buffer))) {
+				out.write(buffer, 0, length);
+			}
+			sha = redisFactory.scriptLoad(fileName.getBytes(), out.toByteArray());
+			if (null != sha)
+				this.sha.put(fileName, new String(sha));
+			if (LOG.isDebugEnabled())
+				LOG.debug(fileName + ":" + new String(sha));
+		} finally {
+			if (null != in)
+				in.close();
+		}
+	}
 
-    public String getSha(String name) {
-        return sha.get(name);
-    }
+	public void reset(boolean force, String... filePaths) throws IOException, RedisExcecption {
+		if (force) {
+			initLoader(filePaths);
+		} else {
+			for (Map.Entry<String, String> en : scriptPath.entrySet()) {
+				scriptLoad(en.getKey(), en.getValue());
+			}
+		}
+	}
 
-    public void clear() throws RedisExcecption {
-        sha.clear();
-        redisFactory.scriptFlush();
-    }
+	public void initLoader() throws IOException, RedisExcecption {
+		if (null == redisFactory)
+			redisFactory = new JedisStandAloneFactory();
+		else if (null == scan) {
+			scan = new ScanSimple();
+		}
+		try {
+			initLoader(scan.doScan(scanPath).get(scanPath).toArray(new String[0]));
+		} catch (Throwable e) {
+			throw new RedisExcecption(e);
+		}
+	}
 
-    public RedisFactory getRedisFactory() {
-        return redisFactory;
-    }
+	public String getSha(String name) {
+		return sha.get(name);
+	}
 
-    public RedisLua setRedisFactory(RedisFactory redisFactory) {
-        this.redisFactory = redisFactory;
-        return this;
-    }
+	public void clear() throws RedisExcecption {
+		sha.clear();
+		redisFactory.scriptFlush();
+	}
 
-    public Scan getScan() {
-        return scan;
-    }
+	public RedisFactory getRedisFactory() {
+		return redisFactory;
+	}
 
-    public RedisLua setScan(Scan scan) {
-        return this;
-    }
+	public RedisLua setRedisFactory(RedisFactory redisFactory) {
+		this.redisFactory = redisFactory;
+		return this;
+	}
 
-    public RedisLuaSimple() {
-        super();
-    }
+	public Scan getScan() {
+		return scan;
+	}
 
-    public RedisLuaSimple(RedisFactory redisFactory, Scan scan) {
-        super();
-        this.redisFactory = redisFactory;
-        this.scan = scan;
-    }
+	public RedisLua setScan(Scan scan) {
+		return this;
+	}
 
-    public RedisLuaSimple(RedisFactory redisFactory, Scan scan, String scanPath) {
-        super();
-        this.redisFactory = redisFactory;
-        this.scan = scan;
-        this.scanPath = scanPath;
-    }
+	public RedisLuaSimple() {
+		super();
+	}
+
+	public RedisLuaSimple(RedisFactory redisFactory, Scan scan) {
+		super();
+		this.redisFactory = redisFactory;
+		this.scan = scan;
+	}
+
+	public RedisLuaSimple(RedisFactory redisFactory, Scan scan, String scanPath) {
+		super();
+		this.redisFactory = redisFactory;
+		this.scan = scan;
+		this.scanPath = scanPath;
+	}
 
 }
