@@ -13,7 +13,7 @@ import org.w3c.dom.NodeList;
 import com.cheuks.bin.original.common.rmi.RmiBeanFactory;
 import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.common.util.conver.CollectionUtil;
-import com.cheuks.bin.original.common.util.conver.ConverType;
+import com.cheuks.bin.original.common.util.conver.StringUtil;
 import com.cheuks.bin.original.rmi.GenerateRmiBeanFactory;
 import com.cheuks.bin.original.rmi.config.model.ServiceModel;
 import com.cheuks.bin.original.rmi.model.MethodBean;
@@ -22,8 +22,6 @@ import com.cheuks.bin.original.rmi.net.netty.server.NettyServer;
 public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 
 	private static final long serialVersionUID = 1L;
-
-	private final ConverType converType = new ConverType();
 
 	@Override
 	public AbstractConfig makeConfig(Element element, ParserContext parserContext) {
@@ -49,16 +47,16 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 				id = tempElement.getAttribute("id");
 				serviceModel.setVersion(tempElement.getAttribute("version"));
 				serviceModel.setRef(tempValue = tempElement.getAttribute("ref"));
-				if (converType.isEmpty(id) && !converType.isEmpty(tempValue)) {
-					id = converType.toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
+				if (StringUtil.newInstance().isEmpty(id) && !StringUtil.newInstance().isEmpty(tempValue)) {
+					id = StringUtil.newInstance().toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
 				}
 				serviceModel.setRefClass(tempValue = tempElement.getAttribute("class"));
-				if (converType.isEmpty(id) && !converType.isEmpty(tempValue)) {
-					id = converType.toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
+				if (StringUtil.newInstance().isEmpty(id) && !StringUtil.newInstance().isEmpty(tempValue)) {
+					id = StringUtil.newInstance().toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
 				}
 				serviceModel.setInterfaceName(tempValue = tempElement.getAttribute("interface"));
-				if (converType.isEmpty(id) && !converType.isEmpty(tempValue)) {
-					id = converType.toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
+				if (StringUtil.newInstance().isEmpty(id) && !StringUtil.newInstance().isEmpty(tempValue)) {
+					id = StringUtil.newInstance().toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
 				}
 				serviceModel.setId(id);
 				serviceModel.setDescribe(tempElement.getAttribute("describe"));

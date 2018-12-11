@@ -18,7 +18,7 @@ import com.cheuks.bin.original.common.annotation.rmi.RmiProviderAnnotation;
 import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.common.rmi.RmiInvokeClient;
 import com.cheuks.bin.original.common.rmi.model.ClassBean;
-import com.cheuks.bin.original.common.util.conver.ConverType;
+import com.cheuks.bin.original.common.util.conver.StringUtil;
 import com.cheuks.bin.original.common.util.scan.Scan;
 import com.cheuks.bin.original.common.util.scan.ScanSimple;
 import com.cheuks.bin.original.rmi.config.ReferenceGroupConfig.ReferenceGroupModel;
@@ -63,8 +63,6 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 		pool.insertClassPath(new ClassClassPath(this.getClass()));
 	}
 
-	private ConverType converType = new ConverType();
-
 	private final String suffixName = "$proxyClass";
 
 	public String getSuffixName(String nick) {
@@ -86,7 +84,7 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 			multiInstance = referenceConfig.getMultiInstance();
 			tempClass = Class.forName(referenceConfig.getInterfaceName().replace("/", ".").replace(".class", ""));
 
-			id = converType.isEmpty(referenceConfig.getId(), converType.toLowerCaseFirstOne(tempClass.getSimpleName()));
+			id = StringUtil.newInstance().isEmpty(referenceConfig.getId(), StringUtil.newInstance().toLowerCaseFirstOne(tempClass.getSimpleName()));
 			version = referenceConfig.getVersion();
 
 			final ClassBean classBean = new ClassBean(tempClass, id, version, multiInstance);
@@ -182,10 +180,10 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 						if (null != (consumer = tempClass.getDeclaredAnnotation(RmiConsumerAnnotation.class))) {
 
 							referenceModel = new ReferenceModel();
-							referenceModel.setId(converType.isEmpty(consumer.id(), converType.toLowerCaseFirstOne(tempClass.getSimpleName())));
+							referenceModel.setId(StringUtil.newInstance().isEmpty(consumer.id(), StringUtil.newInstance().toLowerCaseFirstOne(tempClass.getSimpleName())));
 							referenceModel.setInterfaceName(tempClass.getName());
 							referenceModel.setMultiInstance(false);
-							referenceModel.setVersion(converType.isEmpty(consumer.version(), scanModel.getVersion()));
+							referenceModel.setVersion(StringUtil.newInstance().isEmpty(consumer.version(), scanModel.getVersion()));
 							referenceGroupModel.getReferenceGroup().put(referenceModel.getId(), referenceModel);
 						}
 					}
@@ -222,8 +220,8 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 						if (null != (provider = tempClass.getDeclaredAnnotation(RmiProviderAnnotation.class))) {
 							serviceModel = new ServiceModel();
 							serviceModel.setInterfaceName(provider.interfaceClass().getName());
-							serviceModel.setVersion(converType.isEmpty(provider.version(), scanModel.getVersion()));
-							serviceModel.setId(converType.isEmpty(provider.id(), converType.toLowerCaseFirstOne(tempClass.getSimpleName())));
+							serviceModel.setVersion(StringUtil.newInstance().isEmpty(provider.version(), scanModel.getVersion()));
+							serviceModel.setId(StringUtil.newInstance().isEmpty(provider.id(), StringUtil.newInstance().toLowerCaseFirstOne(tempClass.getSimpleName())));
 							serviceModel.setRefClass(tempClass.getName());
 							serviceGroupModel.getServices().put(serviceModel.getId(), serviceModel);
 						}
