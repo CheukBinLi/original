@@ -20,7 +20,7 @@ public interface CacheFactory<K, V> {
 
 	public V remove(K key) throws CacheException;
 
-	public void clear() throws CacheException;
+	public void scriptClear() throws CacheException;
 
 	public int size() throws CacheException;
 

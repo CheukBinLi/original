@@ -96,6 +96,16 @@ public class StringUtil extends ConverType {
 		return str;
 	}
 
+	public boolean isBlank(String str) {
+		if (isEmpty(str) || str.trim().length() < 1)
+			return true;
+		return false;
+	}
+
+	public String isBlank(String str, String defaultValue) {
+		return isBlank(str) ? defaultValue : str;
+	}
+
 	/***
 	 * 
 	 * @param str
@@ -148,7 +158,7 @@ public class StringUtil extends ConverType {
 		}
 		return result;
 	}
-	
+
 	public static void main(String[] args) {
 		System.out.println(StringUtil.newInstance().concatCount(
 				"file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua", ".jar!"));

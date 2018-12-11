@@ -1,8 +1,12 @@
 package com.cheuks.bin.original.cache.redis;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.cheuks.bin.original.common.cache.redis.RedisExcecption;
 import com.cheuks.bin.original.common.cache.redis.RedisFactory;
+import com.cheuks.bin.original.common.util.scan.Scan;
+import com.cheuks.bin.original.common.util.scan.ScanSimple;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -47,6 +53,13 @@ public class JedisStandAloneFactory implements RedisFactory {
 	private String encoding = "UTF-8";
 
 	private CacheSerialize cacheSerialize;
+	
+	private Scan scan;
+	
+	private String scanPath = "lua.*$lua";
+
+	private final Map<String, String> sha = new ConcurrentHashMap<String, String>();
+	private final Map<String, String> scriptPath = new ConcurrentHashMap<String, String>();
 
 	public CacheSerialize getCacheSerialize() {
 		return cacheSerialize;
@@ -1318,7 +1331,102 @@ public class JedisStandAloneFactory implements RedisFactory {
 			destory(jedis);
 		}
 	}
+	
+	/***
+	 * redisLua
+	 */
 
+	public void initScriptLoader(String... filePaths) throws IOException, RedisExcecption {
+		if (null == filePaths)
+			initScriptLoader();
+		long result = -1l;
+		if (LOG.isDebugEnabled())
+			LOG.debug("removeListString:" + result);
+		String fileName;
+		for (String str : filePaths) {
+			fileName = str.substring(str.lastIndexOf("/") + 1, str.lastIndexOf("."));
+			scriptPath.put(fileName, str);
+			scriptFileLoad(fileName, str);
+		}
+
+	}
+
+	void scriptFileLoad(String fileName, String path) throws IOException, RedisExcecption {
+
+		Jedis jedis = getResource();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		InputStream in = null;
+		byte[] buffer = new byte[1024];
+		int length;
+		byte[] sha;
+		out.reset();
+		try {
+			in = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+			while (-1 != (length = in.read(buffer))) {
+				out.write(buffer, 0, length);
+			}
+			sha = jedis.scriptLoad(out.toByteArray());
+			if (null != sha)
+				this.sha.put(fileName, new String(sha));
+			if (LOG.isDebugEnabled())
+				LOG.debug(fileName + ":" + new String(sha));
+		} finally {
+			destory(jedis);
+			if (null != in)
+				in.close();
+		}
+
+	}
+
+	public void scriptReset(boolean force, String... filePaths) throws IOException, RedisExcecption {
+		if (force) {
+			initScriptLoader(filePaths);
+		} else {
+			for (Map.Entry<String, String> en : scriptPath.entrySet()) {
+				scriptFileLoad(en.getKey(), en.getValue());
+			}
+		}
+	}
+
+	public void initScriptLoader() throws IOException, RedisExcecption {
+		if (null == scan) {
+			scan = new ScanSimple();
+		}
+		try {
+			initScriptLoader(scan.doScan(scanPath).get(scanPath).toArray(new String[0]));
+		} catch (Throwable e) {
+			throw new RedisExcecption(e);
+		}
+	}
+
+	public String getScriptSha(String name) {
+		return sha.get(name);
+	}
+
+	public void scriptClear() throws RedisExcecption {
+		Jedis jedis = getResource();
+		try {
+			sha.clear();
+			jedis.scriptFlush();
+		} catch (Exception e) {
+		} finally {
+			destory(jedis);
+		}
+	}
+
+	boolean scriptReload(Throwable e) throws Exception {
+		LOG.warn(e.getMessage(), e);
+		if (null != e && null != e.getMessage() && e.getMessage().contains("NOSCRIPT")) {
+			try {
+				scriptReset(false);
+			} catch (RedisExcecption e1) {
+				throw new Exception(e);
+			}
+			return true;
+		}
+		return false;
+	}
+	
 	public String getEncoding() {
 		return encoding;
 	}

@@ -2,7 +2,7 @@ package com.cheuks.bin.original.common.cache.redis;
 
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 
-public interface RedisFactory extends RedisBinary, RedisCommand, RedisObject, RedisOO {
+public interface RedisFactory extends RedisScript, RedisBinary, RedisCommand, RedisObject, RedisOO {
 
 	CacheSerialize getCacheSerialize();
 	
