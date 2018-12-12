@@ -15,7 +15,6 @@ import com.cheuks.bin.original.common.util.reflection.FieldInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 import com.cheuks.bin.original.common.util.reflection.Type;
 
-@SuppressWarnings("unchecked")
 public class JsonMapper {
 
 	final static Logger LOG = LoggerFactory.getLogger(JsonMapper.class);
@@ -95,11 +94,11 @@ public class JsonMapper {
 		return writerString(o, filterProvider, withAlias, withOutTransient, true, false);
 	}
 
-	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean eol, Map<String, ? extends Object>... additionalAttributes) throws Exception {
+	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean eol, @SuppressWarnings("unchecked") Map<String, ? extends Object>... additionalAttributes) throws Exception {
 		return writer(o, filterProvider, withAlias, withOutTransient, eol, false, additionalAttributes);
 	}
 
-	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean eol, boolean filterSpecialCharacters, Map<String, ? extends Object>... additionalAttributes) throws Exception {
+	public String writer(final Object o, FilterProvider filterProvider, boolean withAlias, boolean withOutTransient, boolean eol, boolean filterSpecialCharacters, @SuppressWarnings("unchecked") Map<String, ? extends Object>... additionalAttributes) throws Exception {
 		StringBuilder additional = null;
 		String subResult;
 		if (null != additionalAttributes && additionalAttributes.length > 0) {

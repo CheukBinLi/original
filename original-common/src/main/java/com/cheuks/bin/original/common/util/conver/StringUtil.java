@@ -159,6 +159,24 @@ public class StringUtil extends ConverType {
 		return result;
 	}
 
+	public String fillPosition(String content, char ch, int len, boolean left) {
+		if (null == content || content.length() >= len)
+			return content;
+		StringBuilder result = new StringBuilder();
+		for (int i = content.length(); i < len; i++) {
+			result.append(ch);
+		}
+		return left ? result.toString() + content : content + result.toString();
+	}
+
+	public String fillPositionLeft(String content, char ch, int len) {
+		return fillPosition(content, ch, len, true);
+	}
+
+	public String fillPositionRight(String content, char ch, int len) {
+		return fillPosition(content, ch, len, false);
+	}
+
 	public static void main(String[] args) {
 		System.out.println(StringUtil.newInstance().concatCount(
 				"file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua", ".jar!"));
@@ -169,6 +187,9 @@ public class StringUtil extends ConverType {
 		System.out.println(a.substring(a.lastIndexOf(".jar!") + 5));
 
 		System.out.println(new StringUtil().toLowerUnderscoreCaseCamel("a_abcde_fghijk_"));
+		
+		System.err.println(newInstance().fillPositionLeft("x", '0', 3));
+		System.err.println(newInstance().fillPositionRight("x", '0', 3));
 
 	}
 }

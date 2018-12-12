@@ -253,7 +253,7 @@ public class ObjectFill {
 		if (null == b.getFields())
 			b.setFields(ReflectionUtil.instance().scanClassFieldInfo4Map(b.getClazz(), true, true, true));
 
-		Set<String> igonre = null == ignores ? null : new HashSet<>(Arrays.asList(ignores));
+		Set<String> igonre = null == ignores ? null : new HashSet<String>(Arrays.asList(ignores));
 		Object value = null;
 		for (Entry<String, FieldInfo> en : a.getFields().entrySet()) {
 			if (null != igonre && igonre.contains(en.getKey())) {
