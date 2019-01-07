@@ -259,7 +259,7 @@ public class ObjectFill {
 			if (null != igonre && igonre.contains(en.getKey())) {
 				continue;
 			}
-			if ((notTransient && en.getValue().isTransient()) || (notNull && null == (value = en.getValue().getField().get(source)))) {
+			if ((notTransient && en.getValue().isTransient()) || (null == (value = en.getValue().getField().get(source)) && notNull)) {
 				continue;
 			}
 			FieldInfo fieldInfo = b.getFields().get(en.getKey());
