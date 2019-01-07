@@ -164,7 +164,7 @@ public class ReflectionUtil {
 
 		// 向上遍历父类
 		while (true) {
-			if (null == (tempClass = currentClass.getSuperclass()) || tempClass == currentClass)
+			if (null == (tempClass = currentClass.getSuperclass()) || tempClass == currentClass || tempClass == Object.class)
 				break;
 			classes.addLast(currentClass = tempClass);
 		}
