@@ -99,7 +99,7 @@ public class ReflectionUtil {
 
 		// 向上遍历父类
 		while (true) {
-			if (null == (tempClass = clazz.getSuperclass()) || tempClass == currentClass)
+			if (null == (tempClass = currentClass.getSuperclass()) || tempClass == currentClass)
 				break;
 			classes.addLast(currentClass = tempClass);
 		}
@@ -164,7 +164,7 @@ public class ReflectionUtil {
 
 		// 向上遍历父类
 		while (true) {
-			if (null == (tempClass = clazz.getSuperclass()) || tempClass == currentClass)
+			if (null == (tempClass = currentClass.getSuperclass()) || tempClass == currentClass)
 				break;
 			classes.addLast(currentClass = tempClass);
 		}
@@ -232,7 +232,7 @@ public class ReflectionUtil {
 
 		// 向上遍历父类
 		while (true) {
-			if (null == (tempClass = clazz.getSuperclass()) || tempClass == currentClass)
+			if (null == (tempClass = currentClass.getSuperclass()) || tempClass == currentClass)
 				break;
 			classes.addLast(currentClass = tempClass);
 		}
@@ -289,7 +289,7 @@ public class ReflectionUtil {
 
 		// 向上遍历父类
 		while (true) {
-			if (null == (tempClass = clazz.getSuperclass()) || tempClass == currentClass)
+			if (null == (tempClass = currentClass.getSuperclass()) || tempClass == currentClass)
 				break;
 			classes.addLast(currentClass = tempClass);
 		}
