@@ -241,10 +241,16 @@ public class ScanSimple extends AbstractScan {
 		public abstract Set<String> doFilter(Set<URL> url, String pathPattern, String startIndex) throws Exception;
 
 		public Set<String> call() throws Exception {
-			Set<String> result = doFilter(urls, pathPattern, startIndex);
-			if (null != countDownLatch)
-				countDownLatch.countDown();
-			return result;
+			try {
+				Set<String> result = doFilter(urls, pathPattern, startIndex);
+				return result;
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				if (null != countDownLatch) {
+					countDownLatch.countDown();
+				}
+			}
 		}
 
 	}
