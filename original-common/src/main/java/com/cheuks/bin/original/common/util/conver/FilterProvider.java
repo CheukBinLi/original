@@ -4,7 +4,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FilterProvider {
+	
 	private final Map<String, Filter> filters;
+	
+	private Object additional;
 
 	public FilterProvider(Filter... filters) {
 		super();
@@ -92,4 +95,16 @@ public class FilterProvider {
 		//		}
 		return filter.getReplaces().get(name);
 	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T getAdditional() {
+		return (T) additional;
+	}
+
+	public FilterProvider setAdditional(Object additional) {
+		this.additional = additional;
+		return this;
+	}
+	
+	
 }
