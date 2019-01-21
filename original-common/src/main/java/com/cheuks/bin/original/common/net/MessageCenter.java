@@ -28,7 +28,7 @@ public interface MessageCenter<INPUT extends Object, MODEL extends Serializable,
 	 */
 	@SuppressWarnings("unchecked")
 	default MessageCenter<INPUT, MODEL, TYPE> addHandler(final MessageHandler<INPUT, MODEL, TYPE>... handlers) {
-		if (CollectionUtil.newInstance().isEmpty((Object[]) handlers))
+		if (CollectionUtil.isEmpty((Object[]) handlers))
 			return this;
 		List<MessageHandler<Object, Serializable, Object>> list;
 		for (MessageHandler<INPUT, MODEL, TYPE> item : handlers) {

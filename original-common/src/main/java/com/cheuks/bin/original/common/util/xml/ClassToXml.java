@@ -119,7 +119,7 @@ public class ClassToXml {
 		Field field;
 		ClassInfo subClassInfo;
 
-		Map<String, FieldInfo> fields = CollectionUtil.newInstance().isEmpty(classInfo.getFields()) ? reflectionUtil.scanClassFieldInfo4Map(classInfo.getClazz(), true, true, true) : classInfo.getFields();
+		Map<String, FieldInfo> fields = CollectionUtil.isEmpty(classInfo.getFields()) ? reflectionUtil.scanClassFieldInfo4Map(classInfo.getClazz(), true, true, true) : classInfo.getFields();
 
 		for (Entry<String, FieldInfo> en : fields.entrySet()) {
 			field = en.getValue().getField();

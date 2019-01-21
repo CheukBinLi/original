@@ -11,11 +11,12 @@ public class CollectionUtil {
 
 	private static final CollectionUtil newInstance = new CollectionUtil();
 
+	@Deprecated
 	public static final CollectionUtil newInstance() {
 		return newInstance;
 	}
 
-	public <K, V> Map<K, V> removeNullValue(final Map<K, V> collection) {
+	public static <K, V> Map<K, V> removeNullValue(final Map<K, V> collection) {
 		Iterator<Entry<K, V>> it = collection.entrySet().iterator();
 		Entry<K, V> en;
 		while (it.hasNext()) {
@@ -26,7 +27,7 @@ public class CollectionUtil {
 		return collection;
 	}
 
-	public Map<String, Object> toMap(Object... params) {
+	public static Map<String, Object> toMap(Object... params) {
 		if (null == params || 0 != (params.length % 2))
 			return null;
 		Map<String, Object> map = new WeakHashMap<String, Object>(params.length * 2);
@@ -37,7 +38,7 @@ public class CollectionUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <K> Map<K, Object> toMap(boolean isWeak, Object... params) {
+	public static <K> Map<K, Object> toMap(boolean isWeak, Object... params) {
 		if (null == params || 0 != (params.length % 2))
 			return null;
 		Map<K, Object> result = isWeak ? new WeakHashMap<K, Object>(params.length * 2) : new HashMap<K, Object>(params.length * 2);
@@ -62,55 +63,56 @@ public class CollectionUtil {
 		return result;
 	}
 
-	public boolean isNotEmpty(Collection<?> collection) {
+	public static boolean isNotEmpty(Collection<?> collection) {
 		return !isEmpty(collection);
 	}
 
-	public boolean isEmpty(Collection<?> collection) {
+	public static boolean isEmpty(Collection<?> collection) {
 		return null == collection || collection.size() == 0;
 	}
 
-	public boolean isNotEmpty(Map<?, ?> map) {
+	public static boolean isNotEmpty(Map<?, ?> map) {
 		return !isEmpty(map);
 	}
 
-	public boolean isEmpty(Map<?, ?> map) {
+	public static boolean isEmpty(Map<?, ?> map) {
 		return null == map || map.size() == 0;
 	}
 
-	public boolean isNotEmpty(Object... o) {
+	public static boolean isNotEmpty(Object... o) {
 		return !isEmpty(o);
 	}
 
-	public boolean isEmpty(Object... o) {
+	public static boolean isEmpty(Object... o) {
 		return null == o || o.length < 1;
 	}
 
-	public static <K, V> MapBuilder<K, V> mapBuilder() {
-		return new MapBuilder<K, V>();
+	public static MapBuilder mapBuilder() {
+		return new MapBuilder();
 	}
 
-	public static class MapBuilder<K, V> {
+	public static class MapBuilder {
 
-		private Map<K, V> data;
+		private Map<Object, Object> data;
 
-		public MapBuilder<K, V> append(K k, V v) {
+		public MapBuilder append(Object k, Object v) {
 			if (null == this.data)
-				data = new HashMap<K, V>();
+				data = new HashMap<Object, Object>();
 			data.put(k, v);
 			return this;
 		}
 
-		public Map<K, V> build() {
-			return data;
+		@SuppressWarnings("unchecked")
+		public <K, V> Map<K, V> build() {
+			return (Map<K, V>) data;
 		}
 
 	}
 
 	public static void main(String[] args) {
 
-		Map<String, Object> a = newInstance.toMap(true, new Object[] { 1, "1", 2, "2" });
-		Map<String, Object> b = newInstance.toMap("1", 1, "2", 2);
+		Map<String, Object> a = toMap(true, new Object[] { 1, "1", 2, "2" });
+		Map<String, Object> b = toMap("1", 1, "2", 2);
 		System.out.println(a);
 		System.out.println(b);
 	}

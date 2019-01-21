@@ -12,7 +12,7 @@ public class ReplaceProvider {
 		if (null == content) {
 			return null == replaceNull ? content : replaceNull;
 		}
-		if (CollectionUtil.newInstance().isEmpty(replaces)) {
+		if (CollectionUtil.isEmpty(replaces)) {
 			return content;
 		}
 		for (ReplaceModel item : replaces) {

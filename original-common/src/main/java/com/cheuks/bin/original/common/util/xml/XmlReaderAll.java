@@ -159,7 +159,7 @@ public class XmlReaderAll extends DefaultHandler {
 			}
 			f.setAccessible(true);
 			List<Field> subField = reflectionUtil.searchCollection(f, true);
-			if (CollectionUtil.newInstance().isNotEmpty(subField)) {//list,map有问题
+			if (CollectionUtil.isNotEmpty(subField)) {//list,map有问题
 				//				f.set(qName, null);
 				Class<?> c = (Class<?>) clazz.get(subField.get(0));
 				o = c.newInstance();

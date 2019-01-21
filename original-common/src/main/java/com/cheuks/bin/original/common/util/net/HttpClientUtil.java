@@ -134,7 +134,7 @@ public class HttpClientUtil {
 			con.setRequestProperty("Range", "bytes=" + "");
 			StringBuilder sb = new StringBuilder();
 
-			if (!CollectionUtil.newInstance().isEmpty(params)) {
+			if (!CollectionUtil.isEmpty(params)) {
 				params.forEach((k, v) -> {
 					sb.append("------").append(BOUNDARY).append("\r\n");
 					sb.append("Content-Disposition: form-data; name=\"");
