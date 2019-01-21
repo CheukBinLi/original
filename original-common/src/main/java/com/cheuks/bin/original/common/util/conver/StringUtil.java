@@ -191,11 +191,8 @@ public class StringUtil extends ConverType {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Set<Character> filter = new HashSet<>(Arrays.asList(cs));
 		Character code;
-	      byte[] b = new byte[2]; 
 		for (int i = 0; i < str.length(); i++) {
-			if (filter.contains(code = str.charAt(i))) {
-				b[0] = (byte) ((code & 0xFF00) >> 8); 
-				b[1] = (byte) (code & 0xFF); 
+			if (!filter.contains(code = str.charAt(i))) {
 				out.write(code);
 			}
 		}
@@ -210,7 +207,7 @@ public class StringUtil extends ConverType {
 		Set<Character> filter = new HashSet<>(Arrays.asList(cs));
 		Character code;
 		for (int i = 0; i < str.length(); i++) {
-			if (filter.contains(code = str.charAt(i))) {
+			if (!filter.contains(code = str.charAt(i))) {
 				result.append(code);
 			}
 		}
