@@ -178,11 +178,11 @@ public class StringUtil extends ConverType {
 		return fillPosition(content, ch, len, true);
 	}
 
-	public String fillPositionRight(String content, char ch, int len) {
+	public static String fillPositionRight(String content, char ch, int len) {
 		return fillPosition(content, ch, len, false);
 	}
 
-	public byte[] filterCharestBytes(String str, Character... cs) throws UnsupportedEncodingException {
+	public static byte[] filterCharestBytes(String str, Character... cs) throws UnsupportedEncodingException {
 		if (isEmpty(str)) {
 			return new byte[0];
 		} else if (null == cs || cs.length < 1) {
@@ -199,7 +199,7 @@ public class StringUtil extends ConverType {
 		return out.toByteArray();
 	}
 
-	public String filterCharest(String str, Character... cs) {
+	public static String filterCharest(String str, Character... cs) {
 		if (isEmpty(str) || (null == cs || cs.length < 1)) {
 			return str;
 		}
