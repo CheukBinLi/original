@@ -1,9 +1,11 @@
 package com.cheuks.bin.original.common.util;
 
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import javax.crypto.Mac;
@@ -17,6 +19,10 @@ public class SignUtil {
 									MD5,
 									HMACSHA256
 	}
+
+	private static final String SYMBOLS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+	private static final Random RANDOM = new SecureRandom();
 
 	/***
 	 * 
@@ -112,6 +118,16 @@ public class SignUtil {
 			sb.append(Integer.toHexString((item & 0xFF) | 0x100).substring(1, 3));
 		}
 		return sb.toString().toUpperCase();
+	}
+
+	public static String generateNonceStr(int len) {
+		if (len < 0)
+			return null;
+		char[] nonceChars = new char[len];
+		for (int index = 0; index < len; ++index) {
+			nonceChars[index] = SYMBOLS.charAt(RANDOM.nextInt(SYMBOLS.length()));
+		}
+		return new String(nonceChars);
 	}
 
 }
