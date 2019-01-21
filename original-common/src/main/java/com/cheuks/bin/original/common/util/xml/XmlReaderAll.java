@@ -152,7 +152,7 @@ public class XmlReaderAll extends DefaultHandler {
 				f = reflectionCache.getFieldByMap(X.getClass().getSuperclass(), qName);
 			}
 			if (null == f) {
-				f = reflectionCache.getFieldByMap(X.getClass(), StringUtil.newInstance().toLowerUnderscoreCaseCamel(qName));
+				f = reflectionCache.getFieldByMap(X.getClass(), StringUtil.toLowerUnderscoreCaseCamel(qName));
 				if (null == f) {
 					return;
 				}

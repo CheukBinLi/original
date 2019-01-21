@@ -1,6 +1,10 @@
 package com.cheuks.bin.original.common.util.conver;
 
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +25,7 @@ public class StringUtil extends ConverType {
 	protected StringUtil() {
 	}
 
+	@Deprecated
 	public static StringUtil newInstance() {
 		if (null == INSTANCE) {
 			synchronized (StringUtil.class) {
@@ -43,7 +48,7 @@ public class StringUtil extends ConverType {
 	 * @param value
 	 * @return
 	 */
-	public String generateRegexString(String value) {
+	public static String generateRegexString(String value) {
 		if (null == value || value.length() < 1)
 			return value;
 		String result = value;
@@ -53,7 +58,7 @@ public class StringUtil extends ConverType {
 		return result;
 	}
 
-	public int concatCount(String content, String regex) {
+	public static int concatCount(String content, String regex) {
 		Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
 		Matcher m = p.matcher(content);
 		int count = 0;
@@ -63,13 +68,13 @@ public class StringUtil extends ConverType {
 		return count;
 	}
 
-	public String toUpperCaseFirstOne(String name) {
+	public static String toUpperCaseFirstOne(String name) {
 		char[] ch = name.toCharArray();
 		ch[0] = Character.toUpperCase(ch[0]);
 		return new String(ch);
 	}
 
-	public String toLowerCaseFirstOne(String name) {
+	public static String toLowerCaseFirstOne(String name) {
 		if (name.length() < 1)
 			return name;
 		char[] ch = name.toCharArray();
@@ -77,32 +82,32 @@ public class StringUtil extends ConverType {
 		return new String(ch);
 	}
 
-	public boolean isEmpty(String str) {
+	public static boolean isEmpty(String str) {
 		if (null == str || str.length() < 1)
 			return true;
 		return false;
 	}
 
-	public String isEmpty(String str, String defaultValue) {
+	public static String isEmpty(String str, String defaultValue) {
 		if (null == str || str.length() < 1)
 			return defaultValue;
 		return str;
 	}
 
-	public String isEmpty(String str, String defaultValue, boolean isDefaultValueToUpperCaseFirstOne) {
+	public static String isEmpty(String str, String defaultValue, boolean isDefaultValueToUpperCaseFirstOne) {
 		if (null == str || str.length() < 1)
 			if (null == str || str.length() < 1)
 				return isDefaultValueToUpperCaseFirstOne ? toLowerCaseFirstOne(defaultValue) : defaultValue;
 		return str;
 	}
 
-	public boolean isBlank(String str) {
+	public static boolean isBlank(String str) {
 		if (isEmpty(str) || str.trim().length() < 1)
 			return true;
 		return false;
 	}
 
-	public String isBlank(String str, String defaultValue) {
+	public static String isBlank(String str, String defaultValue) {
 		return isBlank(str) ? defaultValue : str;
 	}
 
@@ -111,7 +116,7 @@ public class StringUtil extends ConverType {
 	 * @param str
 	 * @return
 	 */
-	public String toLowerCaseUnderscoreCamel(String str) {
+	public static String toLowerCaseUnderscoreCamel(String str) {
 		if (isEmpty(str))
 			return "";
 		StringBuilder result = new StringBuilder();
@@ -121,7 +126,7 @@ public class StringUtil extends ConverType {
 		return result.toString();
 	}
 
-	public String toLowerUnderscoreCaseCamel(String str) {
+	public static String toLowerUnderscoreCaseCamel(String str) {
 		if (isEmpty(str))
 			return "";
 		StringBuilder result = new StringBuilder();
@@ -139,7 +144,7 @@ public class StringUtil extends ConverType {
 		return result.toString();
 	}
 
-	public Long[] converLongs(String... strs) {
+	public static Long[] converLongs(String... strs) {
 		if (null == strs || strs.length < 1)
 			return new Long[0];
 		Long[] result = new Long[strs.length];
@@ -149,7 +154,7 @@ public class StringUtil extends ConverType {
 		return result;
 	}
 
-	public Integer[] converIntegers(String... strs) {
+	public static Integer[] converIntegers(String... strs) {
 		if (null == strs || strs.length < 1)
 			return new Integer[0];
 		Integer[] result = new Integer[strs.length];
@@ -159,7 +164,7 @@ public class StringUtil extends ConverType {
 		return result;
 	}
 
-	public String fillPosition(String content, char ch, int len, boolean left) {
+	public static String fillPosition(String content, char ch, int len, boolean left) {
 		if (null == content || content.length() >= len)
 			return content;
 		StringBuilder result = new StringBuilder();
@@ -169,7 +174,7 @@ public class StringUtil extends ConverType {
 		return left ? result.toString() + content : content + result.toString();
 	}
 
-	public String fillPositionLeft(String content, char ch, int len) {
+	public static String fillPositionLeft(String content, char ch, int len) {
 		return fillPosition(content, ch, len, true);
 	}
 
@@ -177,19 +182,51 @@ public class StringUtil extends ConverType {
 		return fillPosition(content, ch, len, false);
 	}
 
-	public static void main(String[] args) {
-		System.out.println(StringUtil.newInstance().concatCount(
-				"file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua", ".jar!"));
-
-		String a = "file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua";
-		String[] as = a.split("!");
-		System.err.println(Arrays.toString(as));
-		System.out.println(a.substring(a.lastIndexOf(".jar!") + 5));
-
-		System.out.println(new StringUtil().toLowerUnderscoreCaseCamel("a_abcde_fghijk_"));
-		
-		System.err.println(newInstance().fillPositionLeft("x", '0', 3));
-		System.err.println(newInstance().fillPositionRight("x", '0', 3));
-
+	public byte[] filterCharestBytes(String str, Character... cs) throws UnsupportedEncodingException {
+		if (isEmpty(str)) {
+			return new byte[0];
+		} else if (null == cs || cs.length < 1) {
+			return str.getBytes("UTF-8");
+		}
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Set<Character> filter = new HashSet<>(Arrays.asList(cs));
+		Character code;
+		for (int i = 0; i < str.length(); i++) {
+			if (filter.contains(code = str.charAt(i))) {
+				out.write(code);
+			}
+		}
+		return out.toByteArray();
 	}
+
+	public String filterCharest(String str, Character... cs) {
+		if (isEmpty(str) || (null == cs || cs.length < 1)) {
+			return str;
+		}
+		StringBuilder result = new StringBuilder();
+		Set<Character> filter = new HashSet<>(Arrays.asList(cs));
+		Character code;
+		for (int i = 0; i < str.length(); i++) {
+			if (filter.contains(code = str.charAt(i))) {
+				result.append(code);
+			}
+		}
+		return result.toString();
+	}
+
+	//	public static void main(String[] args) {
+	//		System.out.println(StringUtil.newInstance().concatCount(
+	//				"file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua", ".jar!"));
+	//
+	//		String a = "file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua";
+	//		String[] as = a.split("!");
+	//		System.err.println(Arrays.toString(as));
+	//		System.out.println(a.substring(a.lastIndexOf(".jar!") + 5));
+	//
+	//		System.out.println(new StringUtil().toLowerUnderscoreCaseCamel("a_abcde_fghijk_"));
+	//		
+	//		System.err.println(newInstance().fillPositionLeft("x", '0', 3));
+	//		System.err.println(newInstance().fillPositionRight("x", '0', 3));
+	//
+	//	}
 }

@@ -95,7 +95,7 @@ public class ObjectFill {
 			} else {
 				name = en.getKey();
 			}
-			result.put(UnderscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(name) : name, value);
+			result.put(UnderscoreCamel ? StringUtil.toLowerCaseUnderscoreCamel(name) : name, value);
 		}
 		return result;
 	}
@@ -145,7 +145,7 @@ public class ObjectFill {
 			if (null == (value = en.getValue().get(o).toString()) || null != ignoreField && ignoreField.contains(en.getKey())) {
 				continue;
 			}
-			result.append("&").append(underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(en.getKey()) : en.getKey()).append("=").append(value);
+			result.append("&").append(underscoreCamel ? StringUtil.toLowerCaseUnderscoreCamel(en.getKey()) : en.getKey()).append("=").append(value);
 
 		}
 		return result.length() > 0 ? result.substring(1) : "";

@@ -124,7 +124,7 @@ public class ClassToXml {
 		for (Entry<String, FieldInfo> en : fields.entrySet()) {
 			field = en.getValue().getField();
 			tagName = en.getValue().getAliasOrFieldName();
-			tagName = underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(tagName) : tagName;
+			tagName = underscoreCamel ? StringUtil.toLowerCaseUnderscoreCamel(tagName) : tagName;
 			tempValue = field.get(o);
 			if (withOutNull && null == tempValue)
 				continue;
@@ -186,7 +186,7 @@ public class ClassToXml {
 			if (subClassInfo.isMapOrSetOrCollection()) {
 				recursionSub(hasTagName ? null : subTagName, tempSubValue, result, withOutNull, underscoreCamel);
 			} else if (subClassInfo.isBasicOrArrays()) {
-				result.append(currentClassInfo.isMap() ? "<" + (subTagName = underscoreCamel ? StringUtil.newInstance().toUpperCaseFirstOne(subTagName) : subTagName) + "><![CDATA[" + null == tempSubValue ? "" : tempSubValue + "]]></" + subTagName + ">"
+				result.append(currentClassInfo.isMap() ? "<" + (subTagName = underscoreCamel ? StringUtil.toUpperCaseFirstOne(subTagName) : subTagName) + "><![CDATA[" + null == tempSubValue ? "" : tempSubValue + "]]></" + subTagName + ">"
 						: "<" + tagName + "><![CDATA[" + null == tempSubValue ? "" : tempSubValue + "]]></" + tagName + ">");
 			} else {
 				recursion(tempSubValue, result, withOutNull, underscoreCamel);

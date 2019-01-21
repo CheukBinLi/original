@@ -2,6 +2,7 @@ package com.cheuks.bin.original.common.net;
 
 import java.io.Serializable;
 
+@SuppressWarnings("unused")
 public class Message implements Serializable {
 
 	private static final long serialVersionUID = 4160389084283929387L;

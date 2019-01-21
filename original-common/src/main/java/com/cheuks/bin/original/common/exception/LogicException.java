@@ -49,7 +49,7 @@ public class LogicException extends RuntimeException {
 	}
 
 	public static void isNull(String value, String code, String... msg) throws LogicException {
-		if (StringUtil.newInstance().isBlank(value)) {
+		if (StringUtil.isBlank(value)) {
 			throw new LogicException(code, msg);
 		}
 	}

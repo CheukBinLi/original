@@ -142,7 +142,7 @@ public class ScanSimple extends AbstractScan {
 		String name;
 		while (it.hasNext()) {
 			u = it.next();
-			if (StringUtil.newInstance().concatCount(jarPath = u.getPath(), "jar!") == 2) {
+			if (StringUtil.concatCount(jarPath = u.getPath(), "jar!") == 2) {
 				jarPaths = jarPath.split("!");
 				JarFile jarFile = new JarFile(new File(jarPaths[0].replaceAll("file:/", "").replaceAll("file:", "")));
 				JarInputStream jarInputStream = new JarInputStream(jarFile.getInputStream(jarFile.getJarEntry(jarPaths[1].substring(1))));

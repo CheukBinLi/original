@@ -86,6 +86,27 @@ public class CollectionUtil {
 		return null == o || o.length < 1;
 	}
 
+	public static MapBuilder<?, ?> mapBuilder() {
+		return new MapBuilder<>();
+	}
+
+	public static class MapBuilder<K, V> {
+
+		private Map<K, V> data;
+
+		public MapBuilder<K, V> append(K k, V v) {
+			if (null == this.data)
+				data = new HashMap<K, V>();
+			data.put(k, v);
+			return this;
+		}
+
+		public Map<K, V> build() {
+			return data;
+		}
+
+	}
+
 	public static void main(String[] args) {
 
 		Map<String, Object> a = newInstance.toMap(true, new Object[] { 1, "1", 2, "2" });

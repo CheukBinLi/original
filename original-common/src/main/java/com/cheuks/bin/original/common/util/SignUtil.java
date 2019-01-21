@@ -54,9 +54,9 @@ public class SignUtil {
 			if (null == (value = data.get(k)) || (null != ignore && ignore.contains(k))) {
 				continue;
 			}
-			sb.append(linkCharacter).append(underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(k) : k).append(assignmentCharacter).append(value.toString().trim());
+			sb.append(linkCharacter).append(underscoreCamel ? StringUtil.toLowerCaseUnderscoreCamel(k) : k).append(assignmentCharacter).append(value.toString().trim());
 		}
-		return StringUtil.newInstance().isEmpty(head, "") + (sb.length() > 0 ? sb.substring(linkCharacter.length()) : "") + StringUtil.newInstance().isEmpty(tail, "");
+		return StringUtil.isEmpty(head, "") + (sb.length() > 0 ? sb.substring(linkCharacter.length()) : "") + StringUtil.isEmpty(tail, "");
 	}
 
 	public static String generateSignature(final Map<String, Object> data, String head, String tail, SignType signType, String key, String assignmentCharacter, String linkCharacter, boolean underscoreCamel, String... ignores) throws Exception {
@@ -66,19 +66,19 @@ public class SignUtil {
 		assignmentCharacter = null == assignmentCharacter ? "=" : assignmentCharacter;
 		linkCharacter = null == linkCharacter ? "&" : linkCharacter;
 		Arrays.sort(keyArray);
-		StringBuilder sb = new StringBuilder(StringUtil.newInstance().isEmpty(head, ""));
+		StringBuilder sb = new StringBuilder(StringUtil.isEmpty(head, ""));
 		Object value;
 		for (String k : keyArray) {
 			// 参数值为空，则不参与签名
 			if (null == (value = data.get(k)) || (null != ignore && ignore.contains(k))) {
 				continue;
 			}
-			sb.append(underscoreCamel ? StringUtil.newInstance().toLowerCaseUnderscoreCamel(k) : k).append(assignmentCharacter).append(value.toString().trim()).append(linkCharacter);
+			sb.append(underscoreCamel ? StringUtil.toLowerCaseUnderscoreCamel(k) : k).append(assignmentCharacter).append(value.toString().trim()).append(linkCharacter);
 		}
-		if (!StringUtil.newInstance().isEmpty(key)) {
+		if (!StringUtil.isEmpty(key)) {
 			sb.append("key").append(assignmentCharacter).append(key).append(linkCharacter);
 		}
-		if (StringUtil.newInstance().isEmpty(tail)) {
+		if (StringUtil.isEmpty(tail)) {
 			sb.setLength(sb.length() - (null == linkCharacter ? 0 : linkCharacter.length()));
 		} else {
 			sb.append(tail);
