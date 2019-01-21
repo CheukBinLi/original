@@ -86,8 +86,8 @@ public class CollectionUtil {
 		return null == o || o.length < 1;
 	}
 
-	public static MapBuilder<?, ?> mapBuilder() {
-		return new MapBuilder<>();
+	public static <K, V> MapBuilder<K, V> mapBuilder() {
+		return new MapBuilder<K, V>();
 	}
 
 	public static class MapBuilder<K, V> {
