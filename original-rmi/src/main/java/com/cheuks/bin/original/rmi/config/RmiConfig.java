@@ -28,7 +28,7 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 		if (parserContext.getRegistry().containsBeanDefinition(RMI_CONFIG_BEAN_CONFIG_GROUP))
 			return this;
 		RmiConfigGroup rmiConfigGroup = doParser(element, parserContext);
-		registerBeanDefinition(parserContext, RmiConfigGroup.class, RMI_CONFIG_BEAN_CONFIG_GROUP, CollectionUtil.newInstance().toMap("registryModel", rmiConfigGroup.getRegistryModel(), "protocolModel", rmiConfigGroup.getProtocolModel()), null);
+		registerBeanDefinition(parserContext, RmiConfigGroup.class, RMI_CONFIG_BEAN_CONFIG_GROUP, CollectionUtil.toMap("registryModel", rmiConfigGroup.getRegistryModel(), "protocolModel", rmiConfigGroup.getProtocolModel()), null);
 		doGenerate(parserContext, rmiConfigGroup);
 		return this;
 	}
@@ -69,7 +69,7 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 				loadBalanceFactory = P2pLoadBalanceFactory.class;
 			}
 			//
-			registerBeanDefinition(parserContext, loadBalanceFactory, BEAN_LOAD_BALANCE_FACTORY, CollectionUtil.newInstance().toMap("url", address), null);
+			registerBeanDefinition(parserContext, loadBalanceFactory, BEAN_LOAD_BALANCE_FACTORY, CollectionUtil.toMap("url", address), null);
 		}
 		// simpleRmiService初始化
 		// if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_SERVICE_INIT)) {

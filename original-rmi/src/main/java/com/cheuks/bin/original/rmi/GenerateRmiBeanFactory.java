@@ -84,7 +84,7 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 			multiInstance = referenceConfig.getMultiInstance();
 			tempClass = Class.forName(referenceConfig.getInterfaceName().replace("/", ".").replace(".class", ""));
 
-			id = StringUtil.newInstance().isEmpty(referenceConfig.getId(), StringUtil.newInstance().toLowerCaseFirstOne(tempClass.getSimpleName()));
+			id = StringUtil.isEmpty(referenceConfig.getId(), StringUtil.toLowerCaseFirstOne(tempClass.getSimpleName()));
 			version = referenceConfig.getVersion();
 
 			final ClassBean classBean = new ClassBean(tempClass, id, version, multiInstance);
@@ -180,10 +180,10 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 						if (null != (consumer = tempClass.getDeclaredAnnotation(RmiConsumerAnnotation.class))) {
 
 							referenceModel = new ReferenceModel();
-							referenceModel.setId(StringUtil.newInstance().isEmpty(consumer.id(), StringUtil.newInstance().toLowerCaseFirstOne(tempClass.getSimpleName())));
+							referenceModel.setId(StringUtil.isEmpty(consumer.id(), StringUtil.toLowerCaseFirstOne(tempClass.getSimpleName())));
 							referenceModel.setInterfaceName(tempClass.getName());
 							referenceModel.setMultiInstance(false);
-							referenceModel.setVersion(StringUtil.newInstance().isEmpty(consumer.version(), scanModel.getVersion()));
+							referenceModel.setVersion(StringUtil.isEmpty(consumer.version(), scanModel.getVersion()));
 							referenceGroupModel.getReferenceGroup().put(referenceModel.getId(), referenceModel);
 						}
 					}
@@ -220,8 +220,8 @@ public final class GenerateRmiBeanFactory implements RmiContant {
 						if (null != (provider = tempClass.getDeclaredAnnotation(RmiProviderAnnotation.class))) {
 							serviceModel = new ServiceModel();
 							serviceModel.setInterfaceName(provider.interfaceClass().getName());
-							serviceModel.setVersion(StringUtil.newInstance().isEmpty(provider.version(), scanModel.getVersion()));
-							serviceModel.setId(StringUtil.newInstance().isEmpty(provider.id(), StringUtil.newInstance().toLowerCaseFirstOne(tempClass.getSimpleName())));
+							serviceModel.setVersion(StringUtil.isEmpty(provider.version(), scanModel.getVersion()));
+							serviceModel.setId(StringUtil.isEmpty(provider.id(), StringUtil.toLowerCaseFirstOne(tempClass.getSimpleName())));
 							serviceModel.setRefClass(tempClass.getName());
 							serviceGroupModel.getServices().put(serviceModel.getId(), serviceModel);
 						}

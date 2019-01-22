@@ -20,7 +20,7 @@ public class TransactionManagerConfig extends AbstractConfig {
 
 	private static final long serialVersionUID = 1L;
 
-	private StringUtil stringUtil = StringUtil.newInstance();
+	private StringUtil stringUtil = StringUtil;
 
 	@Override
 	public AbstractConfig makeConfig(Element element, ParserContext parserContext) {

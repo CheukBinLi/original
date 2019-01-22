@@ -47,16 +47,16 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 				id = tempElement.getAttribute("id");
 				serviceModel.setVersion(tempElement.getAttribute("version"));
 				serviceModel.setRef(tempValue = tempElement.getAttribute("ref"));
-				if (StringUtil.newInstance().isEmpty(id) && !StringUtil.newInstance().isEmpty(tempValue)) {
-					id = StringUtil.newInstance().toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
+				if (StringUtil.isEmpty(id) && !StringUtil.isEmpty(tempValue)) {
+					id = StringUtil.toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
 				}
 				serviceModel.setRefClass(tempValue = tempElement.getAttribute("class"));
-				if (StringUtil.newInstance().isEmpty(id) && !StringUtil.newInstance().isEmpty(tempValue)) {
-					id = StringUtil.newInstance().toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
+				if (StringUtil.isEmpty(id) && !StringUtil.isEmpty(tempValue)) {
+					id = StringUtil.toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
 				}
 				serviceModel.setInterfaceName(tempValue = tempElement.getAttribute("interface"));
-				if (StringUtil.newInstance().isEmpty(id) && !StringUtil.newInstance().isEmpty(tempValue)) {
-					id = StringUtil.newInstance().toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
+				if (StringUtil.isEmpty(id) && !StringUtil.isEmpty(tempValue)) {
+					id = StringUtil.toLowerCaseFirstOne(tempValue.substring(tempValue.lastIndexOf(".") + 1) + "_v" + serviceModel.getVersion());
 				}
 				serviceModel.setId(id);
 				serviceModel.setDescribe(tempElement.getAttribute("describe"));
@@ -82,7 +82,7 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 		}
 		// 服务端
 		if (!parserContext.getRegistry().containsBeanDefinition(BEAN_RMI_NETWORK_SERVER)) {
-			Map<String, Object> property = CollectionUtil.newInstance().toMap(RMI_CONFIG_BEAN_CONFIG_GROUP, getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP), BEAN_CACHE_SERIALIZE, getConfig(parserContext, BEAN_CACHE_SERIALIZE), BEAN_RMI_BEAN_FACTORY, rmiBeanFactory, BEAN_LOAD_BALANCE_FACTORY,
+			Map<String, Object> property = CollectionUtil.toMap(RMI_CONFIG_BEAN_CONFIG_GROUP, getConfig(parserContext, RMI_CONFIG_BEAN_CONFIG_GROUP), BEAN_CACHE_SERIALIZE, getConfig(parserContext, BEAN_CACHE_SERIALIZE), BEAN_RMI_BEAN_FACTORY, rmiBeanFactory, BEAN_LOAD_BALANCE_FACTORY,
 					getConfig(parserContext, BEAN_LOAD_BALANCE_FACTORY));
 
 			registerBeanDefinition(parserContext, NettyServer.class, BEAN_RMI_NETWORK_SERVER, property, "start");
@@ -107,7 +107,7 @@ public class ServiceGroupConfig extends AbstractConfig implements RmiContant {
 			serviceGroups = (Map<String, ServiceGroupModel>) bean.getPropertyValues().get(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG);
 		} else {
 			serviceGroups = new ConcurrentSkipListMap<String, ServiceGroupModel>();
-			registerBeanDefinition(parserContext, ServiceGroup.class, RMI_CONFIG_BEAN_SERVICE_GROUP, CollectionUtil.newInstance().toMap(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG, serviceGroups), null);
+			registerBeanDefinition(parserContext, ServiceGroup.class, RMI_CONFIG_BEAN_SERVICE_GROUP, CollectionUtil.toMap(ServiceGroup.SERVICE_GROUP_CONFIG_MODEL_FIELD_SERVICE_GROUP_CONFIG, serviceGroups), null);
 			// rmiConfigGroup注入
 			BeanDefinition rmiConfigGroup = parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_CONFIG_GROUP);
 			rmiConfigGroup.getPropertyValues().add(RMI_CONFIG_BEAN_CONFIG_SERVICE_GROUP, parserContext.getRegistry().getBeanDefinition(RMI_CONFIG_BEAN_SERVICE_GROUP));

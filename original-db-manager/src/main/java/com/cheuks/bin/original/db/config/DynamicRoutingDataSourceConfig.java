@@ -57,7 +57,7 @@ public class DynamicRoutingDataSourceConfig extends AbstractConfig {
 						break;
 					tempNode = subList.item(j);
 					if (ContentType.DataSourceConfigType.DATA_SOURCE.equals(tempNode.getNodeName()) || ContentType.DataSourceConfigType.DATA_SOURCE.equals(tempNode.getLocalName())) {
-						datasources.add(new DataSourceModel(StringUtil.newInstance().generateRegexString(((Element) node).getAttribute(ContentType.DataSourceConfigType.PATTERN)), ((Element) node).getAttribute(ContentType.DataSourceConfigType.DATA_SOURCE)));
+						datasources.add(new DataSourceModel(StringUtil.generateRegexString(((Element) node).getAttribute(ContentType.DataSourceConfigType.PATTERN)), ((Element) node).getAttribute(ContentType.DataSourceConfigType.DATA_SOURCE)));
 					}
 				}
 				dynamicRoutingDataSourceModel.setDatasources(datasources);

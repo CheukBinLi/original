@@ -36,7 +36,7 @@ import com.cheuks.bin.original.db.manager.hibernate.BeetlQueryFactory;
 
 public class DbBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
-	private StringUtil stringUtil = StringUtil.newInstance();
+	private StringUtil stringUtil = StringUtil;
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
@@ -116,7 +116,7 @@ public class DbBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 						break;
 					tempNode = subList.item(j);
 					if (ContentType.DataSourceConfigType.DATA_SOURCE.equals(tempNode.getNodeName()) || ContentType.DataSourceConfigType.DATA_SOURCE.equals(tempNode.getLocalName())) {
-						datasources.add(new DataSourceModel(StringUtil.newInstance().generateRegexString(((Element) node).getAttribute(ContentType.DataSourceConfigType.PATTERN)), ((Element) node).getAttribute(ContentType.DataSourceConfigType.DATA_SOURCE)));
+						datasources.add(new DataSourceModel(StringUtil.generateRegexString(((Element) node).getAttribute(ContentType.DataSourceConfigType.PATTERN)), ((Element) node).getAttribute(ContentType.DataSourceConfigType.DATA_SOURCE)));
 					}
 				}
 				dynamicRoutingDataSourceModel.setDatasources(datasources);

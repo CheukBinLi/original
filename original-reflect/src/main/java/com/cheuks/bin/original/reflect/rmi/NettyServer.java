@@ -95,7 +95,7 @@ public class NettyServer {
 							// rmiBeanFactory = new SimpleRmiBeanFactory();
 							throw new NullPointerException("rmiBeanFactory is null");
 						}
-						rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", scanPath, "isServer", true));
+						rmiBeanFactory.init(CollectionUtil.toMap("scan", scanPath, "isServer", true));
 
 						if (null == cacheSerialize)
 							cacheSerialize = new FstCacheSerialize();
@@ -351,7 +351,7 @@ public class NettyServer {
 
 	public static void main(String[] args) throws Throwable {
 		RmiBeanFactory rmiBeanFactory = DefaultRmiBeanFactory.newInstance();
-		rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", "com.cheuks.bin.original.reflect"));
+		rmiBeanFactory.init(CollectionUtil.toMap("scan", "com.cheuks.bin.original.reflect"));
 		NettyServer ns = new NettyServer();
 		NettyHandleServiceFactory handleServiceFactory = NettyHandleServiceFactory.newInstance(8);
 

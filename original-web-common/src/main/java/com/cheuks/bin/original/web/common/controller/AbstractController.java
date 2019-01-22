@@ -118,7 +118,7 @@ public abstract class AbstractController<ModelAndView> extends ObjectFill implem
         Map<String, Object> error = null;
         if (null != e) {
             LOG.error(null, e);
-            error = CollectionUtil.newInstance().toMap(true, new Object[] { "error", e.getMessage() });
+            error = CollectionUtil.toMap(true, new Object[] { "error", e.getMessage() });
         }
         return forward(errorPageUrl, error);
     }

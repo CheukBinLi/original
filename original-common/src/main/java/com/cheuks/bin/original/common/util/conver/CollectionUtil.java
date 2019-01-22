@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
+@SuppressWarnings("unchecked")
 public class CollectionUtil {
 
 	private static final CollectionUtil newInstance = new CollectionUtil();
@@ -27,25 +28,24 @@ public class CollectionUtil {
 		return collection;
 	}
 
-	public static Map<String, Object> toMap(Object... params) {
+	public static <K, V> Map<K, V> toMap(Object... params) {
 		if (null == params || 0 != (params.length % 2))
 			return null;
 		Map<String, Object> map = new WeakHashMap<String, Object>(params.length * 2);
 		for (int i = 0, len = params.length; i < len; i++) {
 			map.put((String) params[i++], params[i]);
 		}
-		return map;
+		return (Map<K, V>) map;
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <K> Map<K, Object> toMap(boolean isWeak, Object... params) {
+	public static <K, V> Map<K, V> toMap(boolean isWeak, Object... params) {
 		if (null == params || 0 != (params.length % 2))
 			return null;
 		Map<K, Object> result = isWeak ? new WeakHashMap<K, Object>(params.length * 2) : new HashMap<K, Object>(params.length * 2);
 		for (int i = 0, len = params.length; i < len; i++) {
 			result.put((K) params[i++], params[i]);
 		}
-		return result;
+		return (Map<K, V>) result;
 	}
 
 	@SafeVarargs
@@ -102,7 +102,6 @@ public class CollectionUtil {
 			return this;
 		}
 
-		@SuppressWarnings("unchecked")
 		public <K, V> Map<K, V> build() {
 			return (Map<K, V>) data;
 		}

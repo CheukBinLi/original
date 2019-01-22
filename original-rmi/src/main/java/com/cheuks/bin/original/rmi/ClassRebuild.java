@@ -106,11 +106,12 @@ public class ClassRebuild {
 			}
 			clazz.addField(newField);
 			if (item.createGetting) {
-				getting = CtMethod.make(String.format("public %s get%s(){return this.%s;}", item.returnType.getName(), StringUtil.newInstance().toUpperCaseFirstOne(item.name), item.name), clazz);
+				getting = CtMethod.make(String.format("public %s get%s(){return this.%s;}", item.returnType.getName(), StringUtil.toUpperCaseFirstOne(item.name), item.name), clazz);
 				clazz.addMethod(getting);
 			}
 			if (item.createSetting) {
-				setting = CtMethod.make(String.format("public void set%s(%s %s){this.%s=%s;}", StringUtil.newInstance().toUpperCaseFirstOne(item.name), item.returnType.getName(), item.name, item.name, item.name), clazz);
+				setting = CtMethod.make(String.format("public void set%s(%s %s){this.%s=%s;}", StringUtil
+						.toUpperCaseFirstOne(item.name), item.returnType.getName(), item.name, item.name, item.name), clazz);
 				clazz.addMethod(setting);
 			}
 		}
@@ -139,7 +140,7 @@ public class ClassRebuild {
 		}
 
 		sb.append("{");
-		if (!StringUtil.newInstance().isEmpty(after)) {
+		if (!StringUtil.isEmpty(after)) {
 			sb.append("try{");
 		}
 		if (null != before) {
@@ -149,7 +150,7 @@ public class ClassRebuild {
 			sb.append(overrideSuper).append((!overrideSuper.endsWith(";") && !overrideSuper.endsWith("}")) ? ";" : "");
 		}
 		//after
-		if (!StringUtil.newInstance().isEmpty(after)) {
+		if (!StringUtil.isEmpty(after)) {
 			sb.append("}finally{").append(after).append("}");
 		}
 		sb.append("}");

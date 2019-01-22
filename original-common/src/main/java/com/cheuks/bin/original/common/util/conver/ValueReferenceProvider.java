@@ -3,6 +3,7 @@ package com.cheuks.bin.original.common.util.conver;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Deprecated
 public class ValueReferenceProvider {
 	private Map<String, ValueReference> valueReference;
 	//	private List<ValueReference> valueReference;

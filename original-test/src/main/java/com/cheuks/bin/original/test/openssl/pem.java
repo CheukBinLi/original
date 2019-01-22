@@ -37,37 +37,38 @@ public class pem {
 		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 		Cipher cipher = Cipher.getInstance("RSA", new BouncyCastleProvider());
 		
-		String public_Key="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDg1vn4jVKYO8WpTtiwhPaIQjmG" + 
-				"PUX25QgJKnFYzNVxw0LwCtelCYAf8fFFsjjccf/nJqXSAKNydS4O0Dnit4MACJ14" + 
-				"Ai8uqQDC5q6vSeVikU0xWAnEwiXVCLIi2aMu9yhSFG1uQruP49GW2NaY6NVQPCOB" + 
-				"WKb1bpYgKfEw9Rq00wIDAQAB";
+		String public_Key="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8V96cZKNyfROPOsC1V732VtoH\r\n" + 
+				"B15NGFTOIf+Y0DRf8PrELctfPcdjrEZ1lPsjJVj6cjJdP0k65yV9zoBhw0yw6sYQ\r\n" + 
+				"XpA5Eir0wN6VcuqXdJgeY2fgT7VtIDMgjN3qtrUfdHxxT2DLqjArCWeYbgYjrZHi\r\n" + 
+				"5EjjcTU7glVQ629kcQIDAQAB";
 		byte[] buffer = base64Decoder.decodeBuffer(public_Key);
 		
 		
 		KeySpec x509 = new X509EncodedKeySpec(buffer);
 		PublicKey publicKey = keyFactory.generatePublic(x509);
 		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		byte[] output = cipher.doFinal("appid=1543028514&appkey=1543028514&command=order.push&param={}&timestamp=1543028514&version=1.0".getBytes());
+//		byte[] output = cipher.doFinal("appid=1543028514&appkey=1543028514&command=order.push&param={}&timestamp=1543028514&version=1.0".getBytes());
+		byte[] output = cipher.doFinal("123456".getBytes());
 		System.err.println(new String(output));
 		System.err.println(DigestUtils.md5DigestAsHex(output));
 		System.err.println(DigestUtils.md5DigestAsHex("123".getBytes()));
 		System.err.println(new String(output));
 		
 		
-		String private_Key="MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAODW+fiNUpg7xalO" + 
-				"2LCE9ohCOYY9RfblCAkqcVjM1XHDQvAK16UJgB/x8UWyONxx/+cmpdIAo3J1Lg7Q" + 
-				"OeK3gwAInXgCLy6pAMLmrq9J5WKRTTFYCcTCJdUIsiLZoy73KFIUbW5Cu4/j0ZbY" + 
-				"1pjo1VA8I4FYpvVuliAp8TD1GrTTAgMBAAECgYEAkosrc9fQnI5gv4A3dZ3D/X2E" + 
-				"dr0bC9etTCQQqnsfJz3INCIs+VFe4/NSeUW3D99xllw3Oc/WuDQt59PJ1r4bL8Ib" + 
-				"51JUQ6vkWtdSEZQXFF0bWwYullKljs7KQ1DFXVEAsGS5HpM3byBWJMCgy3psgGI0" + 
-				"O7xe8Ojrao4Xc10TyKkCQQD+8A/pkldSnneTSmBCcc4kF6FOD7CVrjC6bSMMvCNd" + 
-				"B0nA96i3X8lbpGgc9lKrS5Q1jVDERL+FtY/g2ukwxxCVAkEA4cbPLAbzcdUsd/mV" + 
-				"C/2KcNfBkdPKiKG0l9wX6rh9Ui++VNRUrBZdt9ImsT8wLx5Uz/qVGBkufzV9lWkZ" + 
-				"COBNxwJBALQKP4KZmde8GABKF171VjqBAabKR8/9W2ZdKtKUj3jka76+aEVQfTie" + 
-				"C/TgNJPKZVnIehCR6Jv6FCkdEHAlNV0CQAJpWTUjLd59ZGgzpj/miWADLfIczQEA" + 
-				"mSk2FJtRNSV3lRTa37ym0IFyIS+reRxHuqguCQGk4zZAoALEiJvrqWkCQCO2QzUC" + 
-				"rvQpb9LParaeIHIutnSZ1N9ViQ8VMOjgmXjz5fbDoaozgy/F0RGlDj5/rJwVAw7i" + 
-				"V2Kjk0VJixiRQwE=";
+		String private_Key="MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBALxX3pxko3J9E486\r\n" + 
+				"wLVXvfZW2gcHXk0YVM4h/5jQNF/w+sQty189x2OsRnWU+yMlWPpyMl0/STrnJX3O\r\n" + 
+				"gGHDTLDqxhBekDkSKvTA3pVy6pd0mB5jZ+BPtW0gMyCM3eq2tR90fHFPYMuqMCsJ\r\n" + 
+				"Z5huBiOtkeLkSONxNTuCVVDrb2RxAgMBAAECgYBbD4jbyHSV+A8q4tclVkTMA3Xq\r\n" + 
+				"jA916tulxh5T/eY0tMgpbZK0e6QZdsOiOeOqPHZmsCvVlbGMPxGLX/oGSmybEGuh\r\n" + 
+				"p97CtnNEUItUckXUs55q7yFgO94YfG78gKSARSQGPmkweDLR/Mthz4l+oyYGlR+n\r\n" + 
+				"7iIIOgpHf3gUPuCwoQJBAOchYeqKzDe4TawhoH4sVOGUffaasD2XVVtvhbTdhCmK\r\n" + 
+				"e8mc0tyPRT9G2WHz+awWVGo/kqEcLgB7NEKJKGFfYY0CQQDQm+P9k1t0+Ohtf/uN\r\n" + 
+				"SzxPJ8TVeWDkUlB/PPKzaRWh3QCfxvQw1SjEB+sav6Dq6NTP7m3Rb1PbtViX6dwu\r\n" + 
+				"sct1AkEAkblSavYn29mv3x80eViqC6/720ecZrjLcGLYAjjH4wkVEwB1Uepi1ops\r\n" + 
+				"9H1GpWFOx85dPIbv2g3T3T9s3jes4QJAIExysVk2aNb9Da8qIIdMkCjlJfREFzXT\r\n" + 
+				"ds/V+AdGLSiNpy9jsYffZvKe6SZQYO6pvIP7BtlIz5S1Ydf4mlY23QJBAM2J3U3y\r\n" + 
+				"3JO34gUMwkT1Sb63kDmO9tYh2ALxnP/NdVftMCG0dUV//m5OfGiAfZgDuE/cQmHN\r\n" + 
+				"Sz2rh4owUkP2ZgI=";
 		
 		//解密
 		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(base64Decoder.decodeBuffer(private_Key));

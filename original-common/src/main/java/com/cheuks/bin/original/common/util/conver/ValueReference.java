@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import com.cheuks.bin.original.common.util.reflection.ClassInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 
+@Deprecated
 public class ValueReference {
 	private ClassInfo classInfo;//当前对象信息
 	private Map<String, String> names;//引用的字段名

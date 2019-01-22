@@ -45,6 +45,7 @@ public class HandleService<Input extends Object, Value extends Object> implement
 		}
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	public boolean serviceTypeContains(int serviceType) {
 		synchronized (SERVICE_HANDLE) {
 			return SERVICE_HANDLE.containsKey(serviceType);

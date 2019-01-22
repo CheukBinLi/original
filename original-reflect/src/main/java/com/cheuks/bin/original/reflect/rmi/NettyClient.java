@@ -93,7 +93,7 @@ public class NettyClient extends AbstractObjectPool<NettyClientHandle, InetSocke
 				// rmiBeanFactory = new SimpleRmiBeanFactory();
 				throw new NullPointerException("rmiBeanFactory is null");
 			}
-			rmiBeanFactory.init(CollectionUtil.newInstance().toMap("scan", scanPath, "isServer", false));
+			rmiBeanFactory.init(CollectionUtil.toMap("scan", scanPath, "isServer", false));
 			if (null == registrationFactory)
 				registrationFactory = new ZookeeperRegistrationFactory(zookeeperServerList, baseSleepTimeMs, maxRetries);
 			registrationFactory.start();

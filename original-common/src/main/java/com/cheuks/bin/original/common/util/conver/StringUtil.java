@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +23,8 @@ import java.util.regex.Pattern;
 public class StringUtil extends ConverType {
 
 	private static StringUtil INSTANCE;
+
+	private static final String EMPTY = "";
 
 	protected StringUtil() {
 	}
@@ -107,18 +111,32 @@ public class StringUtil extends ConverType {
 		return false;
 	}
 
+	public static boolean isAllBlank(String... str) {
+		if (null == str || str.length < 1) {
+			return true;
+		}
+		for (String item : str) {
+			if (isBlank(item)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static String isBlank(String str, String defaultValue) {
 		return isBlank(str) ? defaultValue : str;
 	}
 
 	/***
 	 * 
+	 * 驼峰变量名字转下划线变量
+	 * 
 	 * @param str
 	 * @return
 	 */
 	public static String toLowerCaseUnderscoreCamel(String str) {
 		if (isEmpty(str))
-			return "";
+			return EMPTY;
 		StringBuilder result = new StringBuilder();
 		for (Character item : str.toLowerCase().toCharArray()) {
 			result.append((65 <= item && 90 >= item) ? "_" + (char) (item + 32) : item);
@@ -126,9 +144,15 @@ public class StringUtil extends ConverType {
 		return result.toString();
 	}
 
+	/***
+	 * 下划线变量名字转驼峰变量
+	 * 
+	 * @param str
+	 * @return
+	 */
 	public static String toLowerUnderscoreCaseCamel(String str) {
 		if (isEmpty(str))
-			return "";
+			return EMPTY;
 		StringBuilder result = new StringBuilder();
 		boolean nextChange = false;
 		for (Character item : str.toLowerCase().toCharArray()) {
@@ -164,6 +188,18 @@ public class StringUtil extends ConverType {
 		return result;
 	}
 
+	/***
+	 * 补位
+	 * 
+	 * @param content
+	 * @param ch
+	 *            补位字符
+	 * @param len
+	 *            位数
+	 * @param left
+	 *            是否在左边补位
+	 * @return
+	 */
 	public static String fillPosition(String content, char ch, int len, boolean left) {
 		if (null == content || content.length() >= len)
 			return content;
@@ -174,14 +210,41 @@ public class StringUtil extends ConverType {
 		return left ? result.toString() + content : content + result.toString();
 	}
 
+	/***
+	 * 向左补位
+	 * 
+	 * @param content
+	 * @param ch
+	 *            补位字符
+	 * @param len
+	 *            位数
+	 * @return
+	 */
 	public static String fillPositionLeft(String content, char ch, int len) {
 		return fillPosition(content, ch, len, true);
 	}
 
+	/***
+	 * 向右补位
+	 * 
+	 * @param content
+	 * @param ch补位字符
+	 * @param len位数
+	 * @return
+	 */
 	public static String fillPositionRight(String content, char ch, int len) {
 		return fillPosition(content, ch, len, false);
 	}
 
+	/***
+	 * 过滤指定符号
+	 * 
+	 * @param str
+	 * @param cs
+	 *            要过滤的符号
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
 	public static byte[] filterCharestBytes(String str, Character... cs) throws UnsupportedEncodingException {
 		if (isEmpty(str)) {
 			return new byte[0];
@@ -199,6 +262,15 @@ public class StringUtil extends ConverType {
 		return out.toByteArray();
 	}
 
+	/***
+	 * 过滤指定符号
+	 * 
+	 * @param str
+	 * @param cs
+	 *            要过滤的符号
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
 	public static String filterCharest(String str, Character... cs) {
 		if (isEmpty(str) || (null == cs || cs.length < 1)) {
 			return str;
@@ -214,8 +286,52 @@ public class StringUtil extends ConverType {
 		return result.toString();
 	}
 
+	/***
+	 * 拼接
+	 * 
+	 * @param coupler
+	 *            偶合连接字符
+	 * @param str
+	 * @return
+	 */
+	public static String assemble(String coupler, String... str) {
+		if (StringUtil.isAllBlank(str))
+			return null;
+		coupler = isEmpty(coupler, EMPTY);
+		StringBuilder result = new StringBuilder();
+		for (String item : str) {
+			result.append(coupler).append(item);
+		}
+		return result.substring(coupler.length());
+	}
+
+	/***
+	 * 
+	 * 拼接
+	 * 
+	 * key${valueCoupler}value${variableCoupler}key${valueCoupler}value${variableCoupler}
+	 * 
+	 * @param valueCoupler
+	 *            key和value连接字符
+	 * @param param
+	 * @param variableCoupler
+	 *            变量与变量连接字符
+	 * @return
+	 */
+	public static String assemble(String valueCoupler, Map<Object, Object> param, String variableCoupler) {
+		if (CollectionUtil.isEmpty(param))
+			return null;
+		valueCoupler = isEmpty(valueCoupler, EMPTY);
+		variableCoupler = isEmpty(variableCoupler, EMPTY);
+		StringBuilder result = new StringBuilder();
+		for (Entry<Object, Object> en : param.entrySet()) {
+			result.append(variableCoupler).append(en.getKey()).append(valueCoupler).append(en.getValue());
+		}
+		return result.substring(variableCoupler.length());
+	}
+
 	//	public static void main(String[] args) {
-	//		System.out.println(StringUtil.newInstance().concatCount(
+	//		System.out.println(StringUtil.concatCount(
 	//				"file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua", ".jar!"));
 	//
 	//		String a = "file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua";
