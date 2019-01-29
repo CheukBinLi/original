@@ -2,10 +2,13 @@ package com.cheuks.bin.original.common.util.conver;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @SuppressWarnings("unchecked")
 public class CollectionUtil {
@@ -41,7 +44,8 @@ public class CollectionUtil {
 	public static <K, V> Map<K, V> toMap(boolean isWeak, Object... params) {
 		if (null == params || 0 != (params.length % 2))
 			return null;
-		Map<K, Object> result = isWeak ? new WeakHashMap<K, Object>(params.length * 2) : new HashMap<K, Object>(params.length * 2);
+		Map<K, Object> result = isWeak ? new WeakHashMap<K, Object>(params.length * 2)
+				: new HashMap<K, Object>(params.length * 2);
 		for (int i = 0, len = params.length; i < len; i++) {
 			result.put((K) params[i++], params[i]);
 		}
@@ -104,6 +108,29 @@ public class CollectionUtil {
 
 		public <K, V> Map<K, V> build() {
 			return (Map<K, V>) data;
+		}
+
+	}
+
+	public static SetBuilder setBuilder(boolean isConcurrent) {
+		return new SetBuilder(isConcurrent);
+	}
+
+	public static class SetBuilder {
+
+		private Set<Object> data;
+
+		public SetBuilder(boolean isConcurrent) {
+			data = isConcurrent ? new CopyOnWriteArraySet<Object>() : new HashSet<Object>();
+		}
+
+		public SetBuilder append(Object value) {
+			data.add(value);
+			return this;
+		}
+
+		public <V> Set<V> build() {
+			return (Set<V>) data;
 		}
 
 	}
