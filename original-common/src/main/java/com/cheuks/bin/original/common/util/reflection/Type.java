@@ -199,21 +199,24 @@ public enum Type {
 			switch (item) {
 			case '\"':
 				result.append("\\\"");
-				break;
+				continue;
 			case '\\':
 				result.append("\\\\");
-				break;
+				continue;
 			case '\r':
 				result.append("\\r");
-				break;
+				continue;
 			case '\n':
 				result.append("\\n");
 			case '\t':
 				result.append("\\t");
-				break;
+				continue;
 			default:
-				result.append(item);
+				break;
 			}
+			if (item < 32 || item == 127)
+				continue;
+			result.append(item);
 		}
 		return result.toString();
 	}
