@@ -6,6 +6,7 @@ import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
+@Deprecated
 public class OauthVoter implements AccessDecisionVoter<Object> {
 
 	@Override

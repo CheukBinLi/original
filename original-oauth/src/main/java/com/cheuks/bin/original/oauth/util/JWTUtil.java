@@ -10,15 +10,15 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.cheuks.bin.original.common.exception.OverdueException;
 import com.cheuks.bin.original.oauth.model.AuthInfo;
-import com.cheuks.bin.original.oauth.model.KeyModel;
+import com.cheuks.bin.original.oauth.model.encryption.KeyModel;
 
-public class TokenFactory {
+public class JWTUtil {
 
 	interface AuthInfoField {
-		String ID = "id", TYPE = "type", USER_NAME = "name", DEVICE_CODE = "code", ROLE = "role";
+		String ID = "A", TENANT = "B", TYPE = "C", USER_NAME = "D", NONCE = "E", ROLE = "F", SOURCE = "G";
 	}
 
-	Algorithm getAlgorithm(KeyModel key) {
+	public static Algorithm getAlgorithm(KeyModel key) {
 		switch (key.getEncryptionType()) {
 		case HMAC256:
 			return Algorithm.HMAC256(key.getSecret());
@@ -32,18 +32,19 @@ public class TokenFactory {
 		}
 	}
 
-	public String generateToken(AuthInfo auth, KeyModel key, long expireSeconds) throws Throwable {
+	public static String generateToken(AuthInfo auth, KeyModel key, long expireSeconds) throws Throwable {
 		Algorithm algorithm = getAlgorithm(key);
-		String type = auth.getType().trim().toUpperCase();
+		String type = auth.getSource().trim().toUpperCase();
 		JWTCreator.Builder builder = JWT.create().withIssuer(key.getIssuer()).withExpiresAt(new Date(System.currentTimeMillis() + (expireSeconds * 1000)));
 		builder.withClaim(AuthInfoField.ID, auth.getId());
-		builder.withClaim(AuthInfoField.USER_NAME, auth.getUserName());
-		builder.withClaim(AuthInfoField.DEVICE_CODE, auth.getDeviceCode());
+		builder.withClaim(AuthInfoField.TENANT, auth.getTenant());
+		builder.withClaim(AuthInfoField.SOURCE, auth.getSource());
+		builder.withClaim(AuthInfoField.NONCE, auth.getNonceStr());
 		builder.withArrayClaim(AuthInfoField.ROLE, auth.getRole().toArray(new String[0]));
 		return type + ":" + builder.sign(algorithm);
 	}
 
-	public AuthInfo parser(String token, KeyModel key) throws OverdueException, Exception {
+	public static AuthInfo parser(String token, KeyModel key) throws OverdueException, Exception {
 		Algorithm algorithm = getAlgorithm(key);
 		algorithm = Algorithm.HMAC256(key.getSecret());
 		JWTVerifier verifier = JWT.require(algorithm).withIssuer(key.getIssuer()).build();
@@ -52,11 +53,10 @@ public class TokenFactory {
 		if (null == expire || expire.getTime() <= System.currentTimeMillis()) {
 			throw new OverdueException();
 		}
-		return new AuthInfo()
+		return new AuthInfo(jwt.getClaim(AuthInfoField.NONCE).asString())
 							.setId(jwt.getClaim(AuthInfoField.ID).asString())
-							.setUserName(jwt.getClaim(AuthInfoField.USER_NAME).asString())
-							.setDeviceCode(jwt.getClaim(AuthInfoField.DEVICE_CODE).asString())
-							.setRole(new HashSet<String>(jwt.getClaim(AuthInfoField.ROLE).asList(String.class)))
-							.setType(token.substring(0, token.indexOf(":")));
+							.setTenant(jwt.getClaim(AuthInfoField.TENANT).asString())
+							.setSource(jwt.getClaim(AuthInfoField.SOURCE).asString())
+							.setRole(new HashSet<String>(jwt.getClaim(AuthInfoField.ROLE).asList(String.class)));
 	}
 }

@@ -13,22 +13,23 @@ public class Granted implements GrantedAuthority {
 
 	private static final long serialVersionUID = 1L;
 
-	private String name;
-	private String url;
+	private String authority;//权限
 
 	@Override
 	public String getAuthority() {
-		return this.url;
+		return this.authority;
 	}
 
-	public Granted setName(String name) {
-		this.name = name;
-		return this;
+	@Override
+	public int hashCode() {
+		return this.authority.hashCode();
 	}
 
-	public Granted setUrl(String url) {
-		this.url = url;
-		return this;
+	@Override
+	public boolean equals(Object obj) {
+		if (null == obj || !(obj instanceof Granted))
+			return false;
+		return this.authority.equals(((Granted) obj).authority);
 	}
 
 }

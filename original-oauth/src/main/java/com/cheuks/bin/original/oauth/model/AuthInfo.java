@@ -3,46 +3,53 @@ package com.cheuks.bin.original.oauth.model;
 import java.io.Serializable;
 import java.util.Set;
 
+import com.cheuks.bin.original.common.util.SignUtil;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthInfo implements Serializable {
 
 	private static final long serialVersionUID = -4616317180995430675L;
+	
+	public static final AuthInfo EMPTY_AUTH_INFO = new AuthInfo();
 
-	private String id;//用户ID
-	private String type;//来源应用:toke类型
-	private String userName;//用户名
-	private String deviceCode;//设备码
-	private Set<String> role;//权限角色
+	private String id;// 用户ID
+	private String tenant;// 租户ID
+	private String source;// 来源应用例如:token type
+	private final String nonceStr;// 随机
+	private Set<String> role;// 权限角色
 
 	public AuthInfo setId(String id) {
 		this.id = id;
 		return this;
 	}
 
-	public AuthInfo setType(String type) {
-		this.type = type;
-		return this;
-	}
-
-	public AuthInfo setUserName(String userName) {
-		this.userName = userName;
-		return this;
-	}
-
-	public AuthInfo setDeviceCode(String deviceCode) {
-		this.deviceCode = deviceCode;
+	public AuthInfo setSource(String source) {
+		this.source = source;
 		return this;
 	}
 
 	public AuthInfo setRole(Set<String> role) {
 		this.role = role;
 		return this;
+	}
+
+	public AuthInfo setTenant(String tenant) {
+		this.tenant = tenant;
+		return this;
+	}
+
+	public AuthInfo() {
+		this(10);
+	}
+
+	public AuthInfo(int nonceStrLength) {
+		this(SignUtil.generateNonceStr(10));
 	}
 
 }

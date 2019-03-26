@@ -7,8 +7,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -27,13 +31,16 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.cheuks.bin.original.cache.redis.JedisClusterFactory;
+import com.cheuks.bin.original.cache.redis.JedisStandAloneFactory;
+import com.cheuks.bin.original.common.cache.redis.RedisFactory;
+import com.cheuks.bin.original.common.util.web.ResultFactory;
 import com.cheuks.bin.original.oauth.security.OauthAccessDecisionManager;
 import com.cheuks.bin.original.oauth.security.OauthAuthenticationProvider;
 import com.cheuks.bin.original.oauth.security.OauthFilterInvocationSecurityMetadataSource;
 import com.cheuks.bin.original.oauth.security.filter.LoginFilter;
 import com.cheuks.bin.original.oauth.security.filter.OauthBasicAuthenticationFilter;
-import com.cheuks.bin.original.oauth.security.service.AccountDetailsService;
-import com.cheuks.bin.original.oauth.util.ResultFactory;
+import com.cheuks.bin.original.oauth.security.token.TokenManager;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -44,17 +51,12 @@ import lombok.Setter;
 @EnableWebSecurity
 @Order(SecurityProperties.DEFAULT_FILTER_ORDER)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class})
 public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
 
 	@Value("${com.cheuks.bin.original.oauth.login.url:/user/login}")
 	private String loginUrl;
 
-	@Bean
-	@Primary
-	public AccountDetailsService getAccountDetailsService() {
-		return new AccountDetailsService();
-	}
-	
 	@Bean
 	@Primary
 	@ConditionalOnClass(value= {ResultFactory.class})
@@ -73,13 +75,22 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
 	public OauthFilterInvocationSecurityMetadataSource getFilterInvocationSecurityMetadataSource() {
 		return new OauthFilterInvocationSecurityMetadataSource();
 	}
-
-	/***
-	 * 默认7天
-	 */
-	@Value("${web.wecurity.configration.token.expire:604800}")
-	private Long tokenExpire;
-
+	
+//	@Primary
+	@Bean(initMethod = "init")
+	@ConditionalOnMissingBean({ TokenManager.class })
+	TokenManager getTokenManager() {
+		return new TokenManager();
+	}
+	
+	@Bean
+	@ConfigurationProperties(prefix = "redis.factory")
+	@ConditionalOnMissingBean(value = {RedisFactory.class, JedisStandAloneFactory.class, JedisClusterFactory.class})
+	RedisFactory getRedisFactory() {
+//		return new JedisClusterFactory();
+		return new JedisStandAloneFactory();
+	}
+	
 	@Override
 	protected AuthenticationManager authenticationManager() throws Exception {
 		return super.authenticationManager();
@@ -87,14 +98,20 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-//		web.ignoring().antMatchers("/test/**"); 
+		web
+		.ignoring()
+		.antMatchers(
+				"/user/loginPage",
+				"/*.ico"
+				); 
 	}
-
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-
+		getFilterInvocationSecurityMetadataSource().append("/test/**",false, "ALL").append("/t/**",true, "ALL","ANONYMOUS").append("/txxxxa/**/aax",false, "ALL","ANONYMOUS").sort();
+		
 		http
-			.addFilterBefore(new OauthBasicAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(new OauthBasicAuthenticationFilter(getTokenManager(),authenticationManager()), UsernamePasswordAuthenticationFilter.class)
 			.addFilterAt(new LoginFilter(getLoginUrl(), authenticationManager()), UsernamePasswordAuthenticationFilter.class)
 			.authorizeRequests()
 			.anyRequest()
@@ -108,13 +125,13 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
 					return o;
 				}
 			})
-			.and()
-			.authorizeRequests()
-			.antMatchers("/test/**")
-			.permitAll()
-//			.hasAnyRole("ROLE_GUEST")
-			.anyRequest()
-			.authenticated()
+//			.and()
+//			.authorizeRequests()
+//			.antMatchers("/test/**")
+//			.permitAll()
+////			.hasAnyRole("ROLE_GUEST")
+//			.anyRequest()
+//			.authenticated()
 			.and()
 			.sessionManagement()
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -159,7 +176,7 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.authenticationProvider(new OauthAuthenticationProvider(getAccountDetailsService()));
+		auth.authenticationProvider(new OauthAuthenticationProvider(getTokenManager().addIgnore(getLoginUrl())));
 	}
 
 }

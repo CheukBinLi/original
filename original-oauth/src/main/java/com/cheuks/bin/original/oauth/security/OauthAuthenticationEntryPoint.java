@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import com.cheuks.bin.original.oauth.util.ResultFactory;
+import com.cheuks.bin.original.common.util.web.ResultFactory;
 
 public class OauthAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
