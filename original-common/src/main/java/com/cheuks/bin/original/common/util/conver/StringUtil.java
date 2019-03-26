@@ -24,7 +24,7 @@ public class StringUtil extends ConverType {
 
 	private static StringUtil INSTANCE;
 
-	private static final String EMPTY = "";
+	public static final String EMPTY = "";
 
 	protected StringUtil() {
 	}
@@ -116,11 +116,11 @@ public class StringUtil extends ConverType {
 			return true;
 		}
 		for (String item : str) {
-			if (isBlank(item)) {
-				return true;
+			if (!isBlank(item)) {
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	public static String isBlank(String str, String defaultValue) {
@@ -330,19 +330,142 @@ public class StringUtil extends ConverType {
 		return result.substring(variableCoupler.length());
 	}
 
-	//	public static void main(String[] args) {
-	//		System.out.println(StringUtil.concatCount(
-	//				"file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua", ".jar!"));
+	public static String getParent(String path, Character separator) {
+		int len = 0;
+		while (len < path.length()) {
+			if (path.charAt(len) == separator && len != 0) {
+				return path.substring(0, len);
+			}
+			len++;
+		}
+		return path;
+	}
+	
+	public static PathDirectory getPaths(String path, String split,boolean onlyParent) {
+		String[] paths = path.split(split);
+		if(null==paths||paths.length<1)
+			return null;
+		PathDirectory previous, next;
+		PathDirectory result = new PathDirectory();
+		PathDirectory last = new PathDirectory();
+		int index = 0;
+		if (StringUtil.isBlank(paths[index])) {
+			index++;
+		}
+		result
+			.setPath(split + paths[index++])
+			.setParentDirectory(result)
+			.setLastDirectory(last)
+			.setParent(true);
+		
+		if (onlyParent)
+			return result;
+		
+		last.setLast(true);
+		
+		previous = result;
+		StringBuilder tempPath=new StringBuilder(result.getPath());
+		for (int i = index, len = paths.length, lastIndex = len - 1; i < len; i++) {
+			tempPath.append(split).append(paths[i]);
+			next = (i == lastIndex ? last:new PathDirectory())
+					.setLastDirectory(last)
+					.setPreviousDirectory(previous)
+					.setParent(false)
+					.setPath(tempPath.toString())
+					.setParentDirectory(result);
+			previous.setNextDirectory(next);
+			previous = next;
+		}
+		
+		return result;
+	}
+	public static PathDirectory getParentPath(String path, String split) {
+		return getPaths(path, split, true);
+	}
+
+	public static class PathDirectory {
+		private String path;
+		private boolean isParent;
+		private boolean isLast;
+		private PathDirectory parentDirectory;
+		private PathDirectory nextDirectory;
+		private PathDirectory previousDirectory;
+		private PathDirectory lastDirectory;
+		public String getPath() {
+			return path;
+		}
+		public PathDirectory setPath(String path) {
+			this.path = path;
+			return this;
+		}
+		public boolean isParent() {
+			return isParent;
+		}
+		
+		public boolean isLast() {
+			return isLast;
+		}
+		
+		public PathDirectory setLast(boolean isLast) {
+			this.isLast = isLast;
+			return this;
+		}
+		
+		public PathDirectory setParent(boolean isParent) {
+			this.isParent = isParent;
+			return this;
+		}
+		public PathDirectory getNextDirectory() {
+			return nextDirectory;
+		}
+		public PathDirectory setNextDirectory(PathDirectory nextDirectory) {	
+			this.nextDirectory = nextDirectory;
+			return this;
+		}
+		public PathDirectory getParentDirectory() {
+			return parentDirectory;
+		}
+		public PathDirectory setParentDirectory(PathDirectory parentDirectory) {
+			this.parentDirectory = parentDirectory;
+			return this;
+		}
+		public PathDirectory getPreviousDirectory() {
+			return previousDirectory;
+		}
+		public PathDirectory setPreviousDirectory(PathDirectory previousDirectory) {
+			this.previousDirectory = previousDirectory;
+			return this;
+		}
+		public PathDirectory getLastDirectory() {
+			return lastDirectory;
+		}
+		public PathDirectory setLastDirectory(PathDirectory lastDirectory) {
+			this.lastDirectory = lastDirectory;
+			return this;
+		}
+		
+
+	}
+
+	 public static void main(String[] args) {
+	// System.out.println(StringUtil.concatCount(
+	// "file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua",
+	// ".jar!"));
 	//
-	//		String a = "file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua";
-	//		String[] as = a.split("!");
-	//		System.err.println(Arrays.toString(as));
-	//		System.out.println(a.substring(a.lastIndexOf(".jar!") + 5));
+	// String a =
+	// "file:/F:/Sync/JavaProject/original-3.0/original-prototype/original-prototype.spring.cloud/original-prototype.spring.cloud.eureka-server/target/original-prototype.spring.cloud.eureka-server-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/original-cache-0.0.1-SNAPSHOT.jar!/lua";
+	// String[] as = a.split("!");
+	// System.err.println(Arrays.toString(as));
+	// System.out.println(a.substring(a.lastIndexOf(".jar!") + 5));
 	//
-	//		System.out.println(new StringUtil().toLowerUnderscoreCaseCamel("a_abcde_fghijk_"));
-	//		
-	//		System.err.println(newInstance().fillPositionLeft("x", '0', 3));
-	//		System.err.println(newInstance().fillPositionRight("x", '0', 3));
+	// System.out.println(new
+	// StringUtil().toLowerUnderscoreCaseCamel("a_abcde_fghijk_"));
 	//
-	//	}
+	// System.err.println(newInstance().fillPositionLeft("x", '0', 3));
+	// System.err.println(newInstance().fillPositionRight("x", '0', 3));
+	//
+		PathDirectory pd = getPaths("/test/a/b/c/x", "/",false);
+		System.err.println(pd.getParentDirectory().getPath());
+		System.err.println(getParent("/test/a/b/c/x", '/'));
+	 }
 }

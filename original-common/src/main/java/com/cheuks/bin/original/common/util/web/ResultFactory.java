@@ -1,9 +1,12 @@
-package com.cheuks.bin.original.oauth.util;
+package com.cheuks.bin.original.common.util.web;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.cheuks.bin.original.common.exception.LogicException;
 
 /***
  * * CREATE ON 2018年06月04 下午4:37:37 EMAIL:20796698@QQ.COM
@@ -11,9 +14,10 @@ import lombok.extern.slf4j.Slf4j;
  * @author CHEUK.BIN.LI
  * @see 初始化错误码
  */
-@Slf4j
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ResultFactory implements DefaultResultCode {
+
+	private static final Logger log = LoggerFactory.getLogger(ResultFactory.class);
 
 	private final transient Map<String, String> CACHE = new ConcurrentSkipListMap<>();
 
@@ -41,14 +45,14 @@ public class ResultFactory implements DefaultResultCode {
 	public <T> Result<T> create(String code) {
 		switch (code) {
 
-		case SUCCESS:
-			return SUCCESS_RESULT;
+			case SUCCESS :
+				return SUCCESS_RESULT;
 
-		case FAIL:
-			return FAIL_RESULT;
+			case FAIL :
+				return FAIL_RESULT;
 
-		default:
-			return create(code, "", null);
+			default :
+				return create(code, "", null);
 		}
 	}
 
@@ -69,10 +73,11 @@ public class ResultFactory implements DefaultResultCode {
 		CACHE.putAll(msg);
 	}
 
-	//		public static void main(String[] args) {
-	//			ResultFactory rf = new ResultFactory();
-	//			rf.CACHE.put("11011", "{}那边的小朋友{}，请你吃糖好唔好？{}");
-	//			Result<?> x = rf.create(new LogicException("11011", "喂", "听到吗？", "使不得使得"));
-	//			System.err.println(x.getMsg());
-	//		}
+	// public static void main(String[] args) {
+	// ResultFactory rf = new ResultFactory();
+	// rf.CACHE.put("11011", "{}那边的小朋友{}，请你吃糖好唔好？{}");
+	// Result<?> x = rf.create(new LogicException("11011", "喂", "听到吗？",
+	// "使不得使得"));
+	// System.err.println(x.getMsg());
+	// }
 }

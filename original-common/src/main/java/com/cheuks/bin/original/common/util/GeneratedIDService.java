@@ -20,6 +20,10 @@ public class GeneratedIDService implements Serializable {
 	private long sequence;
 	private long maxSequence = -1L ^ (-1L << (timeBits - machineBits));//1024
 
+	/***
+	 * 单机版
+	 * @return
+	 */
 	public synchronized long nextID() {
 		long currentTime = timeGen();
 		if (currentTime == lastTime) {
@@ -34,6 +38,11 @@ public class GeneratedIDService implements Serializable {
 		return currentTime << timeBits | machineID << machineBits | sequence;
 	}
 
+	/***
+	 * 分布式版本
+	 * @param machineId
+	 * @return
+	 */
 	public synchronized long nextID(long machineId) {
 		long currentTime = timeGen();
 		if (currentTime == lastTime) {

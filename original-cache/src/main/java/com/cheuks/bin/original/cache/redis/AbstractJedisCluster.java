@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 
+import com.cheuks.bin.original.cache.FstCacheSerialize;
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.cheuks.bin.original.common.cache.redis.RedisExcecption;
 import com.cheuks.bin.original.common.cache.redis.RedisFactory;
@@ -41,6 +42,13 @@ public abstract class AbstractJedisCluster<T extends JedisCluster> implements Re
 	private final Map<String, String> scriptPath = new ConcurrentHashMap<String, String>();
 
 	public CacheSerialize getCacheSerialize() {
+		if (null == cacheSerialize) {
+			synchronized (this) {
+				if (null == cacheSerialize) {
+					cacheSerialize = new FstCacheSerialize();
+				}
+			}
+		}
 		return cacheSerialize;
 	}
 

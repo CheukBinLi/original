@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.cheuks.bin.original.common.util.reflection.ClassInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 
-public abstract class AbstractHandlerManager<T extends Handler> implements HandlerManager<T, String> {
+public abstract class AbstractHandlerManager<T extends Handler<?>> implements HandlerManager<T, String> {
 
 	static final Logger log = LoggerFactory.getLogger(AbstractHandlerManager.class);
 

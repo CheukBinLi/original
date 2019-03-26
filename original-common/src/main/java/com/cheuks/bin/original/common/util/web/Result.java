@@ -1,10 +1,6 @@
-package com.cheuks.bin.original.oauth.util;
+package com.cheuks.bin.original.common.util.web;
 
 import java.io.Serializable;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 /***
  * *
@@ -18,10 +14,6 @@ import lombok.NoArgsConstructor;
  * @see 结束回调
  *
  */
-//@Setter
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Result<T extends Object> implements Serializable {
 
 	private static final long serialVersionUID = -3379359587196074790L;
@@ -43,6 +35,29 @@ public class Result<T extends Object> implements Serializable {
 	public Result<T> setData(T data) {
 		this.data = data;
 		return this;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public String getMsg() {
+		return msg;
+	}
+
+	public T getData() {
+		return data;
+	}
+
+	public Result(String code, String msg, T data) {
+		super();
+		this.code = code;
+		this.msg = msg;
+		this.data = data;
+	}
+
+	public Result() {
+		super();
 	}
 
 }

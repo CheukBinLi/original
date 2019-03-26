@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.oauth.util;
+package com.cheuks.bin.original.common.util.web;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -15,7 +15,7 @@ public interface DefaultResultCode {
 		return format(format, params);
 	}
 	static String format(String format, String[] params) {
-		if (StringUtil.newInstance().isBlank(format) || null == params || params.length < 1)
+		if (StringUtil.isBlank(format) || null == params || params.length < 1)
 			return format;
 		Matcher matcher = PATTERN.matcher(format);
 		StringBuffer result = new StringBuffer();

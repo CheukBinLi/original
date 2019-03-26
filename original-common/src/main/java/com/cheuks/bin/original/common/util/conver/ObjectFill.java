@@ -151,21 +151,23 @@ public class ObjectFill {
 		return result.length() > 0 ? result.substring(1) : "";
 	}
 
-	public static final <T> T fillObject(T t, Map<String, ?> data) throws IllegalArgumentException, IllegalAccessException {
-		return fillObject(t, data, null);
+	public static final <T> T fillObject(T t, Map<String, ?> data, String... ignore) throws IllegalArgumentException, IllegalAccessException {
+		return fillObject(t, data, null, ignore);
 	}
 
-	public static final <T> T fillObject(T t, Map<String, ?> data, DateFormat dateFormat) throws IllegalArgumentException, IllegalAccessException {
+	public static final <T> T fillObject(T t, Map<String, ?> data, DateFormat dateFormat, String... ignore) throws IllegalArgumentException, IllegalAccessException {
 		// System.out.println(t.getClass());
 		Class<?> c = t.getClass();
 		if (!FIELDS.containsKey(c.getName()))
 			scanClass(c);
 		Map<String, Field> fields = FIELDS.get(c.getName());
+		@SuppressWarnings("unchecked")
+		Set<String> ignores = null == ignore ? CollectionUtil.EMPTY_SET : new HashSet<String>(Arrays.asList(ignore));
 		Object value;
 		Field field;
 		for (Entry<String, ?> en : data.entrySet()) {
 			value = en.getValue();
-			if (null == value || null == (field = fields.get(en.getKey())))
+			if (null == value || ignores.contains(en.getKey()) || null == (field = fields.get(en.getKey())))
 				continue;
 			try {
 				field.set(t, getValue(field.getType(), value, dateFormat));
