@@ -1,4 +1,4 @@
-package com.cheuks.bin.original.oauth.model;
+package com.cheuks.bin.original.oauth.model.encryption;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -57,7 +57,7 @@ public class LogstashLayout extends AbstractStringLayout {
 		}
 
 		StringBuilder result = new StringBuilder("{");
-		if (!StringUtil.newInstance().isBlank(additionalLogAttribute)) {
+		if (!StringUtil.isBlank(additionalLogAttribute)) {
 			result.append(additionalLogAttribute).append(",");
 		}
 		result.append("\"time\":\"").append(time).append("\"").append(",");

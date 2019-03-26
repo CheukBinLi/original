@@ -1,10 +1,6 @@
 package com.cheuks.bin.original.oauth.model;
 
 import java.io.Serializable;
-import java.util.Collection;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,59 +9,25 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User implements Serializable, UserDetails {
+public class User implements Serializable {
 
 	private static final long serialVersionUID = -5367065879692865023L;
 
 	public interface AccountStatus {
 		int NORMAL = 0;
-		int DISABLE = 1;//停用
-		int LOCKED = 2;//锁定
+		int DISABLE = 1;// 停用
+		int LOCKED = 2;// 锁定
 	}
 
+	private String unid;
 	private String userName;
-	private String pwssword;
-	private String type;
+	private String password;
 	private String tenant;
 	private int status;
 	private long expired;
+	private String source;// 来源
 
-	private transient Role roles;
-
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
-	}
-
-	@Override
-	public String getPassword() {
-		return this.pwssword;
-	}
-
-	@Override
-	public String getUsername() {
-		return this.userName;
-	}
-
-	@Override
-	public boolean isAccountNonExpired() {
-		return this.status == 10;
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		return this.status == AccountStatus.LOCKED;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return this.expired < 1 || System.currentTimeMillis() < this.expired;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return this.status == AccountStatus.NORMAL;
-	}
+	private Role roles;
 
 	public String getUserName() {
 		return userName;
@@ -76,13 +38,8 @@ public class User implements Serializable, UserDetails {
 		return this;
 	}
 
-	public User setPwssword(String pwssword) {
-		this.pwssword = pwssword;
-		return this;
-	}
-
-	public User setType(String type) {
-		this.type = type;
+	public User setPassword(String password) {
+		this.password = password;
 		return this;
 	}
 
@@ -106,10 +63,20 @@ public class User implements Serializable, UserDetails {
 		return this;
 	}
 
-	public User(String pwssword, String userName) {
+	public User setUnid(String unid) {
+		this.unid = unid;
+		return this;
+	}
+
+	public User setSource(String source) {
+		this.source = source;
+		return this;
+	}
+
+	public User(String userName, String password) {
 		super();
-		this.pwssword = pwssword;
 		this.userName = userName;
+		this.password = password;
 	}
 
 }

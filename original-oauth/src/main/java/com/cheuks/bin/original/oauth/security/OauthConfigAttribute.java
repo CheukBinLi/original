@@ -22,4 +22,17 @@ public class OauthConfigAttribute implements ConfigAttribute {
 		return this.attribute;
 	}
 
+	@Override
+	public int hashCode() {
+		return getAttribute().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof OauthConfigAttribute) {
+			return this.attribute.equals(((OauthConfigAttribute) obj).attribute);
+		}
+		return false;
+	}
+
 }

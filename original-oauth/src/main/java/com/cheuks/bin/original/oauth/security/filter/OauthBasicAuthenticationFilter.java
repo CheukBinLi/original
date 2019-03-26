@@ -7,67 +7,76 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import com.cheuks.bin.original.oauth.model.User;
-import com.cheuks.bin.original.oauth.security.OauthAuthenticationToken;
+import com.cheuks.bin.original.common.util.conver.JsonMapper;
+import com.cheuks.bin.original.common.util.web.ResultFactory;
+import com.cheuks.bin.original.oauth.security.config.Constant;
+import com.cheuks.bin.original.oauth.security.exceition.IgnoreException;
+import com.cheuks.bin.original.oauth.security.token.TokenManager;
+import com.cheuks.bin.original.oauth.util.ExceptionPrinterUtil;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Setter
-public class OauthBasicAuthenticationFilter extends BasicAuthenticationFilter {
+@Slf4j
+public class OauthBasicAuthenticationFilter extends BasicAuthenticationFilter implements Constant {
 
-	public OauthBasicAuthenticationFilter(AuthenticationManager authenticationManager) {
+	TokenManager tokenManager;
+
+	@Autowired(required = false)
+	ResultFactory resultFactory;
+
+	public ResultFactory getResultFactory() {
+		if (null == resultFactory) {
+			synchronized (this) {
+				resultFactory = new ResultFactory();
+			}
+		}
+		return resultFactory;
+	}
+
+	public OauthBasicAuthenticationFilter setResultFactory(ResultFactory resultFactory) {
+		this.resultFactory = resultFactory;
+		return this;
+	}
+
+	public OauthBasicAuthenticationFilter(TokenManager tokenManager, AuthenticationManager authenticationManager) {
 		super(authenticationManager);
+		this.tokenManager = tokenManager;
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-		System.err.println("xxxxxxxxxxxxxx");
-		//		String token = request.getHeader(AUTHORIZATION);
-		//
-		//		if (null == token || !token.startsWith(TOKEN_TYPE)) {
-		//			chain.doFilter(request, response);
-		//			return;
-		//		}
-		//		token = token.substring(TOKEN_TYPE.length());
-		//		AccountEntity accountEntity;
-		//		try {
-		//			accountEntity = tokenFactory.parserToken(token);
-		//		} catch (Throwable e) {
-		//			ExceptionPrinterUtil.instance().write(response, resultFactory.create(I18nMsg.I18N_TOKEN_EXPIRED_105), null);
-		//			return;
-		//		}
-		//
-		//		boolean isTest = accountEntity.getName().equals("00000000000") || accountEntity.getName().equals("11111111111") || accountEntity.getName().equals("13700000000");
-		//		String machineCode = request.getHeader(MACHINE_CODE);
-		//		if (null == machineCode) {
-		//			ExceptionPrinterUtil.instance().write(response, resultFactory.create(I18nMsg.I18N_MACHINE_CODE_IS_NULL_109), null);
-		//			return;
-		//		}
-		//		//token过期
-		//		if (tokenFactory.tokenIsExpire(accountEntity)) {
-		//			ExceptionPrinterUtil.instance().write(response, resultFactory.create(I18nMsg.I18N_TOKEN_EXPIRED_105), null);
-		//			return;
-		//		} else if (!isTest && !accountEntity.getMachineCode().equals(machineCode)) {//机器码不一致
-		//			ExceptionPrinterUtil.instance().write(response, resultFactory.create(I18nMsg.I18N_MACHINE_CODE_INCONSISTENCIES_103), null);
-		//			return;
-		//		}
-		//
-		//		try {
-		//			accountEntity = tokenFactory.getTokenInfoByToken(token);
-		//		} catch (Throwable e) {
-		//			ExceptionPrinterUtil.instance().write(response, resultFactory.create(I18nMsg.I18N_TOKEN_EXPIRED_105), null);
-		//			return;
-		//		}
-//		User user=new User("test", "123456");
-		SecurityContextHolder.getContext().setAuthentication(new OauthAuthenticationToken(new User("test", "123456"), null));
 
-		chain.doFilter(request, response);
+		Authentication auth;
+		try {
+			try {
+				auth = getTokenManager().analysisToken(request, response);
+				if (null == auth || (ANONYMOUS_USER_DETAIL != auth.getPrincipal() && !getTokenManager().singleSignOnCheck(auth))) {
+					return;
+				}
+				SecurityContextHolder.getContext().setAuthentication(auth);
+			} catch (IgnoreException e) {
+				//忽略放行
+			}
+			// 放行
+			chain.doFilter(request, response);
+		} catch (Throwable e) {
+			try {
+				ExceptionPrinterUtil.instance().writeString(response, JsonMapper.newInstance(true).writer(getResultFactory().create(e), null, true, false, true), null);
+			} catch (Exception e1) {
+				log.error(e.getMessage(), e);
+			}
+			return;
+		}
 	}
 
 }
