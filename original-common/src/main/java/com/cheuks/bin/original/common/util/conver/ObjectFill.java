@@ -14,13 +14,17 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
+import com.cheuks.bin.original.common.annotation.reflect.Replace;
 import com.cheuks.bin.original.common.util.reflection.ClassInfo;
 import com.cheuks.bin.original.common.util.reflection.FieldInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
+import com.cheuks.bin.original.common.util.reflection.Type;
 
 public class ObjectFill {
 
 	protected final static Map<String, Map<String, Field>> FIELDS = new ConcurrentSkipListMap<String, Map<String, Field>>();
+
+	protected final static Map<String, Map<String, Replace>> REPLACE_FIELDS = new ConcurrentSkipListMap<String, Map<String, Replace>>();
 
 	private static volatile SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static volatile SimpleDateFormat dateFormatShort = new SimpleDateFormat("yyyy-MM-dd");
@@ -68,7 +72,8 @@ public class ObjectFill {
 		return objectToMap(o, withOutNull, useAlias, false, ignore);
 	}
 
-	public static final Map<String, Object> objectToMap(Object o, boolean withOutNull, boolean useAlias, boolean UnderscoreCamel, String... ignore) throws IllegalArgumentException, IllegalAccessException {
+	public static final Map<String, Object> objectToMap(Object o, boolean withOutNull, boolean useAlias, boolean UnderscoreCamel, String... ignore)
+			throws IllegalArgumentException, IllegalAccessException {
 		if (!FIELDS.containsKey(o.getClass().getName()))
 			scanClass(o.getClass());
 		Map<String, Field> fields = FIELDS.get(o.getClass().getName());
@@ -269,6 +274,42 @@ public class ObjectFill {
 				fieldInfo.getField().set(target, value);
 			}
 		}
+	}
+	
+	public static <T> T replaceValue(T t, Replace... replaces) throws  Throwable {
+		if (null == t)
+			return t;
+		final ClassInfo a = ClassInfo.getClassInfo(t.getClass());
+		if (a.isMapOrSetOrCollection() || a.isArrays() || a.isBasicOrArrays())
+			return t;
+
+		if (null == a.getFields())
+			a.setFields(ReflectionUtil.instance().scanClassFieldInfo4Map(a.getClazz(), true, true, true));
+		
+//		REPLACE_FIELDS.containsKey(t.getClass().getName());
+		
+		Map<String, Replace> replaceField = REPLACE_FIELDS.get(t.getClass().getName());
+		if (null == replaceField) {
+			replaceField = new HashMap<String, Replace>();
+			Replace replace;
+			Field field;
+			for (Entry<String, FieldInfo> item : a.getFields().entrySet()) {
+				field = item.getValue().getField();
+				replace = field.getDeclaredAnnotation(Replace.class);
+				if (null == replace)
+					continue;
+				replaceField.put(field.getName(), replace);
+				Object value = null == (value = field.get(t)) ? value : Type.valueToString(value, ClassInfo.getClassInfo(value.getClass()), null, false);
+				
+				field.set(Type.getValue(item.getValue().getField().getClass(), field.get(t).toString(), null), value);
+			}
+			REPLACE_FIELDS.put(t.getClass().getName(), replaceField);
+			return t;
+		}
+		
+//		for
+
+		return null;
 	}
 
 }

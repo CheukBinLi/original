@@ -104,7 +104,14 @@ public class HttpClientUtil {
 		return result;
 	}
 
+	/**
+	 * 默认：value进行trim处理
+	 * */
 	public HttpResponseModel fromData(String url, Map<String, Object> params, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws Exception {
+		return fromData(url, params, true, onlyRequest, onlyResponseData, header);
+	}
+	
+	public HttpResponseModel fromData(String url, Map<String, Object> params, boolean isTrim, boolean onlyRequest, boolean onlyResponseData, Map<String, String> header) throws Exception {
 		ByteArrayOutputStream out;
 		HttpResponseModel result;
 		URL urlObj = new URL(url);
@@ -122,9 +129,11 @@ public class HttpClientUtil {
 			con.setUseCaches(false);
 			con.setRequestProperty("Connection", "Keep-Alive");
 			con.setRequestProperty("Charset", "UTF-8");
+			String value;
 			if (null != header) {
 				for (Entry<String, String> item : header.entrySet()) {
-					con.setRequestProperty(item.getKey(), item.getValue());
+					value = item.getValue();
+					con.setRequestProperty(item.getKey(), (isTrim && null != value) ? value.trim() : value);
 				}
 			}
 			String BOUNDARY = "" + System.currentTimeMillis();
@@ -140,7 +149,7 @@ public class HttpClientUtil {
 					sb.append("Content-Disposition: form-data; name=\"");
 					sb.append(k);
 					sb.append("\"\r\n\r\n");
-					sb.append(v.toString());
+					sb.append(null == v ? null : isTrim ? v.toString().trim() : v.toString());
 					sb.append("\r\n");
 				});
 			}
