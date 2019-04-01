@@ -129,11 +129,9 @@ public class HttpClientUtil {
 			con.setUseCaches(false);
 			con.setRequestProperty("Connection", "Keep-Alive");
 			con.setRequestProperty("Charset", "UTF-8");
-			String value;
 			if (null != header) {
 				for (Entry<String, String> item : header.entrySet()) {
-					value = item.getValue();
-					con.setRequestProperty(item.getKey(), (isTrim && null != value) ? value.trim() : value);
+					con.setRequestProperty(item.getKey(), item.getValue());
 				}
 			}
 			String BOUNDARY = "" + System.currentTimeMillis();
