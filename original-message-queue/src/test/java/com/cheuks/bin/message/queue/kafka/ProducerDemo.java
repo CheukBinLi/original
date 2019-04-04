@@ -11,7 +11,7 @@ public class ProducerDemo {
 	void a() {
 		Properties props = new Properties();
 		// props.put("bootstrap.servers", "10.17.38.12:9089");
-		props.put("bootstrap.servers", "10.16.90.164:9090");
+		props.put("bootstrap.servers", "10.10.171.169:9092");
 		props.put("acks", "all");// 记录完整提交，最慢的但是最大可能的持久化
 		props.put("retries", 10);// 请求失败重试的次数
 		props.put("batch.size", 16384);// batch的大小

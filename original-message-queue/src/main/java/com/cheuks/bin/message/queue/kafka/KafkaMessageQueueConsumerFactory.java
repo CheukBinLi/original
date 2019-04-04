@@ -119,7 +119,7 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 		consumer.subscribe(Arrays.asList(topicList.split(",")));// 订阅TOPIC
 		listening = new Thread(new Runnable() {
 			public void run() {
-				System.out.println("开始");
+				LOG.info("kafka init");
 				try {
 					while (!interrupted) {// 轮询
 						ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);
@@ -138,7 +138,7 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 							try {
 								consumer.commitSync();// 同步
 							} catch (Exception e) {
-								e.printStackTrace();
+								LOG.error(e.getMessage(), e);
 							}
 						}
 					}

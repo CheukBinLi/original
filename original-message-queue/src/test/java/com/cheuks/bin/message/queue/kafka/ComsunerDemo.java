@@ -32,7 +32,7 @@ public class ComsunerDemo {
 //		consumer.subscribe(new ArrayList<String>(consumer.listTopics().keySet()));// 订阅所有TOPIC
 		try {
 			while (RUNNING) {// 轮询
-				ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);
+				ConsumerRecords<String, String> records = consumer.poll(500);
 				for (TopicPartition partition : records.partitions()) {
 					List<ConsumerRecord<String, String>> partitionRecords = records.records(partition);
 					for (ConsumerRecord<String, String> record : partitionRecords) {

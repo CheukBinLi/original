@@ -44,6 +44,7 @@ public class XmlReaderTest {
 				"</xml>";
 		A a=XmlReaderAll.paddingModel(str.getBytes(),XmlReaderTest.A.class);
 		System.out.println(a.getToUserName());
+		System.out.println(a.getRecognition());
 	}
 	
 	public static class A{

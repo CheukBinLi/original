@@ -50,8 +50,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
+			<artifactId>slf4j-log4j12</artifactId>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -61,6 +60,7 @@
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
 				<version>${log4j.version}</version>
+				<scope>provided</scope>
 				<!-- <scope>compile</scope> -->
 			</dependency>
 			<dependency>
@@ -90,10 +90,21 @@
 		<!-- <module>original-registration-center</module> -->
 		<module>original-oauth</module>
 		<module>original-oauth-web</module>
+		<module>original-qrcode</module>
+		<module>original-spring-plugin</module>
 	</modules>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<version>2.8.1</version>

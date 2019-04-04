@@ -25,9 +25,11 @@ public @interface Replace {
 	 */
 	String id() default "-1";
 
+	String field() default "";
+
 	/***
-	 * 1:你好吗
-	 * 2:一点都不好
+	 * 1:你好吗 2:一点都不好
+	 * 
 	 * @return
 	 */
 	String[] replacementRule() default "";
