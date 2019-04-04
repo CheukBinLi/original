@@ -14,17 +14,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
-import com.cheuks.bin.original.common.annotation.reflect.Replace;
 import com.cheuks.bin.original.common.util.reflection.ClassInfo;
 import com.cheuks.bin.original.common.util.reflection.FieldInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
-import com.cheuks.bin.original.common.util.reflection.Type;
 
 public class ObjectFill {
 
 	protected final static Map<String, Map<String, Field>> FIELDS = new ConcurrentSkipListMap<String, Map<String, Field>>();
-
-	protected final static Map<String, Map<String, Replace>> REPLACE_FIELDS = new ConcurrentSkipListMap<String, Map<String, Replace>>();
 
 	private static volatile SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static volatile SimpleDateFormat dateFormatShort = new SimpleDateFormat("yyyy-MM-dd");
@@ -276,40 +272,31 @@ public class ObjectFill {
 		}
 	}
 	
-	public static <T> T replaceValue(T t, Replace... replaces) throws  Throwable {
-		if (null == t)
-			return t;
-		final ClassInfo a = ClassInfo.getClassInfo(t.getClass());
-		if (a.isMapOrSetOrCollection() || a.isArrays() || a.isBasicOrArrays())
-			return t;
-
-		if (null == a.getFields())
-			a.setFields(ReflectionUtil.instance().scanClassFieldInfo4Map(a.getClazz(), true, true, true));
-		
-//		REPLACE_FIELDS.containsKey(t.getClass().getName());
-		
-		Map<String, Replace> replaceField = REPLACE_FIELDS.get(t.getClass().getName());
-		if (null == replaceField) {
-			replaceField = new HashMap<String, Replace>();
-			Replace replace;
-			Field field;
-			for (Entry<String, FieldInfo> item : a.getFields().entrySet()) {
-				field = item.getValue().getField();
-				replace = field.getDeclaredAnnotation(Replace.class);
-				if (null == replace)
-					continue;
-				replaceField.put(field.getName(), replace);
-				Object value = null == (value = field.get(t)) ? value : Type.valueToString(value, ClassInfo.getClassInfo(value.getClass()), null, false);
-				
-				field.set(Type.getValue(item.getValue().getField().getClass(), field.get(t).toString(), null), value);
-			}
-			REPLACE_FIELDS.put(t.getClass().getName(), replaceField);
+	public static <T> T replaceValue(T t, String oldStr, String newStr, String... ignore) throws Throwable {
+		if (null == t) {
 			return t;
 		}
-		
-//		for
+		ClassInfo classInfo = ClassInfo.getClassInfo(t.getClass());
+		if (CollectionUtil.isEmpty(classInfo.getFields()))
+			classInfo.setFields(ReflectionUtil.instance().scanClassFieldInfo4Map(classInfo.getClazz(), true, true, true));
+		Field field;
+		String value;
+		Set<String> ignores = null == ignore ? null : new HashSet<>(Arrays.asList(ignore));
+		for (Entry<String, FieldInfo> item : classInfo.getFields().entrySet()) {
+			if (CollectionUtil.isNotEmpty(ignores) && ignores.contains(item.getKey()))
+				continue;
+			field = (null == item.getValue()) ? null : item.getValue().getField();
+			if (null == field || !String.class.isAssignableFrom(item.getValue().getField().getType())) {
+				continue;
+			}
+			value = (String) field.get(t);
+			if (null == value) {
+				continue;
+			}
+			field.set(t, value.replace(oldStr, newStr));
+		}
 
-		return null;
+		return t;
 	}
-
+	
 }
