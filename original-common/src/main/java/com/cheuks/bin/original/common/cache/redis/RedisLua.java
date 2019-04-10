@@ -28,6 +28,10 @@ public interface RedisLua {
 	 * @return
 	 */
 	String getSha(String name);
+	
+	String getSha(String name, RedisFactory redis);
+	
+	String getSha(String name, boolean isCluster);
 
 	/***
 	 * 清空脚本
