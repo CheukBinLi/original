@@ -93,14 +93,6 @@ public class RedisLuaSimple implements RedisLua {
 		return sha.get(name);
 	}
 	
-	public String getSha(String name, RedisFactory redis) {
-		return null == redis ? name : redis.getClass().isAssignableFrom(JedisStandAloneFactory.class) ? this.sha.get(name) : name;
-	}
-
-	public String getSha(String name, boolean isCluster) {
-		return null;
-	}
-
 	public void clear() throws RedisExcecption {
 		sha.clear();
 		redisFactory.scriptFlush();

@@ -1,12 +1,10 @@
 package com.cheuks.bin.original.cache;
 
 import com.cheuks.bin.original.common.cache.redis.RedisExcecption;
-import com.cheuks.bin.original.common.cache.redis.RedisFactory;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import redis.clients.jedis.Jedis;
 
 /**
  * Unit test for simple App.
@@ -57,6 +55,18 @@ public class AppTest extends TestCase {
 		// Object o = redisFactory.eval("return redis.call('keys','a1*');", 0);
 		Object o = redisFactory.eval("return redis.call('keys','a1*');", 0);
 		System.out.println(o);
+		
+//		ScanSimple scan=new ScanSimple();
+//		scan.setScanPath("*.lua");
+//		RedisFactory cluster=new JedisClusterCacheFactory();
+//		cluster.setHost("10.10.171.167:7001,10.10.171.168:7001,10.10.171.169:7001,10.10.171.167:7002,10.10.171.168:7002,10.10.171.169:7002");
+//		RedisLua lua=new RedisLuaSimple(cluster, scan);
+////		cluster.evalSha(lua.getSha("a{cleanToken}"), 2,"a{a}","a{b}");
+//		
+//		String sha=cluster.scriptLoad("a","return KEYS[1]");
+//		System.err.println(cluster.evalSha(sha, 1, "{a}test"));
+		
+		
 	}
 
 }
