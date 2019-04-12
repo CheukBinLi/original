@@ -300,6 +300,8 @@ public class StringUtil extends ConverType {
 		coupler = isEmpty(coupler, EMPTY);
 		StringBuilder result = new StringBuilder();
 		for (String item : str) {
+			if (isEmpty(item))
+				continue;
 			result.append(coupler).append(item);
 		}
 		return result.substring(coupler.length());
