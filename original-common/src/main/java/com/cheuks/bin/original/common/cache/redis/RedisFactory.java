@@ -33,18 +33,18 @@ public interface RedisFactory extends RedisScript, RedisBinary, RedisCommand, Re
 	 * @return
 	 */
 	default String generateScriptKey(String slotKey, String key) {
-		return StringUtil.isBlank(slotKey) ? key : "{" + slotKey + "}" + key;
+		return StringUtil.isBlank(slotKey) ? key : getSlotKey(slotKey) + key;
 	}
 	
 	default byte[] generateScriptBytesKey(String slotKey, String key) {
-		return (StringUtil.isBlank(slotKey) ? key : "{" + slotKey + "}" + key).getBytes();
+		return (StringUtil.isBlank(slotKey) ? key : "{" + getSlotKey(slotKey) + "}" + key).getBytes();
 	}
 
 	default String[] generateScriptKeys(String slotKey, int count, String... keys) {
 		if (StringUtil.isBlank(slotKey))
 			return keys;
 		for (int i = 0, len = keys.length; i < len; i++) {
-			keys[i] = "{" + slotKey + "}" + keys[i];
+			keys[i] = "{" + getSlotKey(slotKey) + "}" + keys[i];
 		}
 		return keys;
 	}
@@ -53,8 +53,19 @@ public interface RedisFactory extends RedisScript, RedisBinary, RedisCommand, Re
 		byte[][] result = new byte[keys.length][];
 		boolean isBlank = StringUtil.isBlank(slotKey);
 		for (int i = 0, len = keys.length; i < len; i++) {
-			result[i] = ((isBlank || i >= count) ? keys[i] : "{" + slotKey + "}" + keys[i]).getBytes();
+			result[i] = ((isBlank || i >= count) ? keys[i] :  "{" + getSlotKey(slotKey) + "}" + keys[i]).getBytes();
 		}
 		return result;
+	}
+	
+	default String getSlotKey(String key) {
+		int s = key.indexOf("{");
+		if (s > -1) {
+			int e = key.indexOf("}", s + 1);
+			if (e > -1 && e != s + 1) {
+				key = key.substring(s + 1, e);
+			}
+		}
+		return key;
 	}
 }
