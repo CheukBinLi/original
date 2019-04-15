@@ -60,7 +60,7 @@ public abstract class AbstractJedisCluster<T extends JedisCluster> implements Re
 		T jedis = getResource();
 		byte[] result;
 		try {
-			result = jedis.scriptLoad(script, getSlotKey(new String()).getBytes());
+			result = jedis.scriptLoad(script, getSlotKey(new String(key)).getBytes());
 			if (getLog().isDebugEnabled())
 				getLog().debug("scriptLoad:" + result);
 			return result;
