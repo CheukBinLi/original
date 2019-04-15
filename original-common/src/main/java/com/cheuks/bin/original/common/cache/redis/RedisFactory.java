@@ -33,7 +33,7 @@ public interface RedisFactory extends RedisScript, RedisBinary, RedisCommand, Re
 	 * @return
 	 */
 	default String generateScriptKey(String slotKey, String key) {
-		return StringUtil.isBlank(slotKey) ? key : getSlotKey(slotKey) + key;
+		return StringUtil.isBlank(slotKey) ? key : "{" + getSlotKey(slotKey) + "}" + key;
 	}
 	
 	default byte[] generateScriptBytesKey(String slotKey, String key) {
