@@ -32,7 +32,15 @@ public interface RedisFactory extends RedisScript, RedisBinary, RedisCommand, Re
 	 *            脚本KEY
 	 * @return
 	 */
-	default String[] generateScriptKey(String slotKey, String... keys) {
+	default String generateScriptKey(String slotKey, String key) {
+		return StringUtil.isBlank(slotKey) ? key : "{" + slotKey + "}" + key;
+	}
+	
+	default byte[] generateScriptBytesKey(String slotKey, String key) {
+		return (StringUtil.isBlank(slotKey) ? key : "{" + slotKey + "}" + key).getBytes();
+	}
+
+	default String[] generateScriptKeys(String slotKey, int count, String... keys) {
 		if (StringUtil.isBlank(slotKey))
 			return keys;
 		for (int i = 0, len = keys.length; i < len; i++) {
@@ -40,12 +48,12 @@ public interface RedisFactory extends RedisScript, RedisBinary, RedisCommand, Re
 		}
 		return keys;
 	}
-	
-	default byte[][] generateScriptBytesKey(String slotKey, String... keys) {
+
+	default byte[][] generateScriptBytesKeys(String slotKey, int count, String... keys) {
 		byte[][] result = new byte[keys.length][];
 		boolean isBlank = StringUtil.isBlank(slotKey);
 		for (int i = 0, len = keys.length; i < len; i++) {
-			result[i] = (isBlank ? keys[i] : "{" + slotKey + "}" + keys[i]).getBytes();
+			result[i] = ((isBlank || i >= count) ? keys[i] : "{" + slotKey + "}" + keys[i]).getBytes();
 		}
 		return result;
 	}
