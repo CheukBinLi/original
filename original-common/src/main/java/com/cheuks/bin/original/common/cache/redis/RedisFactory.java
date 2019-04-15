@@ -48,7 +48,7 @@ public interface RedisFactory extends RedisScript, RedisBinary, RedisCommand, Re
 		}
 		return keys;
 	}
-
+	
 	default byte[][] generateScriptBytesKeys(String slotKey, int count, String... keys) {
 		byte[][] result = new byte[keys.length][];
 		boolean isBlank = StringUtil.isBlank(slotKey);
