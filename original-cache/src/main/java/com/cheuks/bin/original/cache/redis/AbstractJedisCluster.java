@@ -60,7 +60,7 @@ public abstract class AbstractJedisCluster<T extends JedisCluster> implements Re
 		T jedis = getResource();
 		byte[] result;
 		try {
-			result = jedis.scriptLoad(script, key);
+			result = jedis.scriptLoad(script, getSlotKey(new String()).getBytes());
 			if (getLog().isDebugEnabled())
 				getLog().debug("scriptLoad:" + result);
 			return result;
@@ -69,6 +69,17 @@ public abstract class AbstractJedisCluster<T extends JedisCluster> implements Re
 		} finally {
 			destory(jedis);
 		}
+	}
+	
+	public String getSlotKey(String key) {
+		int s = key.indexOf("{");
+		if (s > -1) {
+			int e = key.indexOf("}", s + 1);
+			if (e > -1 && e != s + 1) {
+				key = key.substring(s + 1, e);
+			}
+		}
+		return key;
 	}
 
 	public void delete(byte[] key) throws RedisExcecption {
