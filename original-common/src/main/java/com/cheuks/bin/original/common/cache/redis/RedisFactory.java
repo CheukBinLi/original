@@ -22,7 +22,7 @@ public interface RedisFactory extends RedisScript, RedisBinary, RedisCommand, Re
     void setExpireSecond(int expireSecond);
 
     void setEncoding(String encoding);
-
+    
 	/***
 	 * 生成标准KEY（分布式时必须使用：标准化KEY）
 	 * 
@@ -32,8 +32,21 @@ public interface RedisFactory extends RedisScript, RedisBinary, RedisCommand, Re
 	 *            脚本KEY
 	 * @return
 	 */
-	default String generateScriptKey(String slotKey, String key) {
-		return StringUtil.isBlank(slotKey) ? key : ("{" + slotKey + "}" + key);
+	default String[] generateScriptKey(String slotKey, String... keys) {
+		if (StringUtil.isBlank(slotKey))
+			return keys;
+		for (int i = 0, len = keys.length; i < len; i++) {
+			keys[i] = "{" + slotKey + "}" + keys[i];
+		}
+		return keys;
 	}
 	
+	default byte[][] generateScriptBytesKey(String slotKey, String... keys) {
+		byte[][] result = new byte[keys.length][];
+		boolean isBlank = StringUtil.isBlank(slotKey);
+		for (int i = 0, len = keys.length; i < len; i++) {
+			result[i] = (isBlank ? keys[i] : "{" + slotKey + "}" + keys[i]).getBytes();
+		}
+		return result;
+	}
 }
