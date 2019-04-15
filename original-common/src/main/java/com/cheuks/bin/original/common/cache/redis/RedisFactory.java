@@ -33,18 +33,19 @@ public interface RedisFactory extends RedisScript, RedisBinary, RedisCommand, Re
 	 * @return
 	 */
 	default String generateScriptKey(String slotKey, String key) {
-		return StringUtil.isBlank(slotKey) ? key : "{" + slotKey + "}" + key;
+		return StringUtil.isBlank(slotKey) ? key : slotKey.contains("{") ? slotKey + key : "{" + slotKey + "}" + key;
 	}
 	
 	default byte[] generateScriptBytesKey(String slotKey, String key) {
-		return (StringUtil.isBlank(slotKey) ? key : "{" + slotKey + "}" + key).getBytes();
+		return (StringUtil.isBlank(slotKey) || slotKey.contains("{") ? key : slotKey.contains("{") ? slotKey + key : "{" + slotKey + "}" + key).getBytes();
 	}
 
 	default String[] generateScriptKeys(String slotKey, int count, String... keys) {
 		if (StringUtil.isBlank(slotKey))
 			return keys;
+		boolean flags = slotKey.contains("{");
 		for (int i = 0, len = keys.length; i < len; i++) {
-			keys[i] = "{" + slotKey + "}" + keys[i];
+			keys[i] = flags ? slotKey + keys[i] : "{" + slotKey + "}" + keys[i];
 		}
 		return keys;
 	}
@@ -52,8 +53,9 @@ public interface RedisFactory extends RedisScript, RedisBinary, RedisCommand, Re
 	default byte[][] generateScriptBytesKeys(String slotKey, int count, String... keys) {
 		byte[][] result = new byte[keys.length][];
 		boolean isBlank = StringUtil.isBlank(slotKey);
+		boolean flags = slotKey.contains("{");
 		for (int i = 0, len = keys.length; i < len; i++) {
-			result[i] = ((isBlank || i >= count) ? keys[i] : "{" + slotKey + "}" + keys[i]).getBytes();
+			result[i] = ((isBlank || i >= count) ? keys[i] : flags ? slotKey + keys[i] : "{" + slotKey + "}" + keys[i]).getBytes();
 		}
 		return result;
 	}
