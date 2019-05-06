@@ -8,7 +8,8 @@ public class ReplaceModel {
 	public String replace(String content) {
 		if (null == content)
 			return content;
-		return content.replace(oldValue, newValue);
+//		return content.replace(oldValue, newValue);
+		return content.replaceAll(oldValue, newValue);
 	}
 
 	public String getOldValue() {

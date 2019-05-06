@@ -44,7 +44,7 @@ public interface RedisFactory extends RedisScript, RedisBinary, RedisCommand, Re
 		if (StringUtil.isBlank(slotKey))
 			return keys;
 		for (int i = 0, len = keys.length; i < len; i++) {
-			keys[i] = "{" + getSlotKey(slotKey) + "}" + keys[i];
+			keys[i] = i >= count ? keys[i] : "{" + getSlotKey(slotKey) + "}" + keys[i];
 		}
 		return keys;
 	}
