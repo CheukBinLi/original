@@ -21,15 +21,13 @@ public class ExectorsDispatcher implements ExecutorService {
 	}
 
 	public void addRunnableGroupJob(Object job) {
-		if (RUNNABLE_QUEUE.isEmpty()) {
-			synchronized (RUNNABLE_QUEUE) {
-				if (RUNNABLE_QUEUE.isEmpty()) {
-					return;
-				}
-				DispatcherRunnable<Object> runnable = RUNNABLE_QUEUE.removeFirst();
-				runnable.add(job);
-				RUNNABLE_QUEUE.addLast(runnable);
+		synchronized (RUNNABLE_QUEUE) {
+			if (RUNNABLE_QUEUE.isEmpty()) {
+				return;
 			}
+			DispatcherRunnable<Object> runnable = RUNNABLE_QUEUE.removeFirst();
+			runnable.add(job);
+			RUNNABLE_QUEUE.addLast(runnable);
 		}
 	}
 
