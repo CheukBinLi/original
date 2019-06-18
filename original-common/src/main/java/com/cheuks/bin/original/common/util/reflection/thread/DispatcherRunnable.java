@@ -12,7 +12,7 @@ public abstract class DispatcherRunnable<ITEM> implements Runnable {
 
 	private final BlockingDeque<ITEM> JOBS = new LinkedBlockingDeque<>();
 
-	private volatile boolean interrupted = true;
+	private volatile boolean interrupted = false;
 
 	public abstract void run(ITEM job);
 
@@ -34,6 +34,7 @@ public abstract class DispatcherRunnable<ITEM> implements Runnable {
 					}
 					continue;
 				}
+				run(job);
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
