@@ -3,7 +3,9 @@ package com.cheuks.bin.original.common.util.scan;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -112,7 +114,7 @@ public class ScanSimple extends AbstractScan {
 				Iterator<URL> it = url.iterator();
 				Set<String> result = new HashSet<String>();
 				while (it.hasNext())
-					result.addAll(fileTypeFilter(new File(it.next().getPath()), pathPattern, startIndex));
+					result.addAll(fileTypeFilter(toFilePath(it.next()), pathPattern, startIndex));
 				return result;
 			}
 		}));
@@ -144,7 +146,8 @@ public class ScanSimple extends AbstractScan {
 			u = it.next();
 			if (StringUtil.concatCount(jarPath = u.getPath(), "jar!") == 2) {
 				jarPaths = jarPath.split("!");
-				JarFile jarFile = new JarFile(new File(jarPaths[0].replaceAll("file:/", "").replaceAll("file:", "")));
+//				JarFile jarFile = new JarFile(new File(jarPaths[0].replaceAll("file:/", "").replaceAll("file:", "")));
+				JarFile jarFile = new JarFile(toFilePath(u));
 				JarInputStream jarInputStream = new JarInputStream(jarFile.getInputStream(jarFile.getJarEntry(jarPaths[1].substring(1))));
 				ZipEntry zipEntry = null;
 				while (null != (zipEntry = jarInputStream.getNextEntry())) {
@@ -153,7 +156,7 @@ public class ScanSimple extends AbstractScan {
 					}
 				}
 			} else {
-				JarFile jarFile = new JarFile(new File(u.getPath().substring(0, u.getPath().indexOf("!")).replaceAll("file:", "")));
+				JarFile jarFile = new JarFile(toFilePath(u));
 				Enumeration<JarEntry> jars = jarFile.entries();
 				while (jars.hasMoreElements()) {
 					JarEntry jarEntry = jars.nextElement();
@@ -253,6 +256,21 @@ public class ScanSimple extends AbstractScan {
 			}
 		}
 
+	}
+	
+	File toFilePath(URL path) {
+		try {
+			String filePath = URLDecoder.decode(path.getPath(), "UTF-8");
+			int start = filePath.startsWith("file:") ? 5 : 0;
+			int end = filePath.contains("!") ? filePath.indexOf("!") : filePath.length();
+			filePath = filePath.substring(start, end);
+			File result = new File(filePath);
+			if (result.isFile() || result.isDirectory())
+				return result;
+			return new File(filePath.startsWith("/") ? filePath.substring(1) : filePath);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static void main(String[] args) throws Throwable {
