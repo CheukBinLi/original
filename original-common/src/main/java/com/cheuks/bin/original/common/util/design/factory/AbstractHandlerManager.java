@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.cheuks.bin.original.common.util.conver.StringUtil;
 import com.cheuks.bin.original.common.util.reflection.ClassInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
 
@@ -27,6 +28,8 @@ public abstract class AbstractHandlerManager<T extends Handler<?>> implements Ha
 
 	@Override
 	public void addHandler(T t) {
+		if(StringUtil.isBlank(t.getType()))
+			return;
 		POOL.put(t.getType(), t);
 		POOL_FOR_NAME.put(t.getClass().getName(), t);
 	}
