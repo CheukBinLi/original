@@ -101,31 +101,26 @@ public class KafkaMessageQueueProducerFactory implements MessageQueueProducerFac
 	private Properties propertie = new Properties();
 	private volatile Producer<String, String> producer;
 	private volatile boolean isInit = false;
-	private long timeoutMillis=60000;
+	private long timeoutMillis=30000;
 
-	public RecordMetadata makeMessage(String queueName, String message, Object additional) throws MessageQueueException {
-		Future<RecordMetadata> response = producer.send(new ProducerRecord<String, String>(queueName, message, message));
+	public synchronized RecordMetadata makeMessage(String queueName, String message, Object additional) throws MessageQueueException {
+		final Future<RecordMetadata> response = producer.send(new ProducerRecord<String, String>(queueName, message, message));
 		try {
 			return response.get(timeoutMillis, TimeUnit.MILLISECONDS);
 		} catch (Throwable e) {
 			throw new MessageQueueException(e);
-		}
+		}finally {}
 		// return producer.send(new ProducerRecord<String, String>(queueName,
 		// null != additional ? additional.toString() : null, message));
 	}
 
-	public RecordMetadata makeMessage(String queueName, String message, Object additional, final MessageQueueCallBack<RecordMetadata> callBack) throws MessageQueueException {
-		Future<RecordMetadata> response = producer.send(new ProducerRecord<String, String>(queueName, null != additional ? additional.toString() : null, message), new Callback() {
+	public synchronized void makeAsyncMessage(String queueName, String message, Object additional, final MessageQueueCallBack<RecordMetadata> callBack) throws MessageQueueException {
+		final Future<RecordMetadata> response = producer.send(new ProducerRecord<String, String>(queueName, null != additional ? additional.toString() : null, message), new Callback() {
 			// 回调
 			public void onCompletion(RecordMetadata paramRecordMetadata, Exception paramException) {
 				callBack.onCompletion(paramRecordMetadata, paramException);
 			}
 		});
-		try {
-			return response.get(timeoutMillis, TimeUnit.MILLISECONDS);
-		} catch (Throwable e) {
-			throw new MessageQueueException(e);
-		}
 	}
 
 	public void destory() {

@@ -11,6 +11,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.WakeupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 	/***
 	 * Consumer向集群发送自己的心跳(30秒)，超时则认为Consumer已经死了，kafka会把它的分区分配给其他进程
 	 */
-	private Integer sessionTimeout;
+	private Integer sessionTimeout = 60000;
 
 	private String keyDeserializer = "org.apache.kafka.common.serialization.StringDeserializer";
 	private String valueDeserializer = "org.apache.kafka.common.serialization.StringDeserializer";
@@ -142,6 +143,8 @@ public class KafkaMessageQueueConsumerFactory implements MessageQueueConsumerFac
 							}
 						}
 					}
+				} catch (WakeupException e) {
+					LOG.error(e.getMessage(), e);
 				} finally {
 					consumer.close();
 					interrupted = false;

@@ -24,7 +24,7 @@ public interface MessageQueueProducerFactory<R, C> {
 	 * @return
 	 * @throws MessageQueueException 回调
 	 */
-	R makeMessage(String queueName, String message, Object additional, MessageQueueCallBack<C> callBack) throws MessageQueueException;
+	void makeAsyncMessage(String queueName, String message, Object additional, MessageQueueCallBack<C> callBack) throws MessageQueueException;
 
 	/***
 	 * 服务初始化

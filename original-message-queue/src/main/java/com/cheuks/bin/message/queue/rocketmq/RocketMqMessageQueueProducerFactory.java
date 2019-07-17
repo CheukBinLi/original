@@ -32,7 +32,7 @@ public class RocketMqMessageQueueProducerFactory implements MessageQueueProducer
 	 * @throws e
 	 * @return
 	 */
-	public SendResult makeMessage(String queueName, String message, Object additional) throws MessageQueueException {
+	public synchronized SendResult makeMessage(String queueName, String message, Object additional) throws MessageQueueException {
 		try {
 			return producer.send(new Message(queueName, additional.toString(), message.getBytes(charset)));
 		} catch (Exception e) {
@@ -47,7 +47,7 @@ public class RocketMqMessageQueueProducerFactory implements MessageQueueProducer
 	 * @throws e
 	 * @return 抛出或者返回空对象new SendResult();
 	 */
-	public SendResult makeMessage(String queueName, String message, Object additional, final MessageQueueCallBack<SendResult> callBack) throws MessageQueueException {
+	public synchronized void makeAsyncMessage(String queueName, String message, Object additional, final MessageQueueCallBack<SendResult> callBack) throws MessageQueueException {
 		try {
 			producer.send(new Message(queueName, additional.toString(), message.getBytes(charset)), new SendCallback() {
 				public void onSuccess(SendResult sendResult) {
@@ -58,7 +58,6 @@ public class RocketMqMessageQueueProducerFactory implements MessageQueueProducer
 					callBack.onCompletion(null, new Exception(e));
 				}
 			});
-			return new SendResult();
 		} catch (Exception e) {
 			throw new MessageQueueException(e);
 		}
