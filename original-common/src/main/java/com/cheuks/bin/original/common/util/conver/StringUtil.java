@@ -138,7 +138,7 @@ public class StringUtil extends ConverType {
 		if (isEmpty(str))
 			return EMPTY;
 		StringBuilder result = new StringBuilder();
-		for (Character item : str.toLowerCase().toCharArray()) {
+		for (Character item : str.toCharArray()) {
 			result.append((65 <= item && 90 >= item) ? "_" + (char) (item + 32) : item);
 		}
 		return result.toString();
