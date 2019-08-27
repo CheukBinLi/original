@@ -54,7 +54,7 @@ public class GeneratedIDService implements Serializable {
 			sequence = 0L;
 		}
 		lastTime = currentTime;
-		return currentTime << timeBits | machineID << machineBits | sequence;
+		return currentTime << timeBits | machineId << machineBits | sequence;
 	}
 
 	long nextSecond(long currentTime) {
