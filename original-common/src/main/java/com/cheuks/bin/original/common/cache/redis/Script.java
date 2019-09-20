@@ -1,12 +1,15 @@
 package com.cheuks.bin.original.common.cache.redis;
 
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.cheuks.bin.original.common.cache.redis.RedisExcecption;
 import com.cheuks.bin.original.common.util.conver.StringUtil;
 
-public class Script {
+public class Script implements Serializable{
+
+	private static final long serialVersionUID = 7380536752738652726L;
 
 	protected static final Pattern PATTERN = Pattern.compile("\\@\\{[0-9,a-z,A-Z]+\\}");
 
@@ -115,7 +118,7 @@ public class Script {
 	}
 
 	public static void main(String[] args) throws RedisExcecption {
-		String a="{application:@{pay}}-lock:@{function}-@{tenant}";
+		String a="{application:@{pay}}-lock:@{function}-@{tenant}"
 		System.err.println(Script.format("[","}",a, new String[] {"mmx","order","1"}));
 	}
 
