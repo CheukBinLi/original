@@ -1403,9 +1403,10 @@ public abstract class AbstractJedisCluster<T extends JedisCluster> implements Re
 	public Object evalShaByScript(String scriptName, int keys, String... keysAndArgs) throws RedisExcecption {
 		String [] keysParam=new String[keys];
 		if (keys > 0 && (null == keysAndArgs || keysAndArgs.length >= keys)) {
-			Arrays.copyOfRange(keysParam, 0, keys);
+			keysParam = Arrays.copyOfRange(keysAndArgs, 0, keys);
 		}
-		String key = Script.format(scriptName, keysParam);
+		Script script = SCRIPT.get(scriptName);
+		String key = Script.format(script.getSlotName(), keysParam);
 		String sha1 = SCRIPTLOADED.get(key);
 		if (StringUtil.isBlank(sha1)) {
 			sha1 = scriptLoad(SCRIPT.get(scriptName), keysParam);

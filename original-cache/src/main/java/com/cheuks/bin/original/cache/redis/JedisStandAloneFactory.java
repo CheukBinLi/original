@@ -1544,7 +1544,7 @@ public class JedisStandAloneFactory implements RedisFactory {
 	public Object evalShaByScript(String scriptName, int keys, String... keysAndArgs) throws RedisExcecption {
 		String [] keysParam=new String[keys];
 		if (keys > 0 && (null == keysAndArgs || keysAndArgs.length >= keys)) {
-			Arrays.copyOfRange(keysParam, 0, keys);
+			keysParam = Arrays.copyOfRange(keysAndArgs, 0, keys);
 		}
 		Script script = SCRIPT.get(scriptName);
 		String key = Script.format(script.getSlotName(), keysParam);

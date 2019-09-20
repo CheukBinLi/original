@@ -118,7 +118,7 @@ public class Script implements Serializable{
 	}
 
 	public static void main(String[] args) throws RedisExcecption {
-		String a="{application:@{pay}}-lock:@{function}-@{tenant}"
+		String a="{application:@{pay}}-lock:@{function}-@{tenant}";
 		System.err.println(Script.format("[","}",a, new String[] {"mmx","order","1"}));
 	}
 
