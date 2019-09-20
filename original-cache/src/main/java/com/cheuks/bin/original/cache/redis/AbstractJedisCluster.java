@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +15,8 @@ import com.cheuks.bin.original.cache.FstCacheSerialize;
 import com.cheuks.bin.original.common.cache.CacheSerialize;
 import com.cheuks.bin.original.common.cache.redis.RedisExcecption;
 import com.cheuks.bin.original.common.cache.redis.RedisFactory;
+import com.cheuks.bin.original.common.cache.redis.Script;
+import com.cheuks.bin.original.common.util.conver.StringUtil;
 import com.cheuks.bin.original.common.util.scan.Scan;
 import com.cheuks.bin.original.common.util.scan.ScanSimple;
 
@@ -40,6 +43,8 @@ public abstract class AbstractJedisCluster<T extends JedisCluster> implements Re
 
 	private final Map<String, String> sha = new ConcurrentHashMap<String, String>();
 	private final Map<String, String> scriptPath = new ConcurrentHashMap<String, String>();
+	private final Map<String, Script> SCRIPT = new ConcurrentHashMap<String, Script>();
+	private final Map<String, String> SCRIPTLOADED = new ConcurrentHashMap<String, String>();
 
 	public CacheSerialize getCacheSerialize() {
 		if (null == cacheSerialize) {
@@ -1378,4 +1383,34 @@ public abstract class AbstractJedisCluster<T extends JedisCluster> implements Re
 		return encoding;
 	}
 
+	@Override
+	public AbstractJedisCluster<T> appendScript(Script... script) {
+		for (Script item : script) {
+			SCRIPT.put(item.getName(), item);
+		}
+		return this;
+	}
+
+	@Override
+	public String scriptLoad(Script script, String... keys) throws RedisExcecption {
+		String key = script.format(keys);
+		String sha1 = new String(scriptLoad(key, script.getScript()));
+		SCRIPTLOADED.put(key, sha1);
+		return sha1;
+	}
+
+	@Override
+	public Object evalShaByScript(String scriptName, int keys, String... keysAndArgs) throws RedisExcecption {
+		String [] keysParam=new String[keys];
+		if (keys > 0 && (null == keysAndArgs || keysAndArgs.length >= keys)) {
+			Arrays.copyOfRange(keysParam, 0, keys);
+		}
+		String key = Script.format(scriptName, keysParam);
+		String sha1 = SCRIPTLOADED.get(key);
+		if (StringUtil.isBlank(sha1)) {
+			sha1 = scriptLoad(SCRIPT.get(scriptName), keysParam);
+		}
+		return evalSha(sha1, keys, keysAndArgs);
+	}
+	
 }
