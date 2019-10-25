@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1401,15 +1400,15 @@ public abstract class AbstractJedisCluster<T extends JedisCluster> implements Re
 
 	@Override
 	public Object evalShaByScript(String scriptName, int keys, String... keysAndArgs) throws RedisExcecption {
-		String [] keysParam=new String[keys];
-		if (keys > 0 && (null == keysAndArgs || keysAndArgs.length >= keys)) {
-			keysParam = Arrays.copyOfRange(keysAndArgs, 0, keys);
-		}
+//		String [] keysParam=new String[keys];
+//		if (keys > 0 && (null == keysAndArgs || keysAndArgs.length >= keys)) {
+//			keysParam = Arrays.copyOfRange(keysAndArgs, 0, keys);
+//		}
 		Script script = SCRIPT.get(scriptName);
-		String key = Script.format(script.getSlotName(), keysParam);
+		String key = Script.format(script.getSlotName(), keysAndArgs);
 		String sha1 = SCRIPTLOADED.get(key);
 		if (StringUtil.isBlank(sha1)) {
-			sha1 = scriptLoad(SCRIPT.get(scriptName), keysParam);
+			sha1 = scriptLoad(SCRIPT.get(scriptName), keysAndArgs);
 		}
 		return evalSha(sha1, keys, keysAndArgs);
 	}

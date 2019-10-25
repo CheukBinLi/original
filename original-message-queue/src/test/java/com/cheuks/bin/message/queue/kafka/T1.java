@@ -25,12 +25,12 @@ public class T1 {
 			//			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("192.168.3.27:9092", "T1_TOPIC,T2_TOPIC", "CCTV_1").init(null);
 //			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("10.16.90.163:9089,10.16.90.164:9090,10.16.90.165:9091", "flightorders,*,afterSale,jdorders", "Y911").init(null);
 //			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("10.17.149.11:9092,10.17.149.63:9092,10.17.149.64:9092", "flightorders,*,afterSale,jdorders", "Y911").init(null);
-			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("127.0.0.1:1092", "flightorders,afterSale,jdorders,test", "XXXMMX111").init(null);
+			messageQueueConsumerFactory = new KafkaMessageQueueConsumerFactory("10.10.171.161:9092", "flightorders,afterSale,jdorders,test", "bigbigballX").init(null);
 			//all
 			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
 
 				public void doProcess(String value, Object originalObject) {
-					System.out.println("topic:jdorders : " + value);
+					System.out.println("topic:flightorders : " + value);
 				}
 
 				public Object getQueueInfo() {
@@ -73,7 +73,7 @@ public class T1 {
 			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
 
 				public void doProcess(String value, Object originalObject) {
-					System.err.println("topic:jdorders ," + value);
+					System.err.println("topic:topic_2 ," + value);
 				}
 
 				public Object getQueueInfo() {
@@ -94,7 +94,7 @@ public class T1 {
 			messageQueueConsumerFactory.setMessageQueueConsumer(new MessageQueueConsumerHandler() {
 				
 				public void doProcess(String value, Object originalObject) {
-					System.err.println("topic:* ," + value);
+					System.err.println("topic:test ," + value);
 				}
 				
 				public Object getQueueInfo() {
@@ -113,27 +113,37 @@ public class T1 {
 			final CountDownLatch countDownLatch = new CountDownLatch(1);
 			//			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("192.168.3.27:9092,10.17.38.12:9089,10.73.11.117:9091,10.73.11.117:9092").init(null);
 			//			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("192.168.3.27:9092").init(null);
-			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("127.0.0.1:9092").init(null);
-			ExecutorService executorService = Executors.newCachedThreadPool();
-			executorService.execute(new Runnable() {
-				public void run() {
-					int count = 10;
-					while (--count > 0) {
-						messageQueueProducerFactory.makeMessage("flightorders", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
-						messageQueueProducerFactory.makeMessage("jdorders", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
-						messageQueueProducerFactory.makeMessage("T2_TOPIC", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-					messageQueueProducerFactory.makeMessage("T1_TOPIC", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
-					messageQueueProducerFactory.makeMessage("flightorders", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
-					countDownLatch.countDown();
-				}
-			});
-			countDownLatch.await();
+			messageQueueProducerFactory = new KafkaMessageQueueProducerFactory("10.10.171.161:9092").init(null);
+			messageQueueProducerFactory.makeMessage("test", "hello1", null);
+			messageQueueProducerFactory.makeMessage("test", "hello2", null);
+			messageQueueProducerFactory.makeMessage("test", "hello3", null);
+			messageQueueProducerFactory.makeMessage("test", "hello4", null);
+			messageQueueProducerFactory.makeAsyncMessage("flightorders", "flightorders1", null,null);
+			messageQueueProducerFactory.makeAsyncMessage("flightorders", "flightorders2", null,null);
+			messageQueueProducerFactory.makeAsyncMessage("flightorders", "flightorders3", null,null);
+			messageQueueProducerFactory.makeAsyncMessage("flightorders", "flightorders4", null,null);
+			messageQueueProducerFactory.makeMessage("test", "hello5", null);
+			messageQueueProducerFactory.makeMessage("test", "hello6", null);
+//			ExecutorService executorService = Executors.newCachedThreadPool();
+//			executorService.execute(new Runnable() {
+//				public void run() {
+//					int count = 10;
+//					while (--count > 0) {
+//						messageQueueProducerFactory.makeMessage("flightorders", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
+//						messageQueueProducerFactory.makeMessage("jdorders", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
+//						messageQueueProducerFactory.makeMessage("T2_TOPIC", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
+//						try {
+//							Thread.sleep(1000);
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//						}
+//					}
+//					messageQueueProducerFactory.makeMessage("T1_TOPIC", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
+//					messageQueueProducerFactory.makeMessage("flightorders", String.format("{name:%s,dateTime:%s}", Thread.currentThread().getName(), new SimpleDateFormat("hh:mm:ss").format(System.currentTimeMillis())), null);
+//					countDownLatch.countDown();
+//				}
+//			});
+//			countDownLatch.await();
 			messageQueueProducerFactory.destory();
 			System.out.println("结束");
 		} catch (Exception e) {

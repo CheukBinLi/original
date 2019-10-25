@@ -1,22 +1,17 @@
 package com.cheuks.bin.original.common.util.conver;
 
-import java.lang.reflect.Field;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListMap;
-
 import com.cheuks.bin.original.common.annotation.reflect.Alias;
 import com.cheuks.bin.original.common.util.reflection.ClassInfo;
 import com.cheuks.bin.original.common.util.reflection.FieldInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
+
+import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 public class ObjectFill {
 
@@ -239,6 +234,61 @@ public class ObjectFill {
 
 	private static String getFirstValue(boolean isArray, Object data) {
 		return isArray ? ((String[]) data)[0] : data.toString();
+	}
+	
+    public static interface Process<T, U> {
+
+        default U before(U u){ return u; }
+
+		default T after(T t){ return t; }
+    }
+	
+	public <S,T> List<T> xcopy(final List<S> sources, final Class<T> target, Process<T,S> process, boolean notNull, boolean notTransient, String... ignores) throws Exception {
+
+		if (CollectionUtil.isEmpty(sources) || null == target)
+			return null;
+		final ClassInfo a = ClassInfo.getClassInfo(sources.get(0).getClass());
+		if (a.isMapOrSetOrCollection() || a.isArrays() || a.isBasicOrArrays())
+			return null;
+
+		final ClassInfo b = ClassInfo.getClassInfo(target.getClass());
+		if (b.isMapOrSetOrCollection() || b.isArrays() || b.isBasicOrArrays())
+			return null;
+		if (null == a.getFields())
+			a.setFields(ReflectionUtil.instance().scanClassFieldInfo4Map(a.getClazz(), true, true, true));
+		if (null == b.getFields())
+			b.setFields(ReflectionUtil.instance().scanClassFieldInfo4Map(b.getClazz(), true, true, true));
+
+		Set<String> igonre = null == ignores ? null : new HashSet<String>(Arrays.asList(ignores));
+		Object value = null;
+		T obj;
+		List<T> result =new ArrayList<T>();
+		for (S item : sources) {
+			if (null != process)
+				item = process.before(item);
+			if (null == item)
+				continue;
+			obj = target.newInstance();
+			for (Entry<String, FieldInfo> en : a.getFields().entrySet()) {
+				if (null != igonre && igonre.contains(en.getKey())) {
+					continue;
+				}
+				if ((notTransient && en.getValue().isTransient()) || (null == (value = en.getValue().getField().get(item)) && notNull)) {
+					continue;
+				}
+				FieldInfo fieldInfo = b.getFields().get(en.getKey());
+				if (null != fieldInfo) {
+					fieldInfo.getField().set(obj, value);
+				}
+			}
+			if (null != process)
+				obj = process.after(obj);
+			if (null == obj)
+				continue;
+			result.add(obj);
+		}
+		return result;
+		
 	}
 
 	public static void xcopy(final Object source, final Object target, boolean notNull, boolean notTransient, String... ignores) throws Exception {

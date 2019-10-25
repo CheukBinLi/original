@@ -26,7 +26,7 @@ public class Script implements Serializable{
 	 */
 	private String script;
 	
-	private final String[] defaultWrap = new String[]{"{", "}"};
+	private final String[] defaultWrap = new String[]{"", ""};
 
 	private String[] wrap;
 

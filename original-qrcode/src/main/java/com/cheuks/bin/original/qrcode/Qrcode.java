@@ -868,7 +868,7 @@ private static byte selectMask(byte[][] matrixContent,int maxCodewordsBitWithRem
 	}
 	
 	public static void main(String[] args) throws Throwable {
-		System.err.println(encode("你好吗？", 1, 5));
+		System.err.println(encode("chrome-extension://klbibkeccnjlkjkiokjodocebajanakg/suspended.html#ttl=%E6%9C%89%E9%81%93%E4%BA%91%E7%AC%94%E8%AE%B0&pos=0&uri=https://note.youdao.com/ynoteshare1/index.html?id=dd9ec8a63ab3b97eba58bf7b32e4a8d9&type=notehare1/index.html?id=dd9ec8a63ab3b97eba58bf7b32e4a8d9&type=notehare1/index.html?id=dd9ec8a63ab3b97eba58bf7b32e4a8d9&type=note", 1, 5));
 	}
 
 

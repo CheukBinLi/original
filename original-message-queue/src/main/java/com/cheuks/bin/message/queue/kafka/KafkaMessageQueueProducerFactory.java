@@ -109,7 +109,7 @@ public class KafkaMessageQueueProducerFactory implements MessageQueueProducerFac
 			return response.get(timeoutMillis, TimeUnit.MILLISECONDS);
 		} catch (Throwable e) {
 			throw new MessageQueueException(e);
-		}finally {}
+		}finally {producer.flush();}
 		// return producer.send(new ProducerRecord<String, String>(queueName,
 		// null != additional ? additional.toString() : null, message));
 	}
