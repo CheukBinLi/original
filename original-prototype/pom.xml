@@ -31,5 +31,6 @@
     <module>original-prototype.spring.cloud</module>
     <module>original-prototype-spring-boot</module>
     <module>original-prototype-classloader</module>
+    <module>original-prototype-ailbaba</module>
   </modules>
 </project>

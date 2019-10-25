@@ -23,7 +23,7 @@
 		<mybatis.version>3.4.1</mybatis.version>
 		<freemarker.version>2.3.23</freemarker.version>
 		<gson.version>2.6.2</gson.version>
-		<jedis.version>2.8.1</jedis.version>
+		<jedis.version>3.1.0</jedis.version>
 		<beetl.version>2.5.2</beetl.version>
 		<elasticsearch.version>5.1.1</elasticsearch.version>
 		<elasticsearch-mapper-attachments.version>3.1.2</elasticsearch-mapper-attachments.version>
@@ -36,11 +36,19 @@
 		<git.jar.path>d:/lib/maven</git.jar.path>
 		<jackson.version>2.9.6</jackson.version>
 	</properties>
-	<!-- <distributionManagement> <repository> <id>releases</id> <name>Local 
-		Nexus Repository</name> <url>http://nexus.juweitu.com:8081/content/repositories/releases/</url> 
-		</repository> <snapshotRepository> <id>Snapshots</id> <name>Local Nexus Repository</name> 
-		<url>http://nexus.juweitu.com:8081/content/repositories/snapshots/</url> 
-		</snapshotRepository> </distributionManagement> -->
+
+	<distributionManagement>
+		<repository>
+			<id>eva-releases</id>
+			<name>Nexus Repository</name>
+			<url>http://10.10.171.169:65116/repository/bgyfw/</url>
+		</repository>
+		<snapshotRepository>
+			<id>eva-snapshots</id>
+			<name>Nexus Repository</name>
+			<url>http://10.10.171.169:65116/repository/eva/</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -86,12 +94,14 @@
 			<module>original-session</module> <module>original-test</module> <module>original-web</module> 
 			<module>original-web-common</module> <module>original-prototype</module> 
 			<module>original-anything-test</module> <module>original-configuration</module> -->
-		<module>original-rmi</module>
+		<!-- <module>original-rmi</module> -->
 		<!-- <module>original-registration-center</module> -->
-		<module>original-oauth</module>
+<!-- 		<module>original-oauth</module>
 		<module>original-oauth-web</module>
 		<module>original-qrcode</module>
-		<module>original-spring-plugin</module>
+		<module>original-spring-plugin</module> -->
+		<module>original-common</module>
+		<module>original-cache</module>
 	</modules>
 
 	<build>
@@ -105,14 +115,15 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<plugin>
+			<!-- 目录复制 -->
+<!-- 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<version>2.8.1</version>
 				<configuration>
 					<altDeploymentRepository>internal.repo::default::file://${git.jar.path}</altDeploymentRepository>
-					<!-- <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository> -->
+					<altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
 				</configuration>
-			</plugin>
+			</plugin> -->
 			<!-- <plugin> <groupId>com.github.github</groupId> <artifactId>site-maven-plugin</artifactId> 
 				<version>0.12</version> <configuration> <message>Maven artifacts for ${project.version}</message> 
 				<noJekyll>true</noJekyll> <outputDirectory>${git.jar.path}</outputDirectory> 

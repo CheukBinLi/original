@@ -24,11 +24,13 @@
 			<groupId>org.apache.curator</groupId>
 			<artifactId>curator-framework</artifactId>
 			<version>${org.apache.curator.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.curator</groupId>
 			<artifactId>curator-recipes</artifactId>
 			<version>${org.apache.curator.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- consul -->
