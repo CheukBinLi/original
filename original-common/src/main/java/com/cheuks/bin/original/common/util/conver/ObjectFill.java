@@ -243,7 +243,7 @@ public class ObjectFill {
 		default T after(T t){ return t; }
     }
 	
-	public <S,T> List<T> xcopy(final List<S> sources, final Class<T> target, Process<T,S> process, boolean notNull, boolean notTransient, String... ignores) throws Exception {
+	public static <S,T> List<T> xcopy(final List<S> sources, final Class<T> target, Process<T,S> process, boolean notNull, boolean notTransient, String... ignores) throws Exception {
 
 		if (CollectionUtil.isEmpty(sources) || null == target)
 			return null;
@@ -251,7 +251,7 @@ public class ObjectFill {
 		if (a.isMapOrSetOrCollection() || a.isArrays() || a.isBasicOrArrays())
 			return null;
 
-		final ClassInfo b = ClassInfo.getClassInfo(target.getClass());
+		final ClassInfo b = ClassInfo.getClassInfo(target);
 		if (b.isMapOrSetOrCollection() || b.isArrays() || b.isBasicOrArrays())
 			return null;
 		if (null == a.getFields())
