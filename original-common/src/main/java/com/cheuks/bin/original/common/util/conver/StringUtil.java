@@ -294,15 +294,17 @@ public class StringUtil extends ConverType {
 	 * @param str
 	 * @return
 	 */
-	public static String assemble(String coupler, String... str) {
-		if (StringUtil.isAllBlank(str))
+	public static String assemble(String coupler, Object... str) {
+		if (null == str || str.length < 1)
 			return null;
 		coupler = isEmpty(coupler, EMPTY);
 		StringBuilder result = new StringBuilder();
-		for (String item : str) {
-			if (isEmpty(item))
+		String value;
+		for (Object item : str) {
+			if (null == item || isEmpty(value = item.toString())) {
 				continue;
-			result.append(coupler).append(item);
+			}
+			result.append(coupler).append(value);
 		}
 		return result.substring(coupler.length());
 	}
