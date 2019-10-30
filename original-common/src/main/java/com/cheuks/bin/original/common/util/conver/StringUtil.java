@@ -294,17 +294,31 @@ public class StringUtil extends ConverType {
 	 * @param str
 	 * @return
 	 */
-	public static String assemble(String coupler, Object... str) {
+	public static String assemble(String coupler, String... str) {
 		if (null == str || str.length < 1)
 			return null;
 		coupler = isEmpty(coupler, EMPTY);
 		StringBuilder result = new StringBuilder();
 		String value;
-		for (Object item : str) {
-			if (null == item || isEmpty(value = item.toString())) {
+		for (String item : str) {
+			if (null == item || isEmpty(value = item)) {
 				continue;
 			}
 			result.append(coupler).append(value);
+		}
+		return result.substring(coupler.length());
+	}
+
+	public static String assemble(String coupler, Long... values) {
+		if (null == values || values.length < 1)
+			return null;
+		coupler = isEmpty(coupler, EMPTY);
+		StringBuilder result = new StringBuilder();
+		for (Long item : values) {
+			if (null == item) {
+				continue;
+			}
+			result.append(coupler).append(Long.toString(item));
 		}
 		return result.substring(coupler.length());
 	}
