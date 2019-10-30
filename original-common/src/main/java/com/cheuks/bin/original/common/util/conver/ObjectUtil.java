@@ -38,7 +38,7 @@ public class ObjectUtil {
         return false;
     }
 
-    public static boolean equals(int target, Integer... params) {
+    public static boolean equalsInt(int target, Integer... params) {
         if (null == params)
             return false;
         for (int item : params) {
