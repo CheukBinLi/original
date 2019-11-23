@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,8 @@ public class JedisClusterFactory extends AbstractJedisCluster<JedisCluster> {
 	private int soTimeOut = 500;
 
 	private int connectionTimeout = 30000;
+
+	private String password = "";
 
 	private int maxRedirections = 8;// 最大重定向
 	// private String serverList;
@@ -68,10 +71,9 @@ public class JedisClusterFactory extends AbstractJedisCluster<JedisCluster> {
 			split = ip.nextToken().split(":");
 			if (null == split || split.length < 2)
 				continue;
-			hosts.add(new HostAndPort(split[0], Integer.valueOf(split[1])));
+			hosts.add(new HostAndPort(split[0].trim(), Integer.valueOf(split[1].trim())));
 		}
-
-		jedisCluster = new JedisCluster(hosts, getConnectionTimeout(), soTimeOut, maxRedirections, config);
+		jedisCluster = new JedisCluster(this.hosts, getConnectionTimeout(), this.soTimeOut, this.maxRedirections, this.password, this.config);
 		if (null == getCacheSerialize())
 			// setCacheSerialize(new DefaultCacheSerialize());
 			setCacheSerialize(new KryoCacheSerialize());
@@ -176,7 +178,7 @@ public class JedisClusterFactory extends AbstractJedisCluster<JedisCluster> {
 	}
 
 	public void setPassword(String password) {
-		LOG.warn("cluster not support password auth");
+		this.password = password;
 	}
 
 	public void setPort(int port) {
