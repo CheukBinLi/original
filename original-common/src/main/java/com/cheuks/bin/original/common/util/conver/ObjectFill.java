@@ -4,6 +4,7 @@ import com.cheuks.bin.original.common.annotation.reflect.Alias;
 import com.cheuks.bin.original.common.util.reflection.ClassInfo;
 import com.cheuks.bin.original.common.util.reflection.FieldInfo;
 import com.cheuks.bin.original.common.util.reflection.ReflectionUtil;
+import com.cheuks.bin.original.common.util.reflection.Type;
 
 import java.lang.reflect.Field;
 import java.text.DateFormat;
@@ -17,11 +18,11 @@ public class ObjectFill {
 
 	protected final static Map<String, Map<String, Field>> FIELDS = new ConcurrentSkipListMap<String, Map<String, Field>>();
 
-	private static volatile SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private static volatile SimpleDateFormat dateFormatShort = new SimpleDateFormat("yyyy-MM-dd");
+	private static volatile SimpleDateFormat defaultDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static volatile SimpleDateFormat defaultDateFormatShort = new SimpleDateFormat("yyyy-MM-dd");
 
 	public ObjectFill setDateFormat(String format) {
-		dateFormat.applyPattern(format);
+		defaultDateFormat.applyPattern(format);
 		return this;
 	}
 
@@ -63,7 +64,15 @@ public class ObjectFill {
 		return objectToMap(o, withOutNull, useAlias, false, ignore);
 	}
 
-	public static final Map<String, Object> objectToMap(Object o, boolean withOutNull, boolean useAlias, boolean UnderscoreCamel, String... ignore)
+	public static final Map<String, String> objectToMapString(Object o, boolean withOutNull, boolean useAlias, String dateFormat, String... ignore) throws IllegalArgumentException, IllegalAccessException {
+		return castObject(objectToMap(o, withOutNull, useAlias, false, true, dateFormat, ignore));
+	}
+
+	public static final Map<String, Object> objectToMap(Object o, boolean withOutNull, boolean useAlias, boolean underscoreCamel, String... ignore) throws IllegalArgumentException, IllegalAccessException{
+		return objectToMap(o, withOutNull, useAlias, underscoreCamel, false, null, ignore);
+	}
+
+	public static final Map<String, Object> objectToMap(Object o, boolean withOutNull, boolean useAlias, boolean UnderscoreCamel, boolean toString, String dateFormat, String... ignore)
 			throws IllegalArgumentException, IllegalAccessException {
 		if (!FIELDS.containsKey(o.getClass().getName()))
 			scanClass(o.getClass());
@@ -76,6 +85,7 @@ public class ObjectFill {
 			ignoreField = new HashSet<String>(Arrays.asList(ignore));
 		}
 		Object value = null;
+		DateFormat currentDateFormat = StringUtil.isBlank(dateFormat) ? ObjectFill.defaultDateFormat : new SimpleDateFormat(dateFormat);
 		for (Entry<String, Field> en : fields.entrySet()) {
 			if ((null == (value = en.getValue().get(o)) && withOutNull) || null != ignoreField && ignoreField.contains(en.getKey())) {
 				continue;
@@ -90,6 +100,13 @@ public class ObjectFill {
 				}
 			} else {
 				name = en.getKey();
+			}
+			if (toString) {
+				if (value instanceof Date) {
+					value = currentDateFormat.format((Date) value);
+				} else {
+					Type.valueToString(value, null, ClassInfo.getClassInfo(value.getClass()), null, false);
+				}
 			}
 			result.put(UnderscoreCamel ? StringUtil.toLowerCaseUnderscoreCamel(name) : name, value);
 		}
@@ -214,13 +231,13 @@ public class ObjectFill {
 			if (null != dateFormat)
 				result = dateFormat.parse(date);
 			else
-				result = ObjectFill.dateFormat.parse(date);
+				result = ObjectFill.defaultDateFormat.parse(date);
 		} catch (ParseException e) {
 			try {
 				if (null != dateFormat)
-					result = ObjectFill.dateFormat.parse(date);
+					result = ObjectFill.defaultDateFormat.parse(date);
 				else
-					result = ObjectFill.dateFormatShort.parse(date);
+					result = ObjectFill.defaultDateFormatShort.parse(date);
 			} catch (ParseException e1) {
 				return null;
 			}
@@ -229,7 +246,7 @@ public class ObjectFill {
 	}
 
 	public Object getValue(Class<?> c, Object data) {
-		return getValue(c, data, dateFormat);
+		return getValue(c, data, defaultDateFormat);
 	}
 
 	private static String getFirstValue(boolean isArray, Object data) {
@@ -348,5 +365,8 @@ public class ObjectFill {
 
 		return t;
 	}
-	
+
+	static <T> T castObject(Object obj) {
+		return (T) obj;
+	}
 }
