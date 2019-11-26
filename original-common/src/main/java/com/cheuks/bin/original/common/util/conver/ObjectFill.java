@@ -366,6 +366,7 @@ public class ObjectFill {
 		return t;
 	}
 
+	@SuppressWarnings("unchecked")
 	static <T> T castObject(Object obj) {
 		return (T) obj;
 	}
