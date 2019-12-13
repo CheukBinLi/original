@@ -228,8 +228,8 @@ public class StringUtil extends ConverType {
 	 * 向右补位
 	 * 
 	 * @param content
-	 * @param ch补位字符
-	 * @param len位数
+	 * @param ch 补位字符
+	 * @param len 位数
 	 * @return
 	 */
 	public static String fillPositionRight(String content, char ch, int len) {
@@ -306,7 +306,7 @@ public class StringUtil extends ConverType {
 			}
 			result.append(coupler).append(value);
 		}
-		return result.substring(coupler.length());
+		return result.length() > 0 ? result.substring(coupler.length()) : null;
 	}
 
 	public static String assemble(String coupler, Long... values) {
@@ -320,7 +320,7 @@ public class StringUtil extends ConverType {
 			}
 			result.append(coupler).append(Long.toString(item));
 		}
-		return result.substring(coupler.length());
+		return result.length() > 0 ? result.substring(coupler.length()) : null;
 	}
 
 	/***
@@ -345,7 +345,7 @@ public class StringUtil extends ConverType {
 		for (Entry<Object, Object> en : param.entrySet()) {
 			result.append(variableCoupler).append(en.getKey()).append(valueCoupler).append(en.getValue());
 		}
-		return result.substring(variableCoupler.length());
+		return result.length() > 0 ? result.substring(variableCoupler.length()) : null;
 	}
 
 	public static String getParent(String path, Character separator) {

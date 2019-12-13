@@ -54,6 +54,10 @@ public class ScanSimple extends AbstractScan {
 	}
 
 	public final Map<String, Set<String>> doScan(String path) throws IOException, InterruptedException, ExecutionException {
+		return doScan(null, path);
+	}
+
+	public final Map<String, Set<String>> doScan(ClassLoader classLoader, String path) throws IOException, InterruptedException, ExecutionException {
 		if (LOG.isDebugEnabled())
 			LOG.debug("scan start...");
 		Map<String, Set<String>> result = new HashMap<String, Set<String>>();
@@ -67,7 +71,7 @@ public class ScanSimple extends AbstractScan {
 		String[] fullPaths = paths;
 		// 后期换并发模式
 		for (int i = 0, len = paths.length; i < len; i++) {
-			Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(paths[i].contains("*") ? paths[i].split("/")[0] : paths[i]);
+			Enumeration<URL> urls = (null == classLoader ? Thread.currentThread().getContextClassLoader() : classLoader).getResources(paths[i].contains("*") ? paths[i].split("/")[0] : paths[i]);
 			Set<URL> scanResult = new LinkedHashSet<URL>();
 			while (urls.hasMoreElements()) {
 				scanResult.add(urls.nextElement());

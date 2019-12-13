@@ -105,7 +105,7 @@ public class ObjectFill {
 				if (value instanceof Date) {
 					value = currentDateFormat.format((Date) value);
 				} else {
-					Type.valueToString(value, null, ClassInfo.getClassInfo(value.getClass()), null, false);
+					Type.valueToString(value, null, ClassInfo.getClassInfo(en.getValue().getType()), null, false);
 				}
 			}
 			result.put(UnderscoreCamel ? StringUtil.toLowerCaseUnderscoreCamel(name) : name, value);

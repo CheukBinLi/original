@@ -1,10 +1,14 @@
 package com.cheuks.bin.original.common.util.reflection;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLDecoder;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -43,6 +47,20 @@ public class ClassLoaderUtil {
 	}
 
 	private static final Set<String> PROTOCOLS = new HashSet<>(Arrays.asList("http", "https", "file"));
+
+	public static ClassLoader createClassLoaderByFile(ClassLoader parentClassLoader, String jarFilePatch) throws Exception {
+
+		final Set<URL> jars = new HashSet<>();
+
+		Files.walkFileTree(Paths.get(jarFilePatch), new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				jars.add(file.toFile().toURL());
+				return super.visitFile(file, attrs);
+			}
+		});
+		return createClassLoader(parentClassLoader, jars.toArray(new URL[0]));
+	}
 
 	public static ClassLoader createClassLoader(ClassLoader parentClassLoader, URL... jars) throws Exception {
 		if (null != jars)
@@ -110,7 +128,7 @@ public class ClassLoaderUtil {
 
 	@SuppressWarnings({"unused", "static-access", "unchecked", "rawtypes", "deprecation"})
 	public static void main(String[] args) throws CacheException, Exception {
-
+			System.out.printf(URLDecoder.decode("https%3A%2F%2Fai-test.bgyfw.com%3A55871%2Failogic"));
 		ClassLoader x = new ClassLoader() {
 		};
 		System.err.println(System.getProperty("java.class.path"));
