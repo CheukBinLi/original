@@ -1,12 +1,5 @@
 package com.cheuks.bin.original.rmi.config;
 
-import java.net.InetAddress;
-
-import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import com.cheuks.bin.original.cache.FstCacheSerialize;
 import com.cheuks.bin.original.common.rmi.RmiContant;
 import com.cheuks.bin.original.common.util.conver.CollectionUtil;
@@ -15,9 +8,13 @@ import com.cheuks.bin.original.rmi.config.ReferenceGroupConfig.ReferenceGroup;
 import com.cheuks.bin.original.rmi.config.ServiceGroupConfig.ServiceGroup;
 import com.cheuks.bin.original.rmi.config.model.ProtocolModel;
 import com.cheuks.bin.original.rmi.config.model.RegistryModel;
-import com.cheuks.bin.original.rmi.net.ConsulLoadBalanceFactory;
 import com.cheuks.bin.original.rmi.net.P2pLoadBalanceFactory;
-import com.cheuks.bin.original.rmi.net.ZookeeperLoadBalanceFactory;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.net.InetAddress;
 
 public class RmiConfig extends AbstractConfig implements RmiContant {
 
@@ -55,17 +52,23 @@ public class RmiConfig extends AbstractConfig implements RmiContant {
 			String address = rmiConfigGroup.getRegistryModel().getServerAddress();
 			String[] addresses;
 			Class<?> loadBalanceFactory = null;
-			if (address.contains("://")) {
-				addresses = address.split("://");
-				if ("zookeeper".equals(addresses[0].toLowerCase())) {
-					loadBalanceFactory = ZookeeperLoadBalanceFactory.class;
-				} else if ("consul".equals(addresses[0].toLowerCase())) {
-					loadBalanceFactory = ConsulLoadBalanceFactory.class;
-				} else if ("p2p".equals(addresses[0].toLowerCase())) {
+			try {
+				if (address.contains("://")) {
+					addresses = address.split("://");
+					if ("zookeeper".equals(addresses[0].toLowerCase())) {
+						loadBalanceFactory = this.getClass().getClassLoader().loadClass("com.cheuks.bin.original.registration.center.loadbalance.ZookeeperLoadBalanceFactory");
+//					loadBalanceFactory = ZookeeperLoadBalanceFactory.class;
+					} else if ("consul".equals(addresses[0].toLowerCase())) {
+						loadBalanceFactory = this.getClass().getClassLoader().loadClass("com.cheuks.bin.original.registration.center.loadbalance.ConsulLoadBalanceFactory");
+//						loadBalanceFactory = ConsulLoadBalanceFactory.class;
+					} else if ("p2p".equals(addresses[0].toLowerCase())) {
+						loadBalanceFactory = P2pLoadBalanceFactory.class;
+					}
+					address = addresses[1];
+				} else {
 					loadBalanceFactory = P2pLoadBalanceFactory.class;
 				}
-				address = addresses[1];
-			} else {
+			} catch (ClassNotFoundException e) {
 				loadBalanceFactory = P2pLoadBalanceFactory.class;
 			}
 			//
