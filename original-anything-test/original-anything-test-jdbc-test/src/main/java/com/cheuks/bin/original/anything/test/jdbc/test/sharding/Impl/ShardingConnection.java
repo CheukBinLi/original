@@ -1,11 +1,11 @@
 package com.cheuks.bin.original.anything.test.jdbc.test.sharding.Impl;
 
+import com.cheuks.bin.original.anything.test.jdbc.test.sharding.AbstractConnection;
+
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import com.cheuks.bin.original.anything.test.jdbc.test.sharding.AbstractConnection;
 
 public class ShardingConnection extends AbstractConnection {
 

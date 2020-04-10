@@ -1,13 +1,11 @@
 package com.cheuks.bin.original.anything.test.x.to.html.itext;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-
 import com.itextpdf.text.Document;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.tool.xml.XMLWorkerFontProvider;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
+
+import java.io.FileOutputStream;
 
 public class T1 {
 	public static void main(String[] args) {

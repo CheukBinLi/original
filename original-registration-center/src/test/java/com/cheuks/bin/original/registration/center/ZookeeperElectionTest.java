@@ -1,8 +1,8 @@
 package com.cheuks.bin.original.registration.center;
 
-import java.util.concurrent.CountDownLatch;
-
 import com.cheuks.bin.original.common.registrationcenter.ElectionCallBack;
+
+import java.util.concurrent.CountDownLatch;
 
 public class ZookeeperElectionTest {
 

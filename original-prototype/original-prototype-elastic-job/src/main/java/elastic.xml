@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:reg="http://www.dangdang.com/schema/ddframe/reg" xmlns:job="http://www.dangdang.com/schema/ddframe/job"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:reg="http://www.dangdang.com/schema/ddframe/reg" xmlns:job="http://www.dangdang.com/schema/ddframe/job"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
                         http://www.springframework.org/schema/beans/spring-beans.xsd  
                         http://www.dangdang.com/schema/ddframe/reg  
                         http://www.dangdang.com/schema/ddframe/reg/reg.xsd  
                         http://www.dangdang.com/schema/ddframe/job  
                         http://www.dangdang.com/schema/ddframe/job/job.xsd">
-	<!--配置作业注册中心 -->
-	<reg:zookeeper id="regCenter1" server-lists="10.73.18.102:2181" namespace="dd-job" base-sleep-time-milliseconds="100" max-sleep-time-milliseconds="300" max-retries="3" />
-	<!-- <reg:zookeeper id="regCenter" server-lists="10.73.18.100:2181" namespace="dd-job" base-sleep-time-milliseconds="1000" max-sleep-time-milliseconds="3000" max-retries="20" /> -->
+    <!--配置作业注册中心 -->
+    <reg:zookeeper id="regCenter1" server-lists="10.73.18.102:2181" namespace="dd-job"
+                   base-sleep-time-milliseconds="100" max-sleep-time-milliseconds="300" max-retries="3"/>
+    <!-- <reg:zookeeper id="regCenter" server-lists="10.73.18.100:2181" namespace="dd-job" base-sleep-time-milliseconds="1000" max-sleep-time-milliseconds="3000" max-retries="20" /> -->
 
-	<!-- 配置作业 -->
-	<!-- <job:simple id="mySimpleJob" class="com.cheuks.bin.original.prototype.elastic.job.T1Job" registry-center-ref="regCenter1" sharding-total-count="10" cron="0 0/2 * * * ? *" overwrite="true" /> -->
-	<!-- <job:dataflow id="my1" class="com.cheuks.bin.original.prototype.elastic.job.dataflow.SimpleDataFlowJob" registry-center-ref="regCenter1" sharding-total-count="10" cron="0 59 * * * ? *" streaming-process="true" overwrite="true" /> -->
-	<job:dataflow id="my1" class="com.cheuks.bin.original.prototype.elastic.job.dataflow.SimpleDataFlowJob" registry-center-ref="regCenter1" sharding-total-count="10" cron="0 0/2 * * * ? *" streaming-process="true" overwrite="true" />
+    <!-- 配置作业 -->
+    <!-- <job:simple id="mySimpleJob" class="com.cheuks.bin.original.prototype.elastic.job.T1Job" registry-center-ref="regCenter1" sharding-total-count="10" cron="0 0/2 * * * ? *" overwrite="true" /> -->
+    <!-- <job:dataflow id="my1" class="com.cheuks.bin.original.prototype.elastic.job.dataflow.SimpleDataFlowJob" registry-center-ref="regCenter1" sharding-total-count="10" cron="0 59 * * * ? *" streaming-process="true" overwrite="true" /> -->
+    <job:dataflow id="my1" class="com.cheuks.bin.original.prototype.elastic.job.dataflow.SimpleDataFlowJob"
+                  registry-center-ref="regCenter1" sharding-total-count="10" cron="0 0/2 * * * ? *"
+                  streaming-process="true" overwrite="true"/>
 
 </beans>  

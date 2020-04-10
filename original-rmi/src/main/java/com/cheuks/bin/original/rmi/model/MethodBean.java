@@ -1,10 +1,10 @@
 package com.cheuks.bin.original.rmi.model;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-
 import com.cheuks.bin.original.common.rmi.model.ClassBean;
 import com.cheuks.bin.original.rmi.unit.Reflection;
+
+import java.io.Serializable;
+import java.lang.reflect.Method;
 
 public class MethodBean extends com.cheuks.bin.original.common.rmi.model.MethodBean implements Serializable {
 

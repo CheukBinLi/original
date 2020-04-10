@@ -1,16 +1,9 @@
 package com.cheuks.bin.original.oauth.web;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-
+import com.cheuks.bin.original.common.util.conver.StringUtil;
+import com.cheuks.bin.original.oauth.model.AuthResource;
+import com.cheuks.bin.original.oauth.security.OauthFilterInvocationSecurityMetadataSource;
+import com.cheuks.bin.original.oauth.security.token.TokenManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.AntPathMatcher;
@@ -18,10 +11,9 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.cheuks.bin.original.common.util.conver.StringUtil;
-import com.cheuks.bin.original.oauth.model.AuthResource;
-import com.cheuks.bin.original.oauth.security.OauthFilterInvocationSecurityMetadataSource;
-import com.cheuks.bin.original.oauth.security.token.TokenManager;
+import javax.annotation.PostConstruct;
+import java.util.*;
+import java.util.Map.Entry;
 
 @SuppressWarnings("unused")
 @Configuration

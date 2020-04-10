@@ -1,22 +1,20 @@
 package com.cheuks.bin.original.rmi.net.netty.client;
 
-import java.net.InetSocketAddress;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.cheuks.bin.original.common.rmi.model.TransmissionModel;
 import com.cheuks.bin.original.common.rmi.net.MessageHandle;
 import com.cheuks.bin.original.common.rmi.net.NetworkClient;
 import com.cheuks.bin.original.rmi.config.RmiConfig.RmiConfigGroup;
 import com.cheuks.bin.original.rmi.net.netty.message.NettyClientMessageHandleAdapter;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.ReferenceCountUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
 
 public class NettyClientHandle extends NettyClientMessageHandleAdapter<NettyClientHandle, TransmissionModel> {
 

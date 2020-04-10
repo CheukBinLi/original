@@ -11,26 +11,26 @@ import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperRegistryCenter;
 
 public class T2 {
 
-	public static void main(String[] args) {
-		JobScheduler scheduler = new JobScheduler(createRegistryCenter(), createJobConfiguration());
-		scheduler.init();
-	}
+    public static void main(String[] args) {
+        JobScheduler scheduler = new JobScheduler(createRegistryCenter(), createJobConfiguration());
+        scheduler.init();
+    }
 
-	private static CoordinatorRegistryCenter createRegistryCenter() {
-		CoordinatorRegistryCenter regCenter = new ZookeeperRegistryCenter(new ZookeeperConfiguration("localhost:2181", "big-one"));
-		regCenter.init();
-		return regCenter;
-	}
+    private static CoordinatorRegistryCenter createRegistryCenter() {
+        CoordinatorRegistryCenter regCenter = new ZookeeperRegistryCenter(new ZookeeperConfiguration("localhost:2181", "big-one"));
+        regCenter.init();
+        return regCenter;
+    }
 
-	private static LiteJobConfiguration createJobConfiguration() {
-		// 定义作业核心配置
-		JobCoreConfiguration simpleCoreConfig = JobCoreConfiguration.newBuilder("demoSimpleJob", "0/15 * * * * ?", 10).build();
-		// 定义SIMPLE类型配置
-		SimpleJobConfiguration simpleJobConfig = new SimpleJobConfiguration(simpleCoreConfig, T2_SimpleJob.class.getCanonicalName());
-		// 定义Lite作业根配置
-		LiteJobConfiguration config = LiteJobConfiguration.newBuilder(simpleJobConfig).build();
+    private static LiteJobConfiguration createJobConfiguration() {
+        // 定义作业核心配置
+        JobCoreConfiguration simpleCoreConfig = JobCoreConfiguration.newBuilder("demoSimpleJob", "0/15 * * * * ?", 10).build();
+        // 定义SIMPLE类型配置
+        SimpleJobConfiguration simpleJobConfig = new SimpleJobConfiguration(simpleCoreConfig, T2_SimpleJob.class.getCanonicalName());
+        // 定义Lite作业根配置
+        LiteJobConfiguration config = LiteJobConfiguration.newBuilder(simpleJobConfig).build();
 
-		return config;
-	}
+        return config;
+    }
 
 }
