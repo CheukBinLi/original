@@ -11,25 +11,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Granted implements GrantedAuthority {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private String authority;//权限
+    private String authority;//权限
 
-	@Override
-	public String getAuthority() {
-		return this.authority;
-	}
+    @Override
+    public String getAuthority() {
+        return this.authority;
+    }
 
-	@Override
-	public int hashCode() {
-		return this.authority.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return this.authority.hashCode();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (null == obj || !(obj instanceof Granted))
-			return false;
-		return this.authority.equals(((Granted) obj).authority);
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (null == obj || !(obj instanceof Granted))
+            return false;
+        return this.authority.equals(((Granted) obj).authority);
+    }
 
 }
