@@ -24,6 +24,7 @@
         <module>original-anything-test-x-to-html</module>
         <module>original-anything-test-jvm</module>
         <module>original-anything-test-shading-sphere</module>
+        <module>original-anything-test-mall-marketing</module>
     </modules>
     <dependencies>
         <dependency>
