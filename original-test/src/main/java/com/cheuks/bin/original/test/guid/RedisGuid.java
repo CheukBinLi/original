@@ -32,6 +32,19 @@ public class RedisGuid {
         final RedisLuaSimple redisLuaSimple = new RedisLuaSimple();
         redisLuaSimple.setRedisFactory(factory);
         redisLuaSimple.initLoader();
+
+//        System.out.println(factory.evalSha(redisLuaSimple.getSha("time"), 1
+//                , "ID_TEST"
+//                , "10010"
+//                , "APP"
+//                , "ORDER"
+//                , "1"
+////                                                , Math.floorDiv(System.currentTimeMillis(), 1000) + ""
+////                                                , time
+//        ));
+
+
+
         ExecutorService executorService = new ThreadPoolExecutor(100, 150,
                 0L, TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<>(10));
@@ -52,7 +65,8 @@ public class RedisGuid {
                                 @Override
                                 public void run() {
                                     try {
-                                        System.out.println(factory.evalSha(redisLuaSimple.getSha("time"), 1
+//                                        System.out.println(
+                                                factory.evalSha(redisLuaSimple.getSha("time"), 1
                                                 , "ID_TEST"
                                                 , "10010"
                                                 , "APP"
@@ -60,7 +74,8 @@ public class RedisGuid {
                                                 , "1"
 //                                                , Math.floorDiv(System.currentTimeMillis(), 1000) + ""
 //                                                , time
-                                        ));
+                                        );
+//                                        );
                                     } catch (RedisExcecption redisExcecption) {
                                         redisExcecption.printStackTrace();
                                     } finally {

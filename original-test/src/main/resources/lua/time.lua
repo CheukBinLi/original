@@ -10,11 +10,26 @@ local function floorMod(x, y)
     return x - floorDiv(x, y) * y;
 end
 
+local function getDayOfTime(time)
+    return floorMod(time, 86400);
+end
+
 local function getHour(dateTime)
     return math.floor(dateTime / 3600);
 end
 local function getSecond(dateTime)
     return math.floor(dateTime % 3600);
+end
+
+local function getTime()
+    local time = redis.call("GET", "TIME");
+    if ("false" == tostring(time)) then
+        redis.replicate_commands();
+        time = redis.call("TIME")[1];
+        local expire = 3600 - getSecond(getDayOfTime(time));
+        redis.call("SETEX", "TIME", expire, time);
+    end
+    return time;
 end
 
 local function getKey(sequenceKey, tenantKey, appKey, module)
@@ -34,8 +49,7 @@ local function incr(sequenceKey, tenantKey, appKey, module, year, days, hour, qu
 
     if (sequenceResult == quantity) then
         local randomSec = math.random(10, 60);
-        redis.call("EXPIRE", key, 3600 - elapsedTime + randomSec)
-        ;
+        redis.call("EXPIRE", key, 3600 - elapsedTime + randomSec);
     end
     return sequenceResult;
 end
@@ -55,9 +69,11 @@ local quantity = tonumber(ARGV[4]);
 --time zone
 local timeZone = 8 * 3600;
 --current time
-redis.replicate_commands()
-local time = tonumber(redis.call("TIME")[1]) + timeZone;
+
+--redis.replicate_commands()
+--local time = tonumber(redis.call("TIME")[1]) + timeZone;
 --local time =ARGV[5]
+local time = getTime();
 --daysz
 local days = { 1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 }
 --:year-benchmarkYear
@@ -70,7 +86,7 @@ local DAYS_0000_TO_1970 = (730485 - 10957);
 
 local epochDay = floorDiv(time, SECONDS_PER_DAY);
 
-local dayOfTime = floorMod(time, 86400);
+local dayOfTime = getDayOfTime(time);
 local hour = getHour(dayOfTime);
 local second = getSecond(dayOfTime);
 
