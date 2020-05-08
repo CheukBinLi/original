@@ -14,7 +14,7 @@ public class OauthAccessDecisionManager implements AccessDecisionManager {
 
     @Override
     public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
-        System.err.println("decide");
+//        System.err.println("decide");
 
         if (!CollectionUtil.isEmpty(configAttributes) && !CollectionUtil.isEmpty(authentication.getAuthorities())) {
             for (ConfigAttribute attribute : configAttributes) {

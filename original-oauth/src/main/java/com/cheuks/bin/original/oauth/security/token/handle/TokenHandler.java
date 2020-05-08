@@ -23,6 +23,18 @@ public interface TokenHandler extends Handler<String>, Constant {
         return 0;
     }
 
+    boolean isHead();
+
+    void setHead(boolean isHead);
+
+    boolean isEnd();
+
+    void setEnd(boolean isEnd);
+
+    TokenHandler getNext();
+
+    TokenHandler setNext(TokenHandler tokenHandler);
+
     /***
      * 加密密匙
      * @return

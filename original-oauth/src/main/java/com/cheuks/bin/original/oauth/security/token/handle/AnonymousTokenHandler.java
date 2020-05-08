@@ -62,7 +62,7 @@ public class AnonymousTokenHandler extends AbstractTokenHandler implements Token
 
     @Override
     public UserDetail login(String user, String pass, String verificationCode) throws Throwable {
-        return null;
+        return ANONYMOUS_USER_DETAIL;
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.cheuks.bin.original.spring.plugin.util.design.factory.DefaultHandlerM
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.core.Authentication;
 
 import javax.annotation.PostConstruct;
@@ -32,9 +33,15 @@ public class TokenManager extends DefaultHandlerManager<TokenHandler> implements
 
     protected Set<String> ignore;
 
-    protected LinkedList<TokenHandler> handers = null;
+    protected LinkedList<TokenHandler> handlers = null;
+
+    protected volatile TokenHandler head = null;
+
+    protected TokenHandler handler = null;
 
     protected FilterChain filterChain;
+
+    protected WebSecurity webSecurity;
 
     @Override
     public Class<TokenHandler> getSuperHandler() {
@@ -51,6 +58,8 @@ public class TokenManager extends DefaultHandlerManager<TokenHandler> implements
             }
         }
         ignore.addAll(Arrays.asList(url));
+        if (null != webSecurity)
+            webSecurity.ignoring().antMatchers(url);
         return this;
     }
 
@@ -111,7 +120,7 @@ public class TokenManager extends DefaultHandlerManager<TokenHandler> implements
     public void logout(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         String token = request.getHeader(AUTHORIZATION);
         if (StringUtil.isBlank(token)) {
-            (null == filterChain ? filterChain = new FilterChain() : filterChain).setHandlers(handers).doLogout(request, response, token);
+            (null == filterChain ? filterChain = new FilterChain() : filterChain).setHandler(head).doLogout(request, response, token);
             return;
         }
         TokenInfo info = analysisToken(token, getDelimiter());
@@ -123,7 +132,7 @@ public class TokenManager extends DefaultHandlerManager<TokenHandler> implements
             throw IgnoreException.getDefaultIgnoreException();
         String token = request.getHeader(AUTHORIZATION);
         if (StringUtil.isBlank(token)) {
-            return (null == filterChain ? filterChain = new FilterChain() : filterChain).setHandlers(handers).doAnalysis(request, response);
+            return (null == filterChain ? filterChain = new FilterChain() : filterChain).setHandler(head).doAnalysis(request, response);
         }
         TokenInfo info = analysisToken(token, getDelimiter());
         return getHandler(info.getType()).analysisToken(info, request, response);
@@ -143,13 +152,26 @@ public class TokenManager extends DefaultHandlerManager<TokenHandler> implements
     @PostConstruct
     public void init() {
         super.init();
-        handers = new LinkedList<TokenHandler>(POOL.values());
-        handers.sort(new Comparator<TokenHandler>() {
+        handlers = new LinkedList<TokenHandler>(POOL.values());
+        handlers.sort(new Comparator<TokenHandler>() {
             @Override
             public int compare(TokenHandler o1, TokenHandler o2) {
                 return o1.getOrder() > o2.getOrder() ? 0 : 1;
             }
         });
+        if (CollectionUtil.isEmpty(handlers))
+            return;
+        TokenHandler temp = null;
+        for (TokenHandler item : handlers) {
+            if (null != temp)
+                temp.setNext(item);
+            temp = item;
+        }
+        this.head = handlers.get(0);
+        this.head.setHead(true);
+
+        temp.setNext(this.head);
+        temp.setEnd(true);
     }
 
 }

@@ -103,12 +103,18 @@ public class WebSecurityConfigration extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         getLoginPageUrl(),
                         "/*.ico"
-                );
+                )
+        .antMatchers(getTokenManager().getIgnore().toArray(new String[0]));
+        getTokenManager().setWebSecurity(web);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        getFilterInvocationSecurityMetadataSource().append("/test/**", false, "ALL").append("/t/**", true, "ALL", "ANONYMOUS").append("/txxxxa/**/aax", false, "ALL", "ANONYMOUS").sort();
+//        getFilterInvocationSecurityMetadataSource()
+//                .append("/test/**", false, "ALL")
+//                .append("/t/**", true, "ALL", "ANONYMOUS")
+//                .append("/txxxxa/**/aax", false, "ALL", "ANONYMOUS")
+//                .sort();
 
         http
                 .addFilterBefore(new OauthBasicAuthenticationFilter(getTokenManager(), authenticationManager()), UsernamePasswordAuthenticationFilter.class)

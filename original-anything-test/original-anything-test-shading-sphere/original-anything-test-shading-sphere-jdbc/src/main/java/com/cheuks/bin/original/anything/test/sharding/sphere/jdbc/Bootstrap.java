@@ -1,5 +1,7 @@
 package com.cheuks.bin.original.anything.test.sharding.sphere.jdbc;
 
+import com.cheuks.bin.original.anything.test.sharding.sphere.jdbc.strategy.GoodShadingDatabaseStrategy;
+import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingAlgorithm;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -7,9 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
+import org.springframework.context.annotation.*;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /***
@@ -25,7 +25,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  *
  *
  */
-@ComponentScan({"com.cheuks.bin.original.anything.test.sharding.sphere.jdbc"})
+@Configuration
+@ComponentScan({"com.cheuks.bin.original.anything.test.sharding.sphere"})
 @PropertySources({@PropertySource("classpath:sharding-jdbc.properties")})
 @EnableConfigurationProperties
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
@@ -36,5 +37,11 @@ public class Bootstrap {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Bootstrap.class);
+    }
+
+    @Primary
+    @Bean("goodShadingDatabaseStrategy")
+    public ComplexKeysShardingAlgorithm createComplexKeysShardingAlgorithm() {
+        return new GoodShadingDatabaseStrategy();
     }
 }

@@ -1,12 +1,5 @@
 package com.cheuks.bin.original.test.consul;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-
 import com.google.common.net.HostAndPort;
 import com.orbitz.consul.AgentClient;
 import com.orbitz.consul.CatalogClient;
@@ -19,6 +12,12 @@ import com.orbitz.consul.model.catalog.ImmutableCatalogDeregistration;
 import com.orbitz.consul.model.catalog.ImmutableCatalogRegistration;
 import com.orbitz.consul.model.health.Node;
 import com.orbitz.consul.model.health.Service;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class T2 {
 

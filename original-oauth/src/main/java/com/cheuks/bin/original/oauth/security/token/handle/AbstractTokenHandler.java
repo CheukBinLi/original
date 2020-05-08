@@ -40,6 +40,20 @@ public abstract class AbstractTokenHandler implements TokenHandler, Constant {
     protected String secret = "@default_secret@";// 加密盐
     protected EncryptionType encryptionType = EncryptionType.HMAC256;
     protected long expireSeconds = 604800;// 7天过期
+    //    private TokenHandler head;
+    private TokenHandler next;
+    private boolean end, head = false;
+
+    @Override
+    public TokenHandler getNext() {
+        return this.next;
+    }
+
+    @Override
+    public TokenHandler setNext(TokenHandler tokenHandler) {
+        this.next = tokenHandler;
+        return this;
+    }
 
     /***
      * 登陆

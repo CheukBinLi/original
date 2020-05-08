@@ -1,6 +1,8 @@
 package com.cheuks.bin.original.anything.test.mall.marketing.A1_0;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,7 +22,25 @@ import java.util.Set;
 public class bootstrap {
 
     public static void main(String[] args) throws CloneNotSupportedException {
+        System.out.println(2024 & 3);
+        Date d = new Date(1410856598);
+        long time = Math.floorDiv(System.currentTimeMillis(), 1000) + 28800;
+        System.err.println(time % 86400);
+        System.err.println("Math.floorMod:" + Math.floorMod(time, 86400));
+        System.err.println(Math.floorMod(time, 86400) / 3600);
+        System.err.println((time % 86400) / 3600);
+        System.out.println(Long.MAX_VALUE);
+        System.out.println(Integer.MAX_VALUE);
+        System.err.println((time % 86400) % 3600);
+        System.err.println(3600 - ((time % 86400) % 3600));
+        System.err.println((3600 - ((time % 86400) % 3600)) / 60);
 
+        LocalDateTime a = LocalDateTime.now();
+        int year = a.getDayOfYear();
+        int year1 = a.getYear();
+        a.getHour();
+        a.getDayOfYear();
+        d.getYear();
         ActivityFactory factory = new ActivityFactory();
 
         Goods testProduct;

@@ -1,0 +1,4 @@
+mybatis:
+  configuration:
+    cache-enabled: true
+#  mapper-locations: com.cheuks.bin.original.anything.test.sharding.sphere.jdbc.dao

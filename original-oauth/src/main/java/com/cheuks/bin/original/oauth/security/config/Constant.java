@@ -22,7 +22,9 @@ public interface Constant {
     String LOGIN_SOURCE = "source";
 
     UserDetail ANONYMOUS_USER_DETAIL = new UserDetail(
-            new User().setRoles(
+            new User()
+                    .setUserName("ANONYMOUS")
+                    .setRoles(
                     new Role().appendGranted(ANONYMOUS)
             ), SignUtil.generateNonceStr(10));
 
