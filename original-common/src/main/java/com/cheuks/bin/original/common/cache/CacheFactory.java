@@ -5,7 +5,7 @@ import java.util.Set;
 
 /***
  * 缓存接口
- * 
+ *
  * @author ben
  *
  * @param <K>
@@ -13,18 +13,26 @@ import java.util.Set;
  */
 public interface CacheFactory<K, V> {
 
-	/** 取出 */
-	public V take(K key) throws CacheException;
+    /**
+     * 取出
+     */
+    V take(K key) throws CacheException;
 
-	public V put(K key, V value) throws CacheException;
+    V put(K key, V value) throws CacheException;
 
-	public V remove(K key) throws CacheException;
+    V remove(K key) throws CacheException;
 
-	public void scriptClear() throws CacheException;
+    void scriptClear() throws CacheException;
 
-	public int size() throws CacheException;
+    int size() throws CacheException;
 
-	public Set<K> keys() throws CacheException;
+    Set<K> keys() throws CacheException;
 
-	public Collection<V> values() throws CacheException;
+    Collection<V> values() throws CacheException;
+
+    default void dectory() {
+    }
+
+    default void init() {
+    }
 }
