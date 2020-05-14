@@ -26,6 +26,8 @@ public class User implements Serializable {
     private int status;
     private long expired;
     private String source;// 来源
+    private String grantType;//授权方式
+    private String redirectUri;//网页授权，地址重定向
 
     private Role roles;
 

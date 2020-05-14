@@ -90,6 +90,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 throw new UsernameNotFoundException("password can't be null");
             if (StringUtil.isEmpty(user.getSource()))
                 throw new UsernameNotFoundException("source can't be null");
+            if (StringUtil.isEmpty(user.getGrantType()))
+                throw new UsernameNotFoundException("grantType can't be null");
             return authenticationManager.authenticate(new OauthAuthenticationToken(new UserDetail(user, "123"), response));
         } catch (Exception e) {
             getResultFactory().create(e);
