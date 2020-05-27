@@ -12,6 +12,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 public interface Constant {
+	
+	enum GrantType{
+		PASSWORD
+	}
 
     String AUTHORIZATION = "Authorization";
 

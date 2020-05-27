@@ -84,9 +84,9 @@ public class TokenManager extends DefaultHandlerManager<TokenHandler> implements
      *            来源应用
      * @return
      */
-    public static User buildGuestUserInfo(String tenant, String source) {
-        return new User("0", "GUEST", ANONYMOUS, tenant, 0, Long.MAX_VALUE, source, new Role().appendGranted(ANONYMOUS));
-    }
+	public static User buildGuestUserInfo(String tenant, String source) {
+		return new User("0", "GUEST", ANONYMOUS, tenant, 0, Long.MAX_VALUE, source, GrantType.PASSWORD.name(), null, new Role().appendGranted(ANONYMOUS));
+	}
 
     public static AuthInfo buildGuestAuthInfo(String tenant, String source) {
         return new AuthInfo().setId("0").setRole(CollectionUtil.setBuilder(false).append(ANONYMOUS).build());

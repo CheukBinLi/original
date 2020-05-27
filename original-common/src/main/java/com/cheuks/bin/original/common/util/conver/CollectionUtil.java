@@ -69,6 +69,21 @@ public class CollectionUtil {
 		}
 		return result;
 	}
+	
+	@SafeVarargs
+	public static <T> Collection<T> collageCollection(Collection<T>... arrays) {
+		Collection result = null;
+		for (Collection item : arrays) {
+			if (null == item || item.size() < 1) {
+				continue;
+			}
+			if (null == result) {
+				result = item;
+			}
+			result.addAll(item);
+		}
+		return result;
+	}
 
 	public static boolean isNotEmpty(Collection<?> collection) {
 		return !isEmpty(collection);
