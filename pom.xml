@@ -100,8 +100,8 @@
         <module>original-registration-center</module>
         		<module>original-oauth</module>
                 <module>original-oauth-web</module>
-        <!--        <module>original-qrcode</module>
-               <module>original-spring-plugin</module> -->
+                <module>original-qrcode</module>
+        <!--       <module>original-spring-plugin</module> -->
         <module>original-test</module>
         <module>original-prototype</module>
         <module>original-common</module>
