@@ -31,7 +31,7 @@
 		<com.cheuks.bin.version>0.0.1-SNAPSHOT</com.cheuks.bin.version>
 		<c3p0.version>0.9.1.2</c3p0.version>
 		<!-- <mysql-connector-java.version>5.0.8</mysql-connector-java.version> -->
-		<mysql-connector-java.version>6.0.4</mysql-connector-java.version>
+		<mysql-connector-java.version>8.0.16</mysql-connector-java.version>
 		<druid.version>1.0.26</druid.version>
 		<freemarker.version>2.3.23</freemarker.version>
 		<ehcache.version>2.6.11</ehcache.version>
