@@ -35,7 +35,7 @@
 		<druid.version>1.0.26</druid.version>
 		<freemarker.version>2.3.23</freemarker.version>
 		<ehcache.version>2.6.11</ehcache.version>
-		<commons-io.version>2.5</commons-io.version>
+		<commons-io.version>2.7</commons-io.version>
 		<com.liferay.org.apache.commons.fileupload.version>6.2.0.1</com.liferay.org.apache.commons.fileupload.version>
 		<httpcore.version>4.4.4</httpcore.version>
 		<httpclient.version>4.5.2</httpclient.version>
